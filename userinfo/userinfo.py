@@ -204,19 +204,13 @@ class UserInfo(commands.Cog):
                                      value=box("{} ({}j)".format(recorded.strftime("%d/%m/%Y"),
                                                                  (datetime.now() - recorded).days)))
 
-                    on_fire, last_seen = userinfo['on_fire']['cons_days'], userinfo['on_fire']['last_seen']
-                    last_seen = datetime.strptime(last_seen, '%Y.%m.%d').strftime('%d/%m/%Y')
-                    if last_seen:
-                        last_seen = datetime.strptime(last_seen, '%Y.%m.%d').strftime('%d/%m/%Y')
-                    else:
-                        last_seen = "0"
+                    on_fire, last_seen_data = userinfo['on_fire']['cons_days'], userinfo['on_fire']['last_seen']
+                    last_seen = datetime.strptime(last_seen_data, '%Y.%m.%d').strftime('%d/%m/%Y') if last_seen_data else "Jamais"
                     em.add_field(name='Dernier message', value=box(f"{last_seen} [🔥X]"))
                 else:
-                    on_fire, last_seen = userinfo['on_fire']['cons_days'], userinfo['on_fire']['last_seen']
-                    if last_seen:
-                        last_seen = datetime.strptime(last_seen, '%Y.%m.%d').strftime('%d/%m/%Y')
-                    else:
-                        last_seen = "0"
+                    on_fire, last_seen_data = userinfo['on_fire']['cons_days'], userinfo['on_fire']['last_seen']
+                    last_seen = datetime.strptime(last_seen_data, '%Y.%m.%d').strftime(
+                        '%d/%m/%Y') if last_seen_data else "Jamais"
 
                     em = discord.Embed(title=title, description=get_status_string(user), color=embed_color)
                     em.add_field(name='Création',
