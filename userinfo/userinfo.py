@@ -153,7 +153,7 @@ class UserInfo(commands.Cog):
 
     @user_card_commands.command(name='get')
     @commands.bot_has_permissions(embed_links=True, manage_messages=True)
-    async def display_user_card(self, ctx, user: Union[discord.Member, discord.User] = None):
+    async def display_user_card(self, ctx, user: discord.User = None):
         """Afficher un récapitulatif des informations d'un membre sous forme de carte de membre"""
         menu = None
         page = '📊'
