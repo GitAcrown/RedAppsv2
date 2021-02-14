@@ -5,7 +5,7 @@ from typing import Union
 
 import discord
 import logging
-from redbot.core import Config, commands
+from redbot.core import Config, commands, checks
 from redbot.core.utils.chat_formatting import box
 from redbot.core.utils.menus import start_adding_reactions
 from tabulate import tabulate
@@ -136,6 +136,8 @@ class UserInfo(commands.Cog):
         default_guild = {'user_records': {}}
         self.config.register_member(**default_member)
         self.config.register_guild(**default_guild)
+
+        self.update_adv = {}
 
     async def append_logs(self, user: discord.Member, desc: str):
         member = self.config.member(user)
@@ -320,7 +322,55 @@ class UserInfo(commands.Cog):
             await self.config.member(ctx.author).bio.set("")
             await ctx.send("**Bio supprimée** › Votre bio a été réinitialisée")
 
-    @commands.Cog.listener()
+    @commands.command(name="updateall")
+    @checks.mod_or_permissions(administrator=True)
+    @commands.bot_has_permissions(read_message_history=True)
+    @commands.max_concurrency(1, commands.BucketType.guild)
+    async def update_card_stats(self, ctx, days: int = 0):
+        """Met à jour, du mieux que possible, les statistiques des membres rétroactivement (sur ce salon uniquement)
+
+        <days> = Nombre de jours à regarder, par défaut tout ceux accessible (0)"""
+        after = None
+        members = {}
+        await ctx.send(
+            "📈 **Mise à jour des stats.** • Ce processus peut mettre plusieurs heures si le volume de messages est important (> 1 million)")
+        if days > 0:
+            after = datetime.today() - timedelta(days=days)
+        self.update_adv[ctx.channel.id] = 0
+        try:
+            async for message in ctx.channel.history(limit=None, after=after, oldest_first=True):
+                try:
+                    author = message.author
+                    if author.id not in members:
+                        members[author.id] = message.created_at.timestamp()
+                except:
+                    pass
+                self.update_adv[ctx.channel.id] += 1
+
+        except discord.Forbidden:
+            return await ctx.send("Je n'ai pas accès à tous les messages demandés")
+        except discord.HTTPException:
+            return await ctx.send("Une erreur Discord m'empêche de continuer la mise à jour des statistiques")
+
+        if members:
+            records = await self.config.guild(ctx.guild).user_records()
+            for member in members:
+                records[member] = members[member]
+            await self.config.guild(ctx.guild).user_records.set(records)
+            await ctx.send("📈 **Mise à jour des stats.** • Réussie")
+        else:
+            await ctx.send("📈 **Mise à jour des stats.** • Echec (aucune donnée n'a été traitée)")
+
+    @commands.command(name="updateallinfo")
+    async def update_stats_info(self, ctx):
+        """Affiche des infos sur l'état d'avancement de la mise à jour des stats en cours"""
+        if ctx.channel.id in self.update_adv:
+            info = self.update_adv
+            await ctx.send(f"📈 **Avancement de la MAJ des stats.** • {info} messages traités sur ce salon")
+        else:
+            await ctx.send(f"Aucune mise à jour n'a lieue sur ce salon")
+
+@commands.Cog.listener()
     async def on_message(self, message):
         if message.guild:
             author = message.author
