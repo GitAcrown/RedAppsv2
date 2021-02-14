@@ -365,7 +365,7 @@ class UserInfo(commands.Cog):
     async def update_stats_info(self, ctx):
         """Affiche des infos sur l'état d'avancement de la mise à jour des stats en cours"""
         if ctx.channel.id in self.update_adv:
-            info = self.update_adv
+            info = self.update_adv[ctx.channel.id]
             await ctx.send(f"📈 **Avancement de la MAJ des stats.** • {info} messages traités sur ce salon")
         else:
             await ctx.send(f"Aucune mise à jour n'a lieue sur ce salon")
