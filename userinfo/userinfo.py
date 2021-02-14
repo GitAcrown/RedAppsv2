@@ -370,7 +370,7 @@ class UserInfo(commands.Cog):
         else:
             await ctx.send(f"Aucune mise à jour n'a lieue sur ce salon")
 
-@commands.Cog.listener()
+    @commands.Cog.listener()
     async def on_message(self, message):
         if message.guild:
             author = message.author
