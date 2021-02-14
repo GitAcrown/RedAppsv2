@@ -293,7 +293,7 @@ class UserInfo(commands.Cog):
 
             start_adding_reactions(menu, emojis)
             try:
-                react, user = await self.bot.wait_for("reaction_add",
+                react, ruser = await self.bot.wait_for("reaction_add",
                                                       check=lambda m, u: u == ctx.author and m.message.id == menu.id,
                                                       timeout=60)
             except asyncio.TimeoutError:
