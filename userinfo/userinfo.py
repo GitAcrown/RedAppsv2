@@ -1,7 +1,7 @@
 import asyncio
 from copy import copy
 from datetime import datetime, timedelta
-from typing import Union
+from typing import O, Union
 
 import discord
 import logging
@@ -153,15 +153,19 @@ class UserInfo(commands.Cog):
 
     @user_card_commands.command(name='get')
     @commands.bot_has_permissions(embed_links=True, manage_messages=True)
-    async def display_user_card(self, ctx, user: discord.User = None):
+    async def display_user_card(self, ctx, user: Union[discord.Member, discord.User] = None):
         """Afficher un récapitulatif des informations d'un membre sous forme de carte de membre"""
         menu = None
         page = '📊'
         all_pages = ['📊', '📃', '👤', '🖼️']
         pages_footer = ['Infos', 'Logs', 'Bio', 'Avatar']
-        base_title = user.name if not user.nick else f"{user.name} « {user.nick} »"
         user = user if user else ctx.author
         guild = ctx.guild
+
+        if isinstance(user, discord.Member):
+            base_title = user.name if not user.nick else f"{user.name} « {user.nick} »"
+        else:
+            base_title = user.name
         userinfo = await self.config.member_from_ids(guild, user.id).all()
         guild_records = await self.config.guild(guild).user_records()
         embed_color = STATUS_COLORS[user.status] if not is_streaming(user) else 0x6438AA
