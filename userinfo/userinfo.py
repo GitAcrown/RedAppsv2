@@ -214,6 +214,7 @@ class UserInfo(commands.Cog):
                         '%d/%m/%Y') if last_seen_data else "Jamais"
 
                     em = discord.Embed(title=title, description=get_status_string(user), color=embed_color)
+                    em.set_thumbnail(url=user.avatar_url)
                     em.add_field(name='Création',
                                  value=box("{} ({}j)".format(user.created_at.strftime("%d/%m/%Y"), created_since)))
                     em.add_field(name='Arrivée',
