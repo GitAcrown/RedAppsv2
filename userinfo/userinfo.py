@@ -183,7 +183,7 @@ class UserInfo(commands.Cog):
                     voice_channel = user.voice.channel.mention if user.voice else None
 
                     try:
-                        recorded = datetime.now().fromisoformat(guild_records[user.id])
+                        recorded = datetime.now().fromisoformat(guild_records[str(user.id)])
                     except KeyError:
                         recorded = user.joined_at
                     if recorded > user.joined_at:
@@ -198,7 +198,7 @@ class UserInfo(commands.Cog):
                     em.add_field(name='Arrivée',
                                  value=box("Aucune donnée"))
                     try:
-                        recorded = datetime.now().fromisoformat(guild_records[user.id])
+                        recorded = datetime.now().fromisoformat(guild_records[str(user.id)])
                     except KeyError:
                         em.add_field(name='1re Apparition',
                                      value=box("Aucune donnée"))
@@ -337,12 +337,17 @@ class UserInfo(commands.Cog):
         if days > 0:
             after = datetime.today() - timedelta(days=days)
         self.update_adv[ctx.channel.id] = 0
+        first = False
         try:
             async for message in ctx.channel.history(limit=None, after=after, oldest_first=True):
+                if not first:
+                    await ctx.send(f"📈 **Message de départ** : {message.content} "
+                                   f"[{message.created_at.strftime('%d/%m/%Y %H:%M')}]")
+                    first = True
                 try:
                     author = message.author
                     if author.id not in members:
-                        members[author.id] = message.created_at.timestamp()
+                        members[author.id] = message.created_at.isoformat()
                 except:
                     pass
                 self.update_adv[ctx.channel.id] += 1
