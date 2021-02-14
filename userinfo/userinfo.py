@@ -172,7 +172,7 @@ class UserInfo(commands.Cog):
 
         while True:
             if page == '📊':  # INFOS
-                title = base_title + " ⟩ *Infos*"
+                title = base_title + " • *Infos*"
                 try:
                     created_since, joined_since = (datetime.now() - user.created_at).days, \
                                                   (datetime.now() - user.joined_at).days
@@ -188,7 +188,7 @@ class UserInfo(commands.Cog):
                 except Exception as e:
                     logger.info(msg=e, exc_info=False)
                     em = discord.Embed(title=title, description=get_status_string(user), color=embed_color)
-                    em.set_thumbnail(url=avatar_url)
+                    em.set_thumbnail(url=user.avatar_url)
                     created_since = (datetime.now() - user.created_at).days
                     em.add_field(name='Création',
                                  value=box("{} ({}j)".format(user.created_at.strftime("%d/%m/%Y"), created_since)))
@@ -209,14 +209,14 @@ class UserInfo(commands.Cog):
                     if last_seen:
                         last_seen = datetime.strptime(last_seen, '%Y.%m.%d').strftime('%d/%m/%Y')
                     else:
-                        last_seen = "Jamais"
+                        last_seen = "0"
                     em.add_field(name='Dernier message', value=box(f"{last_seen} [🔥X]"))
                 else:
                     on_fire, last_seen = userinfo['on_fire']['cons_days'], userinfo['on_fire']['last_seen']
                     if last_seen:
                         last_seen = datetime.strptime(last_seen, '%Y.%m.%d').strftime('%d/%m/%Y')
                     else:
-                        last_seen = "Jamais"
+                        last_seen = "0"
 
                     em = discord.Embed(title=title, description=get_status_string(user), color=embed_color)
                     em.add_field(name='Création',
@@ -249,7 +249,7 @@ class UserInfo(commands.Cog):
                         em.add_field(name="En vocal sur", value=voice_channel, inline=False)
 
             elif page == '📃':  # LOGS
-                title = base_title + " ⟩ *Logs*"
+                title = base_title + " • *Logs*"
                 em = discord.Embed(title=title, color=embed_color)
                 logs = userinfo['logs'][::-1]
                 if logs:
@@ -272,12 +272,12 @@ class UserInfo(commands.Cog):
                     em.add_field(name="Surnoms", value=box(", ".join(nicknames[:5])))
 
             elif page == '👤':
-                title = base_title + " ⟩ *Bio*"
+                title = base_title + " • *Bio*"
                 desc = userinfo['bio'] if userinfo['bio'] else "**Description vide.**"
                 em = discord.Embed(title=title, description=desc, color=embed_color)
 
             else:
-                title = base_title + " ⟩ *Avatar*"
+                title = base_title + " • *Avatar*"
                 avatar_url = str(user.avatar_url_as(size=1024))
                 em = discord.Embed(title=title, color=embed_color, description="<" + avatar_url + ">")
                 em.set_image(url=avatar_url)
