@@ -1,7 +1,7 @@
 import asyncio
 from copy import copy
 from datetime import datetime, timedelta
-from typing import O, Union
+from typing import Union
 
 import discord
 import logging
