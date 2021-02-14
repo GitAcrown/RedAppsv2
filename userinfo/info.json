@@ -1,0 +1,13 @@
+{
+    "author": ["Acrone"],
+	"description": "Informations générales sur un membre",
+	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help UserInfo` pour voir les commandes disponibles",
+	"short": "Carte de membre",
+	"tags": ["economy", "community", "fun"],
+    "requirements" : [
+		"tabulate"
+    ],
+    "required_cogs": {},
+	"type": "COG",
+	"end_user_data_statement": "This cog does not store personal data."
+}
