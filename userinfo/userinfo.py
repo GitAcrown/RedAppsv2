@@ -363,6 +363,7 @@ class UserInfo(commands.Cog):
                 records[member] = members[member]
             await self.config.guild(ctx.guild).user_records.set(records)
             await ctx.send("📈 **Mise à jour des stats.** • Réussie")
+            del self.update_adv[ctx.channel.id]
         else:
             await ctx.send("📈 **Mise à jour des stats.** • Echec (aucune donnée n'a été traitée)")
 
