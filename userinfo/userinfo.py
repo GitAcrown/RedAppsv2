@@ -172,7 +172,7 @@ class UserInfo(commands.Cog):
 
         while True:
             if page == '📊':  # INFOS
-                title = base_title + " ⟩ Infos"
+                title = base_title + " ⟩ *Infos*"
                 try:
                     created_since, joined_since = (datetime.now() - user.created_at).days, \
                                                   (datetime.now() - user.joined_at).days
@@ -225,7 +225,7 @@ class UserInfo(commands.Cog):
                     em.add_field(name='1re Apparition',
                                  value=box("{} ({}j)".format(recorded.strftime("%d/%m/%Y"),
                                                              (datetime.now() - recorded).days)))
-                    em.add_field(name='Dernier message', value=box("{} [🔥{}]".format(last_seen, on_fire)))
+                    em.add_field(name='Dernier message', value=box("{} → 🔥{}".format(last_seen, on_fire)))
 
                     if booster_since:
                         em.add_field(name='Boost',
@@ -248,7 +248,7 @@ class UserInfo(commands.Cog):
                         em.add_field(name="En vocal sur", value=voice_channel, inline=False)
 
             elif page == '📃':  # LOGS
-                title = base_title + " ⟩ Logs"
+                title = base_title + " ⟩ *Logs*"
                 em = discord.Embed(title=title, color=embed_color)
                 logs = userinfo['logs'][::-1]
                 if logs:
@@ -271,12 +271,12 @@ class UserInfo(commands.Cog):
                     em.add_field(name="Surnoms", value=box(", ".join(nicknames[:5])))
 
             elif page == '👤':
-                title = base_title + " ⟩ Bio"
+                title = base_title + " ⟩ *Bio*"
                 desc = userinfo['bio'] if userinfo['bio'] else "**Description vide.**"
                 em = discord.Embed(title=title, description=desc, color=embed_color)
 
             else:
-                title = base_title + " ⟩ Avatar"
+                title = base_title + " ⟩ *Avatar*"
                 avatar_url = str(user.avatar_url_as(size=1024))
                 em = discord.Embed(title=title, color=embed_color, description="<" + avatar_url + ">")
                 em.set_image(url=avatar_url)
@@ -292,7 +292,7 @@ class UserInfo(commands.Cog):
             if not menu:
                 menu = await ctx.send(embed=em)
             else:
-                menu = await menu.edit(embed=em)
+                await menu.edit(embed=em)
 
             start_adding_reactions(menu, emojis)
             try:
@@ -305,9 +305,7 @@ class UserInfo(commands.Cog):
                 await menu.edit(embed=em)
                 return
             else:
-                page = react.emoji
-
-            await menu.clear_reactions()
+                await menu.clear_reactions()
 
     @user_card_commands.command(name='bio')
     async def edit_user_bio(self, ctx, *text: str):
@@ -331,15 +329,15 @@ class UserInfo(commands.Cog):
             today = datetime.now().strftime('%Y.%m.%d')
             yester = (datetime.now() - timedelta(days=1)).strftime('%Y.%m.%d')
             if isinstance(author, discord.Member):
-                userinfo = await self.config.member(author).all()
-                on_fire = copy(userinfo['on_fire'])
+                firedata = await self.config.member(author).on_fire()
+                on_fire = copy(firedata)
                 if on_fire['last_seen'] == yester:
                     on_fire['cons_days'] += 1
                 elif on_fire['last_seen'] != today:
                     on_fire['cons_days'] = 0
                 on_fire['last_seen'] = today
 
-                if on_fire != userinfo['on_fire']:
+                if on_fire != firedata:
                     await self.config.member(author).on_fire.set(on_fire)
 
     @commands.Cog.listener()
