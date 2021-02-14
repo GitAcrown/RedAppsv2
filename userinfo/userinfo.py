@@ -164,9 +164,10 @@ class UserInfo(commands.Cog):
 
         if isinstance(user, discord.Member):
             base_title = user.name if not user.nick else f"{user.name} « {user.nick} »"
+            userinfo = await self.config.member(user).all()
         else:
             base_title = user.name
-        userinfo = await self.config.member_from_ids(guild, user.id).all()
+            userinfo = await self.config.member_from_ids(guild.id, user.id).all()
         guild_records = await self.config.guild(guild).user_records()
         embed_color = STATUS_COLORS[user.status] if not is_streaming(user) else 0x6438AA
 
