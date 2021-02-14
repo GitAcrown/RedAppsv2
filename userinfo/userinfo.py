@@ -188,6 +188,7 @@ class UserInfo(commands.Cog):
                 except Exception as e:
                     logger.info(msg=e, exc_info=False)
                     em = discord.Embed(title=title, description=get_status_string(user), color=embed_color)
+                    em.set_thumbnail(url=avatar_url)
                     created_since = (datetime.now() - user.created_at).days
                     em.add_field(name='Création',
                                  value=box("{} ({}j)".format(user.created_at.strftime("%d/%m/%Y"), created_since)))
@@ -305,6 +306,7 @@ class UserInfo(commands.Cog):
                 await menu.edit(embed=em)
                 return
             else:
+                page = react.emoji
                 await menu.clear_reactions()
 
     @user_card_commands.command(name='bio')
