@@ -205,10 +205,17 @@ class UserInfo(commands.Cog):
 
                     on_fire, last_seen = userinfo['on_fire']['cons_days'], userinfo['on_fire']['last_seen']
                     last_seen = datetime.strptime(last_seen, '%Y.%m.%d').strftime('%d/%m/%Y')
+                    if last_seen:
+                        last_seen = datetime.strptime(last_seen, '%Y.%m.%d').strftime('%d/%m/%Y')
+                    else:
+                        last_seen = "Jamais"
                     em.add_field(name='Dernier message', value=box(f"{last_seen} [🔥X]"))
                 else:
                     on_fire, last_seen = userinfo['on_fire']['cons_days'], userinfo['on_fire']['last_seen']
-                    last_seen = datetime.strptime(last_seen, '%Y.%m.%d').strftime('%d/%m/%Y')
+                    if last_seen:
+                        last_seen = datetime.strptime(last_seen, '%Y.%m.%d').strftime('%d/%m/%Y')
+                    else:
+                        last_seen = "Jamais"
 
                     em = discord.Embed(title=title, description=get_status_string(user), color=embed_color)
                     em.add_field(name='Création',
@@ -332,7 +339,7 @@ class UserInfo(commands.Cog):
                     on_fire['cons_days'] = 0
                 on_fire['last_seen'] = today
 
-                if on_fire != userinfo:
+                if on_fire != userinfo['on_fire']:
                     await self.config.member(author).on_fire.set(on_fire)
 
     @commands.Cog.listener()
