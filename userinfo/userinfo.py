@@ -123,9 +123,14 @@ def get_status_string(user):
     return string
 
 def shorten_link(link: str):
-    encoded = parse.quote(link)
-    r = requests.post('https://cleanuri.com/api/v1/shorten', data={"url": encoded})
-    return r.json()['result_url']
+    key = 'a202f4f51e7d72c5826e2fcf649e6c3cc58e1'
+    url = parse.quote(link)
+    r = requests.get('http://cutt.ly/api/api.php?key={}&short={}'.format(key, url))
+    result = r.json()['url']
+    if result['status'] == 7:
+        return result['shortLink']
+    else:
+        return None
 
 class UserInfo(commands.Cog):
     """Informations sur les membres"""
