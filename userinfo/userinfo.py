@@ -7,6 +7,7 @@ import aiohttp
 import discord
 import logging
 
+from urllib import parse
 import requests
 from redbot.core import Config, commands, checks
 from redbot.core.utils.chat_formatting import box
@@ -121,13 +122,10 @@ def get_status_string(user):
         string += f"{status_string}\n"
     return string
 
-async def relink(link: str):
-    """Raccourcissement de lien en utilisant rel.ink"""
-    async with aiohttp.ClientSession() as session:
-        async with session.post("https://rel.ink/api/links/", data={"url": link}) as response:
-            resp = await response.json()
-            base = "https://rel.ink/"
-            return base + resp["hashid"]
+def shorten_link(link: str):
+    encoded = parse.quote(link)
+    r = requests.post('https://cleanuri.com/api/v1/shorten', data={"url": encoded})
+    return r.json()['result_url']
 
 class UserInfo(commands.Cog):
     """Informations sur les membres"""
@@ -391,7 +389,7 @@ class UserInfo(commands.Cog):
 
     @commands.command(name="debuglink", hidden=True)
     async def debuglink(self, ctx, url: str):
-        await ctx.send(await relink(url))
+        await ctx.send(shorten_link(url))
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -438,7 +436,7 @@ class UserInfo(commands.Cog):
 
             if after.avatar_url != before.avatar_url:
                 url = before.avatar_url.split("?")[0]
-                await self.append_logs(after, f"Changement d'avatar › {await relink(url)}")
+                await self.append_logs(after, f"Changement d'avatar › {shorten_link(url)}")
 
     @commands.Cog.listener()
     async def on_member_join(self, user):
