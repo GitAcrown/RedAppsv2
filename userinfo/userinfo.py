@@ -336,7 +336,7 @@ class UserInfo(commands.Cog):
             await ctx.send("**Bio supprimée** › Votre bio a été réinitialisée")
 
     @commands.command(name="freshmeat")
-    @commands.cooldown(1, 10, commands.BucketType.guild)
+    @commands.max_concurrency(1, commands.BucketType.guild)
     async def disp_freshmeat(self, ctx, days: int = 0):
         """Afficher les derniers arrivés dans les X derniers jours (par défaut 0 -> aujourd'hui)"""
         members = ctx.guild.members
