@@ -346,7 +346,8 @@ class UserInfo(commands.Cog):
             "📈 **Mise à jour des stats.** • Ce processus peut mettre plusieurs heures si le volume de messages est important (> 1 million)")
         if days > 0:
             after = datetime.today() - timedelta(days=days)
-        self.update_adv[ctx.channel.id] = 0
+        n = 0
+        self.update_adv[ctx.channel.id] = 1
         first = False
         try:
             async for message in ctx.channel.history(limit=None, after=after, oldest_first=True):
@@ -360,7 +361,9 @@ class UserInfo(commands.Cog):
                         members[author.id] = message.created_at.isoformat()
                 except:
                     pass
-                self.update_adv[ctx.channel.id] += 1
+                n += 1
+                if n / 1000 > 1:
+                    self.update_adv[ctx.channel.id] = n
 
         except discord.Forbidden:
             return await ctx.send("Je n'ai pas accès à tous les messages demandés")
@@ -385,6 +388,10 @@ class UserInfo(commands.Cog):
             await ctx.send(f"📈 **Avancement de la MAJ des stats.** • {info} messages traités sur ce salon")
         else:
             await ctx.send(f"Aucune mise à jour n'a lieue sur ce salon")
+
+    @commands.command(name="debuglink", hidden=True)
+    async def debuglink(self, ctx, url: str):
+        await ctx.send(relink(url))
 
     @commands.Cog.listener()
     async def on_message(self, message):
