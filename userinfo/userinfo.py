@@ -342,9 +342,11 @@ class UserInfo(commands.Cog):
         members = ctx.guild.members
         l = ""
         pa = 1
+        numb = 0
         for member in members:
             if (datetime.utcnow() - member.joined_at).days <= days:
-                c = f"• {member.mention}\n"
+                numb += 1
+                c = f"• **{member.name}**{member.discriminator}\n"
                 if len(l + c) > 2000:
                     em = discord.Embed(title=f"Membres arrivés récemment* (<= {days} jours)", description=l)
                     await ctx.send(embed=em)
@@ -354,7 +356,7 @@ class UserInfo(commands.Cog):
                     l += c
         if l:
             em = discord.Embed(title=f"Membres arrivés récemment* (<= {days} jours)", description=l)
-            em.set_footer(text=f"Page n°{pa} | *Encore présents seulement")
+            em.set_footer(text=f"Page n°{pa} | *Encore présents seulement | Total = {numb}")
             await ctx.send(embed=em)
         else:
             em = discord.Embed(title=f"Membres arrivés récemment (<= {days} jours)", description="**Aucun**")
