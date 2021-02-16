@@ -3,8 +3,11 @@ from copy import copy
 from datetime import datetime, timedelta
 from typing import Union
 
+import aiohttp
 import discord
 import logging
+
+import requests
 from redbot.core import Config, commands, checks
 from redbot.core.utils.chat_formatting import box
 from redbot.core.utils.menus import start_adding_reactions
@@ -118,6 +121,13 @@ def get_status_string(user):
         string += f"{status_string}\n"
     return string
 
+async def relink(link: str):
+    """Raccourcissement de lien en utilisant rel.ink"""
+    async with aiohttp.ClientSession() as session:
+        async with session.post("https://rel.ink/api/links/", data={"url": link}) as response:
+            resp = await response.json()
+            base = "https://rel.ink/"
+            return base + resp["hashid"]
 
 class UserInfo(commands.Cog):
     """Informations sur les membres"""
@@ -421,7 +431,7 @@ class UserInfo(commands.Cog):
 
             if after.avatar_url != before.avatar_url:
                 url = before.avatar_url.split("?")[0]
-                await self.append_logs(after, f"Changement d'avatar › [URL]({url})")
+                await self.append_logs(after, f"Changement d'avatar › {relink(url)}")
 
     @commands.Cog.listener()
     async def on_member_join(self, user):
