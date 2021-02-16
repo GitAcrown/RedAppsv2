@@ -391,7 +391,7 @@ class UserInfo(commands.Cog):
 
     @commands.command(name="debuglink", hidden=True)
     async def debuglink(self, ctx, url: str):
-        await ctx.send(relink(url))
+        await ctx.send(await relink(url))
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -438,7 +438,7 @@ class UserInfo(commands.Cog):
 
             if after.avatar_url != before.avatar_url:
                 url = before.avatar_url.split("?")[0]
-                await self.append_logs(after, f"Changement d'avatar › {relink(url)}")
+                await self.append_logs(after, f"Changement d'avatar › {await relink(url)}")
 
     @commands.Cog.listener()
     async def on_member_join(self, user):
