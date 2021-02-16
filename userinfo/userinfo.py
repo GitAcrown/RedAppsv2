@@ -343,7 +343,7 @@ class UserInfo(commands.Cog):
         l = ""
         pa = 1
         for member in members:
-            if (datetime.now() - member.joined_at).days <= days:
+            if (datetime.utcnow() - member.joined_at).days <= days:
                 c = f"• {member}\n"
                 if len(l + c) > 2000:
                     em = discord.Embed(title=f"Membres arrivés récemment (<= {days} jours)", description=l)
