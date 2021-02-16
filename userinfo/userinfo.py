@@ -335,6 +335,31 @@ class UserInfo(commands.Cog):
             await self.config.member(ctx.author).bio.set("")
             await ctx.send("**Bio supprimée** › Votre bio a été réinitialisée")
 
+    @commands.command(name="freshmeat")
+    @commands.cooldown(1, 30, commands.BucketType.guild)
+    async def disp_freshmeat(self, ctx, days: int = 0):
+        """Afficher les derniers arrivés dans les X derniers jours (par défaut 0 -> aujourd'hui)"""
+        members = ctx.guild.members
+        l = ""
+        pa = 1
+        for member in members:
+            if (datetime.now() - member.joined_at).days <= days:
+                c = f"• {member}\n"
+                if len(l + c) > 2000:
+                    em = discord.Embed(title=f"Membres arrivés récemment (<= {days} jours)", description=l)
+                    await ctx.send(embed=em)
+                    l = c
+                    pa += 1
+                else:
+                    l += c
+        if l:
+            em = discord.Embed(title=f"Membres arrivés récemment (<= {days} jours)", description=l)
+            em.set_footer(text=f"Page n°{pa}")
+            await ctx.send(embed=em)
+        else:
+            em = discord.Embed(title=f"Membres arrivés récemment (<= {days} jours)", description="**Aucun**")
+            await ctx.send(embed=em)
+
     @commands.command(name="updateall")
     @checks.mod_or_permissions(administrator=True)
     @commands.bot_has_permissions(read_message_history=True)
@@ -391,10 +416,6 @@ class UserInfo(commands.Cog):
             await ctx.send(f"📈 **Avancement de la MAJ des stats.** • {info} messages traités sur ce salon")
         else:
             await ctx.send(f"Aucune mise à jour n'a lieue sur ce salon")
-
-    @commands.command(name="debuglink", hidden=True)
-    async def debuglink(self, ctx, url: str):
-        await ctx.send(shorten_link(url))
 
     @commands.Cog.listener()
     async def on_message(self, message):
