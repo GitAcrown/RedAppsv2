@@ -336,7 +336,7 @@ class UserInfo(commands.Cog):
             await ctx.send("**Bio supprimée** › Votre bio a été réinitialisée")
 
     @commands.command(name="freshmeat")
-    @commands.cooldown(1, 30, commands.BucketType.guild)
+    @commands.cooldown(1, 10, commands.BucketType.guild)
     async def disp_freshmeat(self, ctx, days: int = 0):
         """Afficher les derniers arrivés dans les X derniers jours (par défaut 0 -> aujourd'hui)"""
         members = ctx.guild.members
@@ -344,17 +344,17 @@ class UserInfo(commands.Cog):
         pa = 1
         for member in members:
             if (datetime.utcnow() - member.joined_at).days <= days:
-                c = f"• {member}\n"
+                c = f"• {member.mention}\n"
                 if len(l + c) > 2000:
-                    em = discord.Embed(title=f"Membres arrivés récemment (<= {days} jours)", description=l)
+                    em = discord.Embed(title=f"Membres arrivés récemment* (<= {days} jours)", description=l)
                     await ctx.send(embed=em)
                     l = c
                     pa += 1
                 else:
                     l += c
         if l:
-            em = discord.Embed(title=f"Membres arrivés récemment (<= {days} jours)", description=l)
-            em.set_footer(text=f"Page n°{pa}")
+            em = discord.Embed(title=f"Membres arrivés récemment* (<= {days} jours)", description=l)
+            em.set_footer(text=f"Page n°{pa} | *Encore présents seulement")
             await ctx.send(embed=em)
         else:
             em = discord.Embed(title=f"Membres arrivés récemment (<= {days} jours)", description="**Aucun**")
