@@ -364,6 +364,9 @@ class MsgGallery(commands.Cog):
                             else:
                                 fav["votes"].append(user.id)
 
+                            if data['target'] == 1:
+                                await self.config.guild(guild).cache.set_raw(message.id, value=fav)
+
                             if len(fav["votes"]) >= data["target"]:
                                 if not fav["embed"]:
                                     try:
