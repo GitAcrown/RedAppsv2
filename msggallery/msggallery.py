@@ -387,8 +387,9 @@ class MsgGallery(commands.Cog):
                                     if data["disp_notif"]:
                                         try:
                                             dest_channel = self.bot.get_channel(await self.config.guild(guild).channel())
-                                            await message.reply(f"Ce message est passé **favori** sur {dest_channel.mention}",
+                                            notif = await message.reply(f"Ce message est passé **favori** sur {dest_channel.mention}",
                                                                 mention_author=False)
+                                            await notif.delete(delay=60)
                                         except:
                                             raise
                                 else:
