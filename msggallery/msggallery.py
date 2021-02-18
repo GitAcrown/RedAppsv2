@@ -69,7 +69,7 @@ class MsgGallery(commands.Cog):
     def encode_emoji(self, emoji: Union[discord.Emoji, discord.PartialEmoji, str]):
         """Enregistre un emoji"""
         if type(emoji) in (discord.Emoji, discord.PartialEmoji):
-            return emoji.id
+            return str(emoji.id)
         return emoji
 
     def decode_emoji(self, emoji: str):
