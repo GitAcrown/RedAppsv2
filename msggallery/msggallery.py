@@ -142,9 +142,12 @@ class MsgGallery(commands.Cog):
 
         if data['webhook_url']:
             webhook_img = self.get_emoji_repr(emoji)
-            async with aiohttp.ClientSession() as session:
-                webhook = discord.Webhook.from_url(data['webhook_url'], adapter=discord.AsyncWebhookAdapter(session))
-                return await webhook.send(embed=em, username=data['webhook_name'], avatar_url=webhook_img, wait=True)
+            try:
+                async with aiohttp.ClientSession() as session:
+                    webhook = discord.Webhook.from_url(data['webhook_url'], adapter=discord.AsyncWebhookAdapter(session))
+                    return await webhook.send(embed=em, username=data['webhook_name'], avatar_url=webhook_img, wait=True)
+            except:
+                raise
         else:
             return await channel.send(embed=em)
 
@@ -226,8 +229,9 @@ class MsgGallery(commands.Cog):
                     try:
                         webhook_url = await channel.create_webhook(reason=f"Création sur demande de {ctx.author} pour la galerie des messages")
                     except:
-                        return await ctx.send("**Webhook impossible à créer** • Je n'ai réussi à créer le webhook.\n"
+                        await ctx.send("**Webhook impossible à créer** • Je n'ai réussi à créer le webhook.\n"
                                               "Vérifiez mes permissions ou fournissez-moi directement une URL avec la commande.")
+                        raise
                     else:
                         await self.config.guild(guild).webhook_url.set(webhook_url)
                         await ctx.send(f"**Webhook créé** • J'ai créé un webhook au salon configuré : {webhook_url}")
