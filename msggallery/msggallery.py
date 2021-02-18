@@ -81,9 +81,8 @@ class MsgGallery(commands.Cog):
     def get_emoji_repr(self, emoji: Union[discord.Emoji, discord.PartialEmoji, str]):
         """Retourne la représentation imagée de l'emoji"""
         if type(emoji) in (discord.Emoji, discord.PartialEmoji):
-            d_emoji = cast(discord.Emoji, emoji)
-            ext = "gif" if d_emoji.animated else "png"
-            return "https://cdn.discordapp.com/emojis/{id}.{ext}?v=1".format(id=d_emoji.id, ext=ext)
+            ext = "gif" if emoji.animated else "png"
+            return "https://cdn.discordapp.com/emojis/{id}.{ext}?v=1".format(id=emoji.id, ext=ext)
         try:
             cdn_fmt = "https://twemoji.maxcdn.com/2/72x72/{codepoint:x}.png"
             return cdn_fmt.format(codepoint=ord(str(emoji)))
@@ -109,7 +108,7 @@ class MsgGallery(commands.Cog):
         votes = len(msg_data["votes"])
         emoji = self.decode_emoji(data['emoji'])
         color = data.get('embed_color', await self.bot.get_embed_color(channel))
-        foot = f"{emoji} {votes}"
+        foot = f"{emoji} {votes}" if type(emoji) is str else f"{emoji.name} {votes}"
 
         em = discord.Embed(description=text, color=color, timestamp=message.created_at)
         em.set_author(name=message.author.name, icon_url=message.author.avatar_url)
@@ -168,7 +167,7 @@ class MsgGallery(commands.Cog):
 
         votes = len(msg_data["votes"])
         emoji = self.decode_emoji(data['emoji'])
-        foot = f"{emoji} {votes}"
+        foot = f"{emoji} {votes}" if type(emoji) is str else f"{emoji.name} {votes}"
         em = dest_message.embeds[0]
         em.set_footer(text=foot)
         try:
@@ -344,9 +343,7 @@ class MsgGallery(commands.Cog):
             data = await self.config.guild(guild).all()
             if data["channel"]:
                 emoji = emoji.name if emoji.is_unicode_emoji() else str(emoji.id)
-                logger.info(str(emoji))
                 if emoji == data["emoji"]:
-                    logger.info(str(emoji) + " DETECTED")
                     message = await channel.fetch_message(payload.message_id)
                     if message.created_at.timestamp() + 86400 > datetime.utcnow().timestamp():
                         user = guild.get_member(payload.user_id)
