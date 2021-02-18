@@ -276,7 +276,7 @@ class MsgGallery(commands.Cog):
                 em = discord.Embed(title="Couleur modifiée",
                                    description=f"Ceci est une démonstration de la couleur des Embeds du salon des favoris.",
                                    color=color)
-                await self.config.guild(ctx.guild).color.set(color)
+                await self.config.guild(ctx.guild).embed_color.set(color)
             except:
                 return await ctx.send("**Erreur** • La couleur est invalide.\n"
                                       "Sachez qu'elle doit être fournie au format hexadécimal (ex. `D5D5D5` ou `0xD5D5D5`) et que certaines couleurs sont réservées par Discord.")
@@ -284,7 +284,7 @@ class MsgGallery(commands.Cog):
             em = discord.Embed(title="Couleur retirée",
                                description=f"Ceci est une démonstration de la couleur des Embeds du salon des favoris.",
                                color=color)
-            await self.config.guild(ctx.guild).color.set(None)
+            await self.config.guild(ctx.guild).embed_color.set(None)
         await ctx.send(embed=em)
 
     @_msggallery.command(name="reset")
@@ -311,6 +311,7 @@ class MsgGallery(commands.Cog):
             guild = channel.guild
             data = await self.config.guild(guild).all()
             if data["channel"]:
+                emoji = emoji.name if emoji.is_unicode_emoji() else emoji
                 if emoji == self.decode_emoji(data["emoji"]):
                     message = await channel.fetch_message(payload.message_id)
                     if message.created_at.timestamp() + 86400 > datetime.utcnow().timestamp():
