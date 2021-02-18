@@ -230,7 +230,7 @@ class MsgGallery(commands.Cog):
                 if channel:
                     try:
                         webhook_url = await channel.create_webhook(name=await self.config.guild(guild).webhook_name(),
-                                                                   avatar=self.get_emoji_repr(await self.config.guild(guild).emoji()),
+                                                                   avatar=self.bot.user.avatar_url,
                                                                    reason=f"Création sur demande de {ctx.author} pour la galerie des messages")
                     except:
                         await ctx.send("**Webhook impossible à créer** • Je n'ai réussi à créer le webhook.\n"
@@ -344,7 +344,9 @@ class MsgGallery(commands.Cog):
             data = await self.config.guild(guild).all()
             if data["channel"]:
                 emoji = emoji.name if emoji.is_unicode_emoji() else str(emoji.id)
+                logger.info(str(emoji))
                 if emoji == data["emoji"]:
+                    logger.info('Emoji détecté')
                     message = await channel.fetch_message(payload.message_id)
                     if message.created_at.timestamp() + 86400 > datetime.utcnow().timestamp():
                         user = guild.get_member(payload.user_id)
