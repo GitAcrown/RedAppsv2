@@ -3,7 +3,6 @@ from copy import copy
 from datetime import datetime, timedelta
 from typing import Union
 
-import aiohttp
 import discord
 import logging
 

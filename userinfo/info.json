@@ -3,7 +3,7 @@
 	"description": "Informations générales sur un membre",
 	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help UserInfo` pour voir les commandes disponibles",
 	"short": "Carte de membre",
-	"tags": ["economy", "community", "fun"],
+	"tags": ["community", "stats", "infos"],
     "requirements" : [
 		"tabulate"
     ],
