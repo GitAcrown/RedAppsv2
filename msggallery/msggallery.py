@@ -104,7 +104,7 @@ class MsgGallery(commands.Cog):
         except:
             raise NoMsgData("Le message fourni n'a pas de données enregistrées")
 
-        text = f"[→ *Aller au message*]({message.jump_url})\n"
+        text = f"[→ Aller au message]({message.jump_url})\n"
         text += message.content
         votes = len(msg_data["votes"])
         emoji = self.decode_emoji(data['emoji'])
@@ -171,16 +171,28 @@ class MsgGallery(commands.Cog):
         foot = f"{emoji} {votes}" if type(emoji) is str else f"{emoji.name} {votes}"
         em = dest_message.embeds[0]
         em.set_footer(text=foot)
-        try:
-            return await dest_message.edit(embed=em)
-        except discord.Forbidden:
-            logger.info(f"Impossible d'accéder à MSG_ID={dest_message.id}")
-        except:
-            logger.info(
-                f"Suppression des données de {source_message.id} car impossibilité définitive d'accéder à MSG_ID={dest_message.id} "
-                f"(message probablement supprimé)")
-            await self.config.guild(guild).favs.clear_raw(source_message.id)
-            raise
+        if data['webhook_url']:
+            try:
+                async with aiohttp.ClientSession() as session:
+                    webhook = discord.Webhook.from_url(data['webhook_url'], adapter=discord.AsyncWebhookAdapter(session))
+                    return await webhook.edit_message(dest_message.id, embed=em)
+            except:
+                logger.info(
+                    f"Suppression des données de {source_message.id} car impossibilité définitive d'accéder à MSG_ID={dest_message.id} "
+                    f"(message probablement supprimé)")
+                await self.config.guild(guild).favs.clear_raw(source_message.id)
+                raise
+        else:
+            try:
+                return await dest_message.edit(embed=em)
+            except discord.Forbidden:
+                logger.info(f"Impossible d'accéder à MSG_ID={dest_message.id}")
+            except:
+                logger.info(
+                    f"Suppression des données de {source_message.id} car impossibilité définitive d'accéder à MSG_ID={dest_message.id} "
+                    f"(message probablement supprimé)")
+                await self.config.guild(guild).favs.clear_raw(source_message.id)
+                raise
 
     @commands.group(name="msgg")
     @commands.guild_only()
