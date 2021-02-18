@@ -344,9 +344,7 @@ class MsgGallery(commands.Cog):
             data = await self.config.guild(guild).all()
             if data["channel"]:
                 emoji = emoji.name if emoji.is_unicode_emoji() else str(emoji.id)
-                logger.info(str(emoji))
                 if emoji == data["emoji"]:
-                    logger.info('Emoji détecté')
                     message = await channel.fetch_message(payload.message_id)
                     if message.created_at.timestamp() + 86400 > datetime.utcnow().timestamp():
                         user = guild.get_member(payload.user_id)
@@ -363,9 +361,7 @@ class MsgGallery(commands.Cog):
                                 fav["votes"].append([user.id] * data['mods_count_as'])
                             else:
                                 fav["votes"].append(user.id)
-
-                            if data['target'] == 1:
-                                await self.config.guild(guild).cache.set_raw(message.id, value=fav)
+                            await self.config.guild(guild).cache.set_raw(message.id, value=fav)
 
                             if len(fav["votes"]) >= data["target"]:
                                 if not fav["embed"]:
@@ -375,6 +371,7 @@ class MsgGallery(commands.Cog):
                                         logger.error(msg=e, exc_info=True)
                                     else:
                                         fav["embed"] = embed_msg.id
+                                        await self.config.guild(guild).cache.set_raw(message.id, value=fav)
                                 else:
                                     try:
                                         embed_msg = await favchan.fetch_message(fav["embed"])
@@ -382,4 +379,3 @@ class MsgGallery(commands.Cog):
                                         logger.error(msg=e, exc_info=True)
                                     else:
                                         await self.edit_msg(message, embed_msg)
-                            await self.config.guild(guild).cache.set_raw(message.id, value=fav)
