@@ -100,7 +100,7 @@ class MsgGallery(commands.Cog):
             raise ChannelUnavailable('Salon textuel non disponible')
 
         try:
-            msg_data = data['cache'][message.id]
+            msg_data = await self.config.guild(guild).cache.get_raw(message.id)
         except:
             raise NoMsgData("Le message fourni n'a pas de données enregistrées")
 
@@ -162,7 +162,7 @@ class MsgGallery(commands.Cog):
             raise ChannelUnavailable('Salon textuel non disponible')
 
         try:
-            msg_data = data['cache'][source_message.id]
+            msg_data = await self.config.guild(guild).cache.get_raw(source_message.id)
         except:
             raise NoMsgData("Le message fourni n'a pas de données enregistrées")
 
