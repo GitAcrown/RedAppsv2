@@ -1,9 +1,11 @@
+from copy import copy
 from datetime import datetime
 import logging
 from typing import Union, cast
 
 import aiohttp
 import discord
+from discord.ext import tasks
 from redbot.core import Config, commands, checks
 
 logger = logging.getLogger("red.RedAppsv2.msggallery")
@@ -41,6 +43,28 @@ class MsgGallery(commands.Cog):
 
                          "cache": {}}
         self.config.register_guild(**default_guild)
+
+        self.msgg_clear_loop.start()
+
+    @tasks.loop(hours=12)
+    async def msgg_clear_loop(self):
+        await self.clear_msgg_caches()
+
+    @msgg_clear_loop.before_loop
+    async def before_msgg_loop(self):
+        logger.info('Starting msgg_clear_loop...')
+        await self.bot.wait_until_ready()
+
+    async def clear_msgg_caches(self):
+        all_guilds = await self.config.all_guilds()
+        for g in all_guilds:
+            cache = all_guilds[g]['cache']
+            new = copy(cache)
+            for fav in cache:
+                if cache[fav]['created'] < datetime.utcnow().timestamp() - 86400:
+                    del new[fav]
+            if cache != new:
+                await self.config.guild_from_id(g).cache.set(new)
 
     def encode_emoji(self, emoji: Union[discord.Emoji, discord.PartialEmoji, str]):
         """Enregistre un emoji"""
@@ -311,8 +335,8 @@ class MsgGallery(commands.Cog):
             guild = channel.guild
             data = await self.config.guild(guild).all()
             if data["channel"]:
-                emoji = emoji.name if emoji.is_unicode_emoji() else emoji
-                if emoji == self.decode_emoji(data["emoji"]):
+                emoji = emoji.name if emoji.is_unicode_emoji() else str(emoji.id)
+                if emoji == data["emoji"]:
                     message = await channel.fetch_message(payload.message_id)
                     if message.created_at.timestamp() + 86400 > datetime.utcnow().timestamp():
                         user = guild.get_member(payload.user_id)
@@ -321,7 +345,7 @@ class MsgGallery(commands.Cog):
                         try:
                             fav = await self.config.guild(guild).cache.get_raw(message.id)
                         except:
-                            fav = {"votes": [], "embed": None}
+                            fav = {"votes": [], "embed": None, 'created': datetime.utcnow().timestamp()}
                             await self.config.guild(guild).cache.set_raw(message.id, value=fav)
 
                         if user.id not in fav["votes"]:
@@ -330,7 +354,6 @@ class MsgGallery(commands.Cog):
                             else:
                                 fav["votes"].append(user.id)
 
-                            await self.config.guild(guild).cache.set_raw(message.id, value=fav)
                             if len(fav["votes"]) >= data["target"]:
                                 if not fav["embed"]:
                                     embed_msg = await self.post_msg(message)
@@ -338,7 +361,4 @@ class MsgGallery(commands.Cog):
                                 else:
                                     embed_msg = await favchan.fetch_message(fav["embed"])
                                     await self.edit_msg(message, embed_msg)
-                                await self.config.guild(guild).cache.set_raw(message.id, value=fav)
-
-                    elif message.id in await self.config.guild(guild).cache():  # Suppression des données des MSG de +24h
-                        await self.config.guild(guild).cache.clear_raw(message.id)
+                            await self.config.guild(guild).cache.set_raw(message.id, value=fav)
