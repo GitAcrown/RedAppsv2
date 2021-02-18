@@ -358,7 +358,7 @@ class MsgGallery(commands.Cog):
 
                         if user.id not in fav["votes"]:
                             if user.permissions_in(channel).manage_messages:
-                                fav["votes"].append([user.id] * data['mods_count_as'])
+                                fav["votes"].extend([user.id] * data['mods_count_as'])
                             else:
                                 fav["votes"].append(user.id)
                             await self.config.guild(guild).cache.set_raw(message.id, value=fav)
