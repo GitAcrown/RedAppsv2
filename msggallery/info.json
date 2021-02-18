@@ -1,0 +1,11 @@
+{
+    "author": ["Acrone"],
+	"description": "Faire d'un salon une galerie des messages favoris des membres du serveur",
+	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help UserInfo` pour voir les commandes disponibles",
+	"short": "Galerie des meilleurs messages",
+	"tags": ["community", "fun"],
+    "requirements" : [],
+    "required_cogs": {},
+	"type": "COG",
+	"end_user_data_statement": "This cog does not store personal data."
+}
