@@ -107,7 +107,7 @@ class MsgGallery(commands.Cog):
         text += message.content
         votes = len(msg_data["votes"])
         emoji = self.decode_emoji(data['emoji'])
-        color = data.get('embed_color', await self.bot.get_embed_color(channel))
+        color = data['embed_color'] if data['embed_color'] else await self.bot.get_embed_color(channel)
         foot = f"{emoji} {votes}" if type(emoji) is str else f"{emoji.name} {votes}"
 
         em = discord.Embed(description=text, color=color, timestamp=message.created_at)
