@@ -40,6 +40,7 @@ class MsgGallery(commands.Cog):
                          "target": 5,
                          "mods_count_as": 1,
                          "embed_color": 0xffac33,
+                         "disp_notif": True,
 
                          "cache": {}}
         self.config.register_guild(**default_guild)
@@ -199,6 +200,18 @@ class MsgGallery(commands.Cog):
         else:
             await self.config.guild(guild).channel.set(None)
             await ctx.send(f"**Salon retiré** • La fonctionnalité est désactivée.")
+
+    @_msggallery.command(name="notif")
+    async def msgg_notif(self, ctx):
+        """Activer/désactiver l'affichage d'une notification temporaire lorsqu'un message apparaît dans la galerie"""
+        guild = ctx.guild
+        prev = await self.config.guild(guild).disp_notif()
+        if prev:
+            await self.config.guild(guild).disp_notif.set(False)
+            await ctx.send(f"**Notifications désactivées** • Les notifications ne s'afficheront plus.")
+        else:
+            await self.config.guild(guild).disp_notif.set(True)
+            await ctx.send(f"**Notifications activées** • Une notification s'affichera lorsqu'un message passe favori.")
 
     @_msggallery.command(name="webhook")
     async def msgg_webhook(self, ctx, webhook_url: str = None):
@@ -371,6 +384,13 @@ class MsgGallery(commands.Cog):
                                     else:
                                         fav["embed"] = embed_msg.id
                                         await self.config.guild(guild).cache.set_raw(message.id, value=fav)
+                                    if data["disp_notif"]:
+                                        try:
+                                            dest_channel = self.bot.get_channel(await self.config.guild(guild).channel())
+                                            await message.reply(f"Ce message est passé **favori** sur {dest_channel.mention}",
+                                                                mention_author=False)
+                                        except:
+                                            raise
                                 else:
                                     try:
                                         embed_msg = await favchan.fetch_message(fav["embed"])
