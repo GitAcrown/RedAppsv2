@@ -344,7 +344,9 @@ class MsgGallery(commands.Cog):
             data = await self.config.guild(guild).all()
             if data["channel"]:
                 emoji = emoji.name if emoji.is_unicode_emoji() else str(emoji.id)
+                logger.info(str(emoji))
                 if emoji == data["emoji"]:
+                    logger.info(str(emoji) + " DETECTED")
                     message = await channel.fetch_message(payload.message_id)
                     if message.created_at.timestamp() + 86400 > datetime.utcnow().timestamp():
                         user = guild.get_member(payload.user_id)
