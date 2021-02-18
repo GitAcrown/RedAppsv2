@@ -255,7 +255,7 @@ class MsgGallery(commands.Cog):
         await ctx.send(f"**Emoji modifié** • L'emoji de détection sera désormais {emoji}")
 
     @_msggallery.command(name="webhookname")
-    async def msgg_whname(self, ctx, name: str):
+    async def msgg_whname(self, ctx, *, name: str = "Galerie des messages"):
         """Modifier le nom du Webhook utilisé pour afficher les messages
 
         Disponible seulement si la fonctionnalité Webhook est activée"""
@@ -314,7 +314,7 @@ class MsgGallery(commands.Cog):
         else:
             em = discord.Embed(title="Couleur retirée",
                                description=f"Ceci est une démonstration de la couleur des Embeds du salon des favoris.",
-                               color=color)
+                               color=await self.bot.get_embed_color(ctx.channel))
             await self.config.guild(ctx.guild).embed_color.set(None)
         await ctx.send(embed=em)
 
