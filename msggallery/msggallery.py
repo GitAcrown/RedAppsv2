@@ -89,6 +89,8 @@ class MsgGallery(commands.Cog):
             return cdn_fmt.format(codepoint=ord(str(emoji)))
         except TypeError:
             raise InvalidEmoji('Emoji invalide')
+        except:
+            raise
 
     async def post_msg(self, message: discord.Message):
         guild = message.guild
@@ -227,7 +229,9 @@ class MsgGallery(commands.Cog):
                 channel = self.bot.get_channel(chan) if chan else None
                 if channel:
                     try:
-                        webhook_url = await channel.create_webhook(reason=f"Création sur demande de {ctx.author} pour la galerie des messages")
+                        webhook_url = await channel.create_webhook(name=await self.config.guild(guild).webhook_name(),
+                                                                   avatar=self.get_emoji_repr(await self.config.guild(guild).emoji()),
+                                                                   reason=f"Création sur demande de {ctx.author} pour la galerie des messages")
                     except:
                         await ctx.send("**Webhook impossible à créer** • Je n'ai réussi à créer le webhook.\n"
                                               "Vérifiez mes permissions ou fournissez-moi directement une URL avec la commande.")
@@ -360,9 +364,17 @@ class MsgGallery(commands.Cog):
 
                             if len(fav["votes"]) >= data["target"]:
                                 if not fav["embed"]:
-                                    embed_msg = await self.post_msg(message)
-                                    fav["embed"] = embed_msg.id
+                                    try:
+                                        embed_msg = await self.post_msg(message)
+                                    except Exception as e:
+                                        logger.error(msg=e, exc_info=True)
+                                    else:
+                                        fav["embed"] = embed_msg.id
                                 else:
-                                    embed_msg = await favchan.fetch_message(fav["embed"])
-                                    await self.edit_msg(message, embed_msg)
+                                    try:
+                                        embed_msg = await favchan.fetch_message(fav["embed"])
+                                    except Exception as e:
+                                        logger.error(msg=e, exc_info=True)
+                                    else:
+                                        await self.edit_msg(message, embed_msg)
                             await self.config.guild(guild).cache.set_raw(message.id, value=fav)
