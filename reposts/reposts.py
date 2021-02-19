@@ -72,15 +72,39 @@ class Reposts(commands.Cog):
             if cache != new:
                 await self.config.guild_from_id(g).cache.set(new)
 
+    async def message_immune(self, message: discord.Message):
+        guild = message.guild
+        if guild.id not in self.immunity_cache:
+            await self.load_cache(guild)
+        cache = self.immunity_cache[guild.id]
+        if message.author.id in cache["users"] or message.channel.id in cache["channels"]:
+            return True
+        elif [r for r in cache["roles"] if r in [n.id for n in message.author.roles]]:
+            return True
+        return False
+
+    async def link_immune(self, guild: discord.Guild, link: str):
+        if guild.id not in self.immunity_cache:
+            await self.load_cache(guild)
+        cache = self.immunity_cache[guild.id]
+        if link in cache["links_strict"]:
+            return True
+        elif [l for l in cache["links_starting"] if link.startswith(l)]:
+            return True
+        return False
+
     async def is_whitelisted(self, message: discord.Message, link: str):
         author, channel = message.author, message.channel
         wl = await self.config.guild(message.guild).whitelist()
-        if author.id in wl['users'] or channel.id in wl['channels'] or \
-                (r for r in author.roles if r.id in wl['roles']):
+        if author.id in wl["users"] or channel.id in wl["channels"]:
             return True
-        if wl['links_greedy'] or wl['links_lazy']:
-            if link in wl['links_greedy'] or (l for l in wl['links_lazy'] if link.startswith(l)):
-                return True
+        elif [r for r in wl["roles"] if r in [n.id for n in author.roles]]:
+            return True
+
+        if link in wl["links_greedy"]:
+            return True
+        elif [l for l in wl["links_lazy"] if link.startswith(l)]:
+            return True
         return False
 
     def canon_link(self, link: str):
