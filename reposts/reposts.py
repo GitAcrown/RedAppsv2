@@ -69,6 +69,8 @@ class Reposts(commands.Cog):
                 for k in cache[url]:
                     if datetime.now().fromisoformat(k['timestamp']) < datetime.now() - timedelta(days=14):
                         new[url].remove(k)
+                if not cache[url]:
+                    del new[url]
             if cache != new:
                 await self.config.guild_from_id(g).cache.set(new)
 
