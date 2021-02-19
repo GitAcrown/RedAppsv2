@@ -75,9 +75,8 @@ class Reposts(commands.Cog):
     async def is_whitelisted(self, message: discord.Message, link: str):
         author, channel = message.author, message.channel
         wl = await self.config.guild(message.guild).whitelist()
-        if any([author.id in wl['users'],
-               channel.id in wl['channels'],
-               (r for r in author.roles if r.id in wl['roles'])]):
+        if author.id in wl['users'] or channel.id in wl['channels'] or \
+                (r for r in author.roles if r.id in wl['roles']):
             return True
         elif link in wl['links_greedy'] or (l for l in wl['links_lazy'] if link.startswith(l)):
             return True
@@ -270,7 +269,6 @@ class Reposts(commands.Cog):
                 if "http" in content:
                     scan = re.compile(r'(https?://\S*\.\S*)', re.DOTALL | re.IGNORECASE).findall(content)
                     if scan:
-                        logger.info("Lien détecté")
                         url = self.canon_link(scan[0])
                         if not await self.is_whitelisted(message, url):
                             logger.info("Non whitelisté")
@@ -302,32 +300,31 @@ class Reposts(commands.Cog):
         if hasattr(channel, "guild"):
             guild = channel.guild
             data = await self.config.guild(guild).all()
-            if data["channel"]:
-                if emoji == self.repost_emoji:
-                    message = await channel.fetch_message(payload.message_id)
-                    user = guild.get_member(payload.user_id)
+            if data["toggled"] and emoji == self.repost_emoji:
+                message = await channel.fetch_message(payload.message_id)
+                user = guild.get_member(payload.user_id)
 
-                    rdata = await self.get_repost_by_message(message)
-                    if rdata:
-                        txt = ""
-                        repost = rdata.data
-                        em = discord.Embed(title=f"{self.repost_emoji} Liste des reposts",
-                                           description=box(rdata.url),
-                                           color=await self.bot.get_embed_color(message.channel))
-                        em.set_footer(text="Données des 14 derniers jours")
-                        for r in repost:
-                            ts = datetime.now().fromisoformat(r.timestamp).strftime('%d/%m/%Y %H:%M')
-                            author = guild.get_member(r.author)
-                            author = f"**{author.name}**#{author.discriminator}" if author else f"ID: {r.author}"
-                            if repost.index(r) == 0:
-                                em.add_field(name="Premier post", value=f"[Le {ts}]({r.jump_url}) par {author}",
-                                             inline=False)
-                            else:
-                                txt += f"• [Le {ts}]({r.jump_url}) par {author}\n"
-                        em.add_field(name="Re-posts", value=txt, inline=False)
-                        try:
-                            await user.send(embed=em)
-                        except:
-                            raise
+                rdata = await self.get_repost_by_message(message)
+                if rdata:
+                    txt = ""
+                    repost = rdata.data
+                    em = discord.Embed(title=f"{self.repost_emoji} Liste des reposts",
+                                       description=box(rdata.url),
+                                       color=await self.bot.get_embed_color(message.channel))
+                    em.set_footer(text="Données des 14 derniers jours")
+                    for r in repost:
+                        ts = datetime.now().fromisoformat(r.timestamp).strftime('%d/%m/%Y %H:%M')
+                        author = guild.get_member(r.author)
+                        author = f"**{author.name}**#{author.discriminator}" if author else f"ID: {r.author}"
+                        if repost.index(r) == 0:
+                            em.add_field(name="Premier post", value=f"[Le {ts}]({r.jump_url}) par {author}",
+                                         inline=False)
                         else:
-                            await message.remove_reaction(self.repost_emoji, user)
+                            txt += f"• [Le {ts}]({r.jump_url}) par {author}\n"
+                    em.add_field(name="Re-posts", value=txt, inline=False)
+                    try:
+                        await user.send(embed=em)
+                    except:
+                        raise
+                    else:
+                        await message.remove_reaction(self.repost_emoji, user)
