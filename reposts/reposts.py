@@ -25,7 +25,7 @@ class RepostData:
         RepostSeen = namedtuple('RepostSeen', ('message', 'jump_url', 'author', 'timestamp'))
         formatted = []
         for k in self._raw:
-            formatted.append(RepostSeen(**self._raw[k]))
+            formatted.append(RepostSeen(**k))
         return formatted
 
 
@@ -78,8 +78,9 @@ class Reposts(commands.Cog):
         if author.id in wl['users'] or channel.id in wl['channels'] or \
                 (r for r in author.roles if r.id in wl['roles']):
             return True
-        elif link in wl['links_greedy'] or (l for l in wl['links_lazy'] if link.startswith(l)):
-            return True
+        if wl['links_greedy'] or wl['links_lazy']:
+            if link in wl['links_greedy'] or (l for l in wl['links_lazy'] if link.startswith(l)):
+                return True
         return False
 
     def canon_link(self, link: str):
@@ -270,7 +271,9 @@ class Reposts(commands.Cog):
                     scan = re.compile(r'(https?://\S*\.\S*)', re.DOTALL | re.IGNORECASE).findall(content)
                     if scan:
                         url = self.canon_link(scan[0])
-                        logger.info("Non whitelisté")
+                        if await self.is_whitelisted(message, url):
+                            return
+
                         r = {'message': message.id, 'jump_url': message.jump_url, 'author': message.author.id,
                              'timestamp': datetime.now().isoformat()}
                         if url in await self.config.guild(guild).cache():
