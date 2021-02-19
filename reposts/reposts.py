@@ -37,7 +37,7 @@ class Reposts(commands.Cog):
         self.bot = bot
         self.config = Config.get_conf(self, identifier=736144321857978388, force_registration=True)
 
-        default_guild = {'whitelists': {'users': [],
+        default_guild = {'whitelist': {'users': [],
                                         'channels': [],
                                         'roles': [],
                                         'links_greedy': [],
@@ -74,10 +74,10 @@ class Reposts(commands.Cog):
 
     async def is_whitelisted(self, message: discord.Message, link: str):
         author, channel = message.author, message.channel
-        wl = await self.config.guild(message.guild).whitelists()
+        wl = await self.config.guild(message.guild).whitelist()
         if any([author.id in wl['users'],
                channel.id in wl['channels'],
-               (r for r in author.roles if r.id in wl['roles']) is not None]):
+               (r for r in author.roles if r.id in wl['roles'])]):
             return True
         elif link in wl['links_greedy'] or (l for l in wl['links_lazy'] if link.startswith(l)):
             return True
@@ -140,10 +140,10 @@ class Reposts(commands.Cog):
                 f"**Délai de suppression retiré** • Les reposts détectés ne seront plus supprimés.")
 
     @_reposts.group(name="whitelist")
-    async def whitelist(self, ctx):
+    async def reposts_whitelist(self, ctx):
         """Paramètres concernant l'immunité au détecteur de reposts (whitelist)"""
 
-    @whitelist.command()
+    @reposts_whitelist.command()
     async def user(self, ctx, user: discord.Member):
         """Ajouter ou retirer une immunité pour un membre"""
         guild = ctx.guild
@@ -158,7 +158,7 @@ class Reposts(commands.Cog):
             await ctx.send(
                 f"**Retiré de la whitelist** • {user.name} n'est désormais plus immunisé au détecteur de reposts.")
 
-    @whitelist.command()
+    @reposts_whitelist.command()
     async def channel(self, ctx, channel: discord.TextChannel):
         """Ajouter ou retirer une immunité pour un salon écrit"""
         guild = ctx.guild
@@ -172,7 +172,7 @@ class Reposts(commands.Cog):
             await self.config.guild(guild).whitelist.set(wl)
             await ctx.send(f"**Retiré de la whitelist** • Les reposts postés dans #{channel.name} seront de nouveau signalés.")
 
-    @whitelist.command()
+    @reposts_whitelist.command()
     async def role(self, ctx, role: discord.Role):
         """Ajouter ou retirer une immunité pour un rôle (donc les membres possédant ce rôle)"""
         guild = ctx.guild
@@ -188,7 +188,7 @@ class Reposts(commands.Cog):
             await ctx.send(
                 f"**Retiré de la whitelist** • Les membres avec le rôle {role.name} ne sont plus immunisés.")
 
-    @whitelist.command()
+    @reposts_whitelist.command()
     async def link(self, ctx, lien: str):
         """Ajouter ou retirer l'immunité pour un lien, strictement ou non
 
@@ -225,7 +225,7 @@ class Reposts(commands.Cog):
                 await ctx.send(
                     f"**Retiré de la whitelist** • Le lien `{lien}` n'est plus immunisé aux reposts.")
 
-    @whitelist.command(name="list")
+    @reposts_whitelist.command(name="list")
     async def immune_list(self, ctx):
         """Liste les éléments immunisés contre le détecteur de reposts"""
         guild = ctx.guild
