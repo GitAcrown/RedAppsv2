@@ -102,7 +102,7 @@ class Web(commands.Cog):
         if result:
             images = result.images
             image = [i for i in images if i.endswith(".png") or i.endswith(".gif") or i.endswith(".jpg") or i.endswith(".jpeg") or i.endswith('webp')][0]
-            em = discord.Embed(color=discord.Colour.lighter_gray, description=self.redux(result.summary))
+            em = discord.Embed(color=0xeeeeee, description=self.redux(result.summary))
             em.set_author(name=result.title,
                           icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Wikipedia_svg_logo.svg/1024px-Wikipedia_svg_logo.svg.png")
             if image:
