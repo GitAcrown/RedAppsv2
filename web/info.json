@@ -1,0 +1,13 @@
+{
+    "author": ["Acrone"],
+	"description": "Groupement d'API pour la consultation de sites web",
+	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help Web` pour voir les commandes disponibles",
+	"short": "Compilation de commandes de recherche",
+	"tags": ["community", "mod", "management"],
+    "requirements" : [
+		"wikipedia"
+	],
+    "required_cogs": {},
+	"type": "COG",
+	"end_user_data_statement": "This cog does not store personal data."
+}

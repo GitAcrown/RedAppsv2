@@ -9,7 +9,7 @@ from discord.ext import tasks
 from redbot.core import Config, commands, checks
 from redbot.core.utils.chat_formatting import box
 
-logger = logging.getLogger("red.RedAppsv2.repost")
+logger = logging.getLogger("red.RedAppsv2.reposts")
 
 
 class RepostData:
