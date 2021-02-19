@@ -270,28 +270,27 @@ class Reposts(commands.Cog):
                     scan = re.compile(r'(https?://\S*\.\S*)', re.DOTALL | re.IGNORECASE).findall(content)
                     if scan:
                         url = self.canon_link(scan[0])
-                        if not await self.is_whitelisted(message, url):
-                            logger.info("Non whitelisté")
-                            r = {'message': message.id, 'jump_url': message.jump_url, 'author': message.author.id,
-                                 'timestamp': datetime.now().isoformat()}
-                            if url in await self.config.guild(guild).cache():
-                                repost = await self.config.guild(guild).cache.get_raw(url)
-                                repost.append(r)
-                                await self.config.guild(guild).cache.set_raw(url, value=repost)
+                        logger.info("Non whitelisté")
+                        r = {'message': message.id, 'jump_url': message.jump_url, 'author': message.author.id,
+                             'timestamp': datetime.now().isoformat()}
+                        if url in await self.config.guild(guild).cache():
+                            repost = await self.config.guild(guild).cache.get_raw(url)
+                            repost.append(r)
+                            await self.config.guild(guild).cache.set_raw(url, value=repost)
 
-                                dafter = await self.config.guild(guild).delete_after()
-                                if dafter:
-                                    try:
-                                        await message.delete(delay=dafter)
-                                    except:
-                                        raise discord.DiscordException(f"Impossible de supprimer le message {message.id}")
-                                else:
-                                    try:
-                                        await message.add_reaction(self.repost_emoji)
-                                    except:
-                                        raise discord.DiscordException(f"Impossible d'ajouter un emoji au message {message.id}")
+                            dafter = await self.config.guild(guild).delete_after()
+                            if dafter:
+                                try:
+                                    await message.delete(delay=dafter)
+                                except:
+                                    raise discord.DiscordException(f"Impossible de supprimer le message {message.id}")
                             else:
-                                await self.config.guild(guild).cache.set_raw(url, value=[r])
+                                try:
+                                    await message.add_reaction(self.repost_emoji)
+                                except:
+                                    raise discord.DiscordException(f"Impossible d'ajouter un emoji au message {message.id}")
+                        else:
+                            await self.config.guild(guild).cache.set_raw(url, value=[r])
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
