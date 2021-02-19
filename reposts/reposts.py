@@ -270,8 +270,10 @@ class Reposts(commands.Cog):
                 if "http" in content:
                     scan = re.compile(r'(https?://\S*\.\S*)', re.DOTALL | re.IGNORECASE).findall(content)
                     if scan:
+                        logger.info("Lien détecté")
                         url = self.canon_link(scan[0])
                         if not await self.is_whitelisted(message, url):
+                            logger.info("Non whitelisté")
                             r = {'message': message.id, 'jump_url': message.jump_url, 'author': message.author.id,
                                  'timestamp': datetime.now().isoformat()}
                             if url in await self.config.guild(guild).cache():
