@@ -32,13 +32,13 @@ class Web(commands.Cog):
         results, suggestions = wikipedia.search(query, suggestion=True)
         if results:
             if results[0].lower() != query.lower():
-                best = process.extractOne(query, results, score_cutoff=90)
+                best = process.extractOne(query, results, score_cutoff=95)
                 if best:
                     page = best[0]
                     return wikipedia.page(title=page)
                 else:
                     all_results = results + suggestions if suggestions else results
-                    bests = process.extractBests(query, all_results, score_cutoff=75)
+                    bests = process.extractBests(query, all_results, score_cutoff=79)
                     if bests:
                         letters = [i for i in "🇦🇧🇨🇩🇪"]
                         emojis = []
@@ -103,6 +103,7 @@ class Web(commands.Cog):
             images = result.images
             image = [i for i in images if i.endswith(".png") or i.endswith(".gif") or i.endswith(".jpg") or i.endswith(".jpeg") or i.endswith('webp')][0]
             em = discord.Embed(color=0xeeeeee, description=self.redux(result.summary))
+            em.add_field(name="En savoir plus", value=f"<{result.url}>")
             em.set_author(name=result.title,
                           icon_url="https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Wikipedia_svg_logo.svg/1024px-Wikipedia_svg_logo.svg.png")
             if image:
