@@ -1,0 +1,11 @@
+{
+    "author": ["Acrone"],
+	"description": "Détecter et réaliser des actions sur des reposts de liens",
+	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help Reposts` pour voir les commandes disponibles",
+	"short": "Détecteur de reposts",
+	"tags": ["community", "mod", "management"],
+    "requirements" : [],
+    "required_cogs": {},
+	"type": "COG",
+	"end_user_data_statement": "This cog does not store personal data."
+}
