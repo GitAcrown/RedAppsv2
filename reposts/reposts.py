@@ -48,7 +48,7 @@ class Reposts(commands.Cog):
                          'toggled': False}
         self.config.register_guild(**default_guild)
 
-        self.repost_emoji = self.bot.get_emoji()
+        self.repost_emoji = self.bot.get_emoji(812380539319091230)
         self.reposts_cache_clear.start()
 
     @tasks.loop(hours=12)
