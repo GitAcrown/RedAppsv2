@@ -266,6 +266,29 @@ class Reposts(commands.Cog):
             em.set_footer(text="* = Liens commençant par ...")
         await ctx.send(embed=em)
 
+    @commands.command(name="links")
+    async def disp_links(self, ctx, nb: int = 10):
+        """Affiche les X derniers liens détectés (reposts ou non)"""
+        guild = ctx.guild
+        data = await self.config.guild(guild).cache()
+        links = {}
+        for url in data:
+            if data[url]:
+                links[url] = datetime.now().fromisoformat(data[url][-1]['timestamp']).timestamp()
+
+        if links:
+            txt = ""
+            for u in sorted(links, key=links.get, reverse=True)[:nb]:
+                txt += f"<{links[u]}>\n"
+
+            em = discord.Embed(title=f"{nb} derniers liens postés", description=txt,
+                               color=await self.bot.get_embed_color(ctx.channel))
+            em.set_footer(text="Données des 14 derniers jours seulement")
+            await ctx.send(embed=em)
+        else:
+            await ctx.send(
+                f"**Liste vide** • Aucun lien n'a été posté récemment.")
+
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.guild:
@@ -277,6 +300,8 @@ class Reposts(commands.Cog):
                     if scan:
                         url = self.canon_link(scan[0])
                         if await self.is_whitelisted(message, url):
+                            return
+                        if message.author == self.bot.user:
                             return
 
                         r = {'message': message.id, 'jump_url': message.jump_url, 'author': message.author.id,
@@ -310,6 +335,8 @@ class Reposts(commands.Cog):
             if data["toggled"] and emoji == self.repost_emoji:
                 message = await channel.fetch_message(payload.message_id)
                 user = guild.get_member(payload.user_id)
+                if user == self.bot.user:
+                    return
 
                 rdata = await self.get_repost_by_message(message)
                 if rdata:
