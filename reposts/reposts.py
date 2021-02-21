@@ -283,10 +283,14 @@ class Reposts(commands.Cog):
         if links:
             txt = ""
             for u in sorted(links, key=links.get, reverse=True)[:nb]:
-                txt += f"- <{u}>\n"
+                txt += f"• <{u}>\n"
 
-            em = discord.Embed(title=f"Derniers liens postés", description=txt,
-                               color=await self.bot.get_embed_color(ctx.channel))
+            if contain:
+                em = discord.Embed(title=f"{nb} Derniers liens postés contenant \"{contain}\"", description=txt,
+                                   color=await self.bot.get_embed_color(ctx.channel))
+            else:
+                em = discord.Embed(title=f"{nb} Derniers liens postés", description=txt,
+                                   color=await self.bot.get_embed_color(ctx.channel))
             em.set_footer(text="Données des 14 derniers jours seulement")
             await ctx.send(embed=em)
         else:
