@@ -269,7 +269,9 @@ class Reposts(commands.Cog):
 
     @commands.command(name="links")
     async def disp_links(self, ctx, nb: typing.Optional[int] = 10, *, contain: str = None):
-        """Affiche les X derniers liens détectés (reposts ou non)"""
+        """Affiche les X derniers liens détectés (reposts ou non)
+
+        Il est possible de préciser un morceau de texte qui doit être contenu dans les liens recherchés"""
         guild = ctx.guild
         data = await self.config.guild(guild).cache()
         links = {}
