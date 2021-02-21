@@ -5,8 +5,8 @@ import logging
 import re
 
 import discord
+import typing
 from discord.ext import tasks
-from discord.ext.commands import Greedy
 from redbot.core import Config, commands, checks
 from redbot.core.utils.chat_formatting import box
 
@@ -268,7 +268,7 @@ class Reposts(commands.Cog):
         await ctx.send(embed=em)
 
     @commands.command(name="links")
-    async def disp_links(self, ctx, *, nb: int = 10, contain: Greedy[str] = None):
+    async def disp_links(self, ctx, nb: typing.Optional[int] = 10, *, contain: str = None):
         """Affiche les X derniers liens détectés (reposts ou non)"""
         guild = ctx.guild
         data = await self.config.guild(guild).cache()
