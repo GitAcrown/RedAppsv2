@@ -279,7 +279,7 @@ class Reposts(commands.Cog):
         if links:
             txt = ""
             for u in sorted(links, key=links.get, reverse=True)[:nb]:
-                txt += f"<{links[u]}>\n"
+                txt += f"<{u}>\n"
 
             em = discord.Embed(title=f"{nb} derniers liens postés", description=txt,
                                color=await self.bot.get_embed_color(ctx.channel))
