@@ -6,6 +6,7 @@ import re
 
 import discord
 from discord.ext import tasks
+from discord.ext.commands import Greedy
 from redbot.core import Config, commands, checks
 from redbot.core.utils.chat_formatting import box
 
@@ -267,12 +268,15 @@ class Reposts(commands.Cog):
         await ctx.send(embed=em)
 
     @commands.command(name="links")
-    async def disp_links(self, ctx, nb: int = 10):
+    async def disp_links(self, ctx, *, nb: int = 10, contain: Greedy[str] = None):
         """Affiche les X derniers liens détectés (reposts ou non)"""
         guild = ctx.guild
         data = await self.config.guild(guild).cache()
         links = {}
         for url in data:
+            if contain:
+                if contain not in url.lower():
+                    continue
             if data[url]:
                 links[url] = datetime.now().fromisoformat(data[url][-1]['timestamp']).timestamp()
 
@@ -281,13 +285,13 @@ class Reposts(commands.Cog):
             for u in sorted(links, key=links.get, reverse=True)[:nb]:
                 txt += f"- <{u}>\n"
 
-            em = discord.Embed(title=f"{nb} derniers liens postés", description=txt,
+            em = discord.Embed(title=f"Derniers liens postés", description=txt,
                                color=await self.bot.get_embed_color(ctx.channel))
             em.set_footer(text="Données des 14 derniers jours seulement")
             await ctx.send(embed=em)
         else:
             await ctx.send(
-                f"**Liste vide** • Aucun lien n'a été posté récemment.")
+                f"**Liste vide** • Aucun lien conforme à votre recherche n'a été posté récemment.")
 
     @commands.Cog.listener()
     async def on_message(self, message):
