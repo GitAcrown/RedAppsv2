@@ -356,7 +356,7 @@ class Reposts(commands.Cog):
                                        description=box(rdata.url),
                                        color=await self.bot.get_embed_color(message.channel))
                     em.set_footer(text="Données des 14 derniers jours")
-                    chunk = repost if len(repost) <= 9 else repost[-9:]
+                    chunk = repost[1:] if len(repost) <= 9 else repost[-9:]
 
                     r = repost[0]
                     ts = datetime.now().fromisoformat(r.timestamp).strftime('%d/%m/%Y %H:%M')
