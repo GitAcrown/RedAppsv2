@@ -356,15 +356,20 @@ class Reposts(commands.Cog):
                                        description=box(rdata.url),
                                        color=await self.bot.get_embed_color(message.channel))
                     em.set_footer(text="Données des 14 derniers jours")
-                    for r in repost:
-                        ts = datetime.now().fromisoformat(r.timestamp).strftime('%d/%m/%Y %H:%M')
-                        author = guild.get_member(r.author)
-                        author = f"**{author.name}**#{author.discriminator}" if author else f"ID: {r.author}"
-                        if repost.index(r) == 0:
-                            em.add_field(name="Premier post", value=f"[Le {ts}]({r.jump_url}) par {author}",
-                                         inline=False)
-                        else:
-                            txt += f"• [Le {ts}]({r.jump_url}) par {author}\n"
+                    chunk = repost if len(repost) <= 9 else repost[-9:]
+
+                    r = repost[0]
+                    ts = datetime.now().fromisoformat(r.timestamp).strftime('%d/%m/%Y %H:%M')
+                    author = guild.get_member(r.author)
+                    author = f"**{author.name}**#{author.discriminator}" if author else f"ID: {r.author}"
+                    em.add_field(name="Premier post", value=f"[Le {ts}]({r.jump_url}) par {author}",
+                                 inline=False)
+                    for s in chunk:
+                        ts = datetime.now().fromisoformat(s.timestamp).strftime('%d/%m/%Y %H:%M')
+                        author = guild.get_member(s.author)
+                        author = f"**{author.name}**#{author.discriminator}" if author else f"ID: {s.author}"
+                        txt += f"• [Le {ts}]({s.jump_url}) par {author}\n"
+
                     em.add_field(name="Re-posts", value=txt, inline=False)
                     try:
                         await user.send(embed=em)
