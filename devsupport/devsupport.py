@@ -100,9 +100,9 @@ class DevSupport(commands.Cog):
                 sub = discord.Embed(title=f"Ticket #{ticket_id}", description=box(ticket['text']), color=color)
                 author = self.bot.get_user(ticket['author'])
                 author = f"**{author}** ({ctx.author.id})" if author else "ID: " + ticket['author']
-                sub.add_field(name="Auteur", value=f"**{author}** ({ctx.author.id})")
+                sub.add_field(name="Auteur", value=f"{author}")
                 sub.set_footer(text=f"Statut : " + StatusInfo[ticket['type'].lower()][ticket['status']])
-                await submit_channel.send(embed=sub)
+                await ctx.send(embed=sub)
             else:
                 await ctx.send(f"**Proposition introuvable** • Vérifiez l'identifiant.")
         else:
