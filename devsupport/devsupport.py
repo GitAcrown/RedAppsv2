@@ -134,7 +134,8 @@ class DevSupport(commands.Cog):
                     bem.timestamp = ctx.message.created_at
                     bem.set_footer(text=f"Statut : " + StatusInfo[ticket['type'].lower()][ticket['status']])
                     await self.config.Tickets.set_raw(ticket_id, value=ticket)
-                    await msg.edit(embed=bem)
+                    medit = await msg.edit(embed=bem)
+                    await ctx.send(f"**Statut modifié** • Message : <{medit.jump_url}>")
                 else:
                     await ctx.send(f"**Statut invalide** • Vérifiez que ce num. de statut existe "
                                    f"et que c'est pas déjà le statut actuel du ticket.")
