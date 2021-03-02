@@ -46,7 +46,7 @@ class Karma(commands.Cog):
 
         self.karma_loop.start()
 
-    @tasks.loop(seconds=20)
+    @tasks.loop(seconds=30)
     async def karma_loop(self):
         all_guilds = await self.config.all_guilds()
         now = datetime.now()
@@ -57,7 +57,7 @@ class Karma(commands.Cog):
                 for user_id in all_guilds[guild_id]['jail_users']:
                     if all_guilds[guild_id]['jail_users'][user_id] != {}:
                         if datetime.now().fromisoformat(all_guilds[guild_id]['jail_users'][user_id]['time']) <= now:
-                            user = guild.get_member(user_id) if guild.get_member(user_id) else self.bot.get_user(user_id)
+                            user = guild.get_member(int(user_id)) if guild.get_member(int(user_id)) else self.bot.get_user(int(user_id))
                             await self.remove_user_from_jail(user)
 
                             if type(user) == discord.Member:
