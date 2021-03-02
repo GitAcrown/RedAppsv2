@@ -83,7 +83,7 @@ class Karma(commands.Cog):
             raise InvalidSettings("Le rôle de la prison n'a pas été configuré")
 
         async with self.config.guild(guild).jail_users() as jail:
-            jail[user.id] = {'time': time.isoformat(), 'channel': notify_channel.id}
+            jail[str(user.id)] = {'time': time.isoformat(), 'channel': notify_channel.id}
 
         em = discord.Embed(color=await self.bot.get_embed_color(notify_channel))
         em.set_author(name=f"🔒 Peine de prison → {str(user)}", icon_url=user.avatar_url)
@@ -108,7 +108,7 @@ class Karma(commands.Cog):
 
         async with self.config.guild(guild).jail_users() as jail:
             for user in users:
-                jail[user.id] = {'time': time.isoformat(), 'channel': notify_channel.id}
+                jail[str(user.id)] = {'time': time.isoformat(), 'channel': notify_channel.id}
 
         txt = "" if not reason else f"**Raison :** {reason}\n"
         txt += "**Membres concernés :**\n"
@@ -131,7 +131,7 @@ class Karma(commands.Cog):
         msg = None
 
         try:
-            data = await self.config.guild(guild).jail_users.get_raw(user.id)
+            data = await self.config.guild(guild).jail_users.get_raw(str(user.id))
         except KeyError:
             return NoUserData(f"Le membre {user.name} (ID:{user.id}) n'est pas en prison")
         else:
@@ -145,14 +145,14 @@ class Karma(commands.Cog):
             msg = await notify_channel.send(embed=em)
         finally:
             async with self.config.guild(guild).jail_users() as jail:
-                jail[user.id]['time'] = time.isoformat()
+                jail[str(user.id)]['time'] = time.isoformat()
         return msg
 
     async def get_user_jail(self, user: discord.Member):
         """Renvoie les données de prison du membre demandé"""
         guild = user.guild
         try:
-            return await self.config.guild(guild).jail_users.get_raw(user.id)
+            return await self.config.guild(guild).jail_users.get_raw(str(user.id))
         except KeyError:
             return {}
 
@@ -163,7 +163,7 @@ class Karma(commands.Cog):
             guild = user.guild
 
             try:
-                data = await self.config.guild(guild).jail_users.get_raw(user.id)
+                data = await self.config.guild(guild).jail_users.get_raw(str(user.id))
             except KeyError:
                 pass
             else:
@@ -179,13 +179,13 @@ class Karma(commands.Cog):
                     msg = await notify_channel.send(embed=em)
             finally:
                 async with self.config.guild(guild).jail_users() as jail:
-                    jail[user.id] = {}
+                    jail[str(user.id)] = {}
         else:
             all_guilds = await self.config.all_guilds()
             for g in all_guilds:
-                if user.id in all_guilds[g]['jail_users']:
+                if str(user.id) in all_guilds[g]['jail_users']:
                     try:
-                        data = await self.config.guild_from_id(g).jail_users.get_raw(user.id)
+                        data = await self.config.guild_from_id(g).jail_users.get_raw(str(user.id))
                     except KeyError:
                         pass
                     else:
@@ -198,7 +198,7 @@ class Karma(commands.Cog):
 
                             msg = await notify_channel.send(embed=em)
                     finally:
-                        await self.config.guild_from_id(g).jail_users.set_raw(user.id, value={})
+                        await self.config.guild_from_id(g).jail_users.set_raw(str(user.id), value={})
         return msg
 
 
@@ -239,7 +239,7 @@ class Karma(commands.Cog):
         author = ctx.author
         settings = await self.config.guild(guild).jail_settings()
         if not time:
-            time = f"{settings['default_delay']}s"
+            time = f"{settings['default_time']}s"
 
         if settings['role']:
             if time[0] in ('+', '-'):
@@ -256,15 +256,33 @@ class Karma(commands.Cog):
                     return await ctx.send("**Impossible** » Vous ne pouvez pas éditer le temps de prison d'un "
                                           "membre non emprisonné")
             else:
+                to_add, to_rem = [], []
+                for user in users:
+                    if not await self.get_user_jail(user):
+                        to_add.append(user)
+                    else:
+                        to_rem.append(user)
                 try:
                     tmdelta = self.parse_timedelta(time)
                     dt = (datetime.now() + tmdelta)
                 except Exception as e:
                     return await ctx.send(f"**Erreur** » `{e}`")
-                if len(users) == 1:
-                    await self.add_user_to_jail(users[0], dt, ctx.channel, author, reason=reason)
+
+                if to_add:
+                    users = to_add
+                    if len(users) == 1:
+                        await self.add_user_to_jail(users[0], dt, ctx.channel, author, reason=reason)
+                    else:
+                        await self.add_users_to_jail(users, dt, ctx.channel, author, reason=reason)
+
+                elif to_rem:
+                    users = to_rem
+                    for user in users:
+                        await self.remove_user_from_jail(user)
+
                 else:
-                    await self.add_users_to_jail(users, dt, ctx.channel, author, reason=reason)
+                    await ctx.send("**Erreur** » Les membres cités ne peuvent ni être retirés ni ajoutés à la prison")
+
         else:
             await ctx.send("**Non configurée** » La prison n'a pas encore été configurée (v. `[p]pset role`")
 
