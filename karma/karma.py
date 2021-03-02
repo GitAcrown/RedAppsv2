@@ -248,7 +248,10 @@ class Karma(commands.Cog):
                 if userdata:
                     try:
                         tmdelta = self.parse_timedelta(time[1:])
-                        dt = (datetime.now().fromisoformat(userdata['time']) + tmdelta)
+                        if time[0] == "+":
+                            dt = (datetime.now().fromisoformat(userdata['time']) + tmdelta)
+                        else:
+                            dt = (datetime.now().fromisoformat(userdata['time']) - tmdelta)
                     except Exception as e:
                         return await ctx.send(f"**Erreur** » `{e}`")
                     await self.edit_user_jail(user, dt, author)
