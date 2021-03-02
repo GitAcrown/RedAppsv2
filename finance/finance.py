@@ -238,7 +238,7 @@ class Finance(commands.Cog):
 
         acc = await self.get_account(member)
         for log in acc.logs:
-            if datetime.utcnow().fromisoformat(log['timestamp']) == timestamp:
+            if datetime.now().fromisoformat(log['timestamp']) == timestamp:
                 return FinanceLog(**log)
         return None
 
@@ -273,7 +273,7 @@ class Finance(commands.Cog):
         if not isinstance(delta, int):
             raise TypeError("Type de somme du log invalide, {} != int".format(type(delta)))
 
-        log = {'content': content, 'timestamp': datetime.utcnow().isoformat(), 'delta': delta}
+        log = {'content': content, 'timestamp': datetime.now().isoformat(), 'delta': delta}
 
         today = datetime.now().date()
         acc = await self.get_account(member)
@@ -298,7 +298,7 @@ class Finance(commands.Cog):
         async with self.config.member(member).logs() as logs:
             _logs = copy(logs)
             for log in _logs:
-                if datetime.utcnow().fromisoformat(log['timestamp']) == timestamp:
+                if datetime.now().fromisoformat(log['timestamp']) == timestamp:
                     logs.remove(log)
 
         return _logs
