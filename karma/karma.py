@@ -197,7 +197,8 @@ class Karma(commands.Cog):
 
                             msg = await notify_channel.send(embed=em)
                     finally:
-                        await self.config.guild_from_id(g).jail_users.set_raw(str(user.id), value={})
+                        await self.config.guild_from_id(g).jail_users.clear_raw(str(user.id))
+
         return msg
 
 
@@ -294,6 +295,24 @@ class Karma(commands.Cog):
 
         else:
             await ctx.send("**Non configurée** » La prison n'a pas encore été configurée (v. `[p]pset role`")
+
+    @commands.command(name="prisoninfo", aliases=["pinfo"])
+    async def _jail_info(self, ctx):
+        """Affiche une liste des personnes présentement en prison"""
+        guild = ctx.guild
+        author = ctx.author
+        jail, settings = await self.config.guild(guild).jail_users(), await self.config.guild(guild).jail_settings()
+        txt = ""
+        manu = ""
+        if settings['role']:
+            jail_role = guild.get_role(settings['role'])
+
+            for user in guild.members:
+                if user.id in jail:
+                    txt += f"• {user.mention}\n"
+                elif jail_role in user.roles:
+                    manu += f"• {user.mention}\n"
+
 
     async def check_jail_role_perms(self, role: discord.Role):
         to_apply = discord.Permissions(send_messages=False)
