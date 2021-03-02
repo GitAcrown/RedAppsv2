@@ -42,9 +42,7 @@ class Karma(commands.Cog):
                                            'exclude_channels': [],
                                            'default_time': 300},
                          'jail_users': {}}
-        default_member = {}
         self.config.register_guild(**default_guild)
-        self.config.register_user(**default_member)
 
         self.karma_loop.start()
 
@@ -58,7 +56,7 @@ class Karma(commands.Cog):
             if jail_role:
                 for user_id in all_guilds[guild_id]['jail_users']:
                     if all_guilds[guild_id]['jail_users'][user_id] != {}:
-                        if datetime.fromisoformat(all_guilds[guild_id]['jail_users'][user_id]['time']) <= now:
+                        if datetime.now().fromisoformat(all_guilds[guild_id]['jail_users'][user_id]['time']) <= now:
                             user = guild.get_member(user_id) if guild.get_member(user_id) else self.bot.get_user(user_id)
                             await self.remove_user_from_jail(user)
 
@@ -242,6 +240,7 @@ class Karma(commands.Cog):
             time = f"{settings['default_time']}s"
 
         if settings['role']:
+            jail_role = guild.get_role(settings['role'])
             if time[0] in ('+', '-'):
                 user = users[0]
                 userdata = await self.get_user_jail(user)
@@ -282,6 +281,7 @@ class Karma(commands.Cog):
                     users = to_rem
                     for user in users:
                         await self.remove_user_from_jail(user)
+                        await user.remove_roles(jail_role)
 
                 else:
                     await ctx.send("**Erreur** » Les membres cités ne peuvent ni être retirés ni ajoutés à la prison")
