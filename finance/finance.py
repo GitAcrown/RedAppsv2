@@ -430,7 +430,7 @@ class Finance(commands.Cog):
         embeds = []
         tabl = []
         for log in logs[::-1]:
-            if len(tabl) < 10:
+            if len(tabl) < 20:
                 if log.content:
                     tabl.append((log.formatted_time(), f"{log.delta:+}", f"{log.content[:50]}"))
                 else:
@@ -440,6 +440,13 @@ class Finance(commands.Cog):
                 em.set_author(name=f"Opérations de {user}*", icon_url=user.avatar_url)
                 em.set_footer(text="*Opérations de ce jour seulement")
                 embeds.append(em)
+                tabl = []
+
+        if tabl:
+            em = discord.Embed(color=user.color, description=box(tabulate(tabl, headers=["Heure", "Somme", "Détails"])))
+            em.set_author(name=f"Opérations de {user}*", icon_url=user.avatar_url)
+            em.set_footer(text="*Opérations de ce jour seulement")
+            embeds.append(em)
 
         if embeds:
             await menu(ctx, embeds, DEFAULT_CONTROLS)
