@@ -279,7 +279,7 @@ class Karma(commands.Cog):
                     else:
                         await self.add_users_to_jail(users, dt, ctx.channel, author, reason=reason)
                     if to_rem:
-                        txt = "**Membres déjà en prison** :\n" + '\n'.join([f"- {u}" for u in to_rem])
+                        txt = "**Membres déjà en prison** :\n" + '\n'.join([f"• {u}" for u in to_rem])
                         plus = discord.Embed(title="Membres mentionnés déjà emprisonnés", description=txt)
                         plus.set_footer(text="Libérez-les avec la même commande en les mentionnant ensemble")
                         await ctx.send(embed=plus)
@@ -300,7 +300,6 @@ class Karma(commands.Cog):
     async def _jail_info(self, ctx):
         """Affiche une liste des personnes présentement en prison"""
         guild = ctx.guild
-        author = ctx.author
         jail, settings = await self.config.guild(guild).jail_users(), await self.config.guild(guild).jail_settings()
         txt = ""
         manu = ""
@@ -313,6 +312,13 @@ class Karma(commands.Cog):
                 elif jail_role in user.roles:
                     manu += f"• {user.mention}\n"
 
+            em = discord.Embed(title="Prisonniers", color=await self.bot.get_embed_color(ctx.channel))
+            em.description = txt if txt else "Aucun prisonnier"
+            if manu:
+                em.add_field(name="Ajoutés manuellement", value=manu)
+            await ctx.send(embed=em)
+        else:
+            await ctx.send("**Non configurée** » La prison n'a pas encore été configurée (v. `[p]pset role`")
 
     async def check_jail_role_perms(self, role: discord.Role):
         to_apply = discord.Permissions(send_messages=False)
