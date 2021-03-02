@@ -279,7 +279,7 @@ class Karma(commands.Cog):
                     else:
                         await self.add_users_to_jail(users, dt, ctx.channel, author, reason=reason)
                     if to_rem:
-                        txt = "**Membres déjà en prison** :\n" + '\n'.join([f"• {u}" for u in to_rem])
+                        txt = '\n'.join([f"• {u}" for u in to_rem])
                         plus = discord.Embed(title="Membres mentionnés déjà emprisonnés", description=txt)
                         plus.set_footer(text="Libérez-les avec la même commande en les mentionnant ensemble")
                         await ctx.send(embed=plus)
@@ -294,7 +294,7 @@ class Karma(commands.Cog):
                     await ctx.send("**Erreur** » Les membres cités ne peuvent ni être retirés ni ajoutés à la prison")
 
         else:
-            await ctx.send("**Non configurée** » La prison n'a pas encore été configurée (v. `[p]pset role`")
+            await ctx.send("**Non configurée** » La prison n'a pas encore été configurée (v. `[p]pset role`)")
 
     @commands.command(name="prisoninfo", aliases=["pinfo"])
     async def _jail_info(self, ctx):
@@ -307,8 +307,9 @@ class Karma(commands.Cog):
             jail_role = guild.get_role(settings['role'])
 
             for user in guild.members:
-                if user.id in jail:
-                    txt += f"• {user.mention}\n"
+                if str(user.id) in jail:
+                    time = datetime.now().fromisoformat(jail[str(user.id)]['time']).strftime('%d/%m/%Y %H:%M')
+                    txt += f"• {user.mention} » {time}\n"
                 elif jail_role in user.roles:
                     manu += f"• {user.mention}\n"
 
@@ -316,9 +317,12 @@ class Karma(commands.Cog):
             em.description = txt if txt else "Aucun prisonnier"
             if manu:
                 em.add_field(name="Ajoutés manuellement", value=manu)
-            await ctx.send(embed=em)
+            try:
+                await ctx.send(embed=em)
+            except:
+                await ctx.send("**Liste trop longue** » Discord n'autorise pas l'envoi de messages aussi longs")
         else:
-            await ctx.send("**Non configurée** » La prison n'a pas encore été configurée (v. `[p]pset role`")
+            await ctx.send("**Non configurée** » La prison n'a pas encore été configurée (v. `[p]pset role`)")
 
     async def check_jail_role_perms(self, role: discord.Role):
         to_apply = discord.Permissions(send_messages=False)
