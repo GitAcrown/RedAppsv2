@@ -308,6 +308,7 @@ class Karma(commands.Cog):
                                f"Sachez que vous devez manuellement monter le rôle à sa place appropriée dans la hiérarchie.")
         else:
             jail['role'] = None
+            await ctx.send(f"**Rôle retiré** » La prison a été désactivée.")
         await self.config.guild(guild).jail_settings.set(jail)
 
         if jail["role"]:
