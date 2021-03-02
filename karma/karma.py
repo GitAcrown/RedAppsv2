@@ -277,6 +277,11 @@ class Karma(commands.Cog):
                         await self.add_user_to_jail(users[0], dt, ctx.channel, author, reason=reason)
                     else:
                         await self.add_users_to_jail(users, dt, ctx.channel, author, reason=reason)
+                    if to_rem:
+                        txt = "**Membres déjà en prison** :\n" + '\n'.join([f"- {u}" for u in to_rem])
+                        plus = discord.Embed(title="Membres mentionnés déjà emprisonnés", description=txt)
+                        plus.set_footer(text="Libérez-les avec la même commande en les mentionnant ensemble")
+                        await ctx.send(embed=plus)
 
                 elif to_rem:
                     users = to_rem
