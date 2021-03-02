@@ -211,7 +211,7 @@ class Karma(commands.Cog):
         regex = re.compile('^((?P<days>[\\.\\d]+?)j)? *((?P<hours>[\\.\\d]+?)h)? *((?P<minutes>[\\.\\d]+?)m)? *((?P<seconds>[\\.\\d]+?)s)? *$')
         rslt = regex.match(time_string)
         if not rslt:
-            raise ValueError("Aucun timedelta n'a pu être déterminé des valeurs fournies")
+            raise ValueError("Vérifiez les valeurs fournies (membres et/ou temps)")
 
         parsed = rslt.groupdict()
         return timedelta(**{i: int(parsed[i]) for i in parsed if parsed[i]})
