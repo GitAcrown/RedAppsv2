@@ -1,0 +1,11 @@
+{
+    "author": ["Acrone"],
+	"description": "Module d'économie virtuelle utilisé sur NERON",
+	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help Finance` pour voir les commandes disponibles",
+	"short": "Système d'économie virtuelle utilisée sur NERON",
+	"tags": ["community", "fun", "economy"],
+    "requirements" : [],
+    "required_cogs": {},
+	"type": "COG",
+	"end_user_data_statement": "This cog does not store personal data."
+}
