@@ -175,8 +175,10 @@ class Finance(commands.Cog):
         if value > max_balance:
             raise BalanceTooHigh(f"Il est impossible de dépasser le seuil fixé de {max_balance} crédits")
 
+        old_value = await self.config.member(member).balance()
+
         await self.config.member(member).balance.set(value)
-        await self.append_log(member, value, content=reason)
+        await self.append_log(member, value - old_value, content=reason)
 
         return value
 
