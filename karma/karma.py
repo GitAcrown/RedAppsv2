@@ -307,7 +307,7 @@ class Karma(commands.Cog):
             jail_role = guild.get_role(settings['role'])
 
             for user in guild.members:
-                if str(user.id) in jail:
+                if jail.get(str(user.id), {}):
                     time = datetime.now().fromisoformat(jail[str(user.id)]['time']).strftime('%d/%m/%Y %H:%M')
                     txt += f"• {user.mention} » {time}\n"
                 elif jail_role in user.roles:
