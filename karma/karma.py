@@ -109,14 +109,14 @@ class Karma(commands.Cog):
                 jail[str(user.id)] = {'time': time.isoformat(), 'channel': notify_channel.id}
 
         txt = "" if not reason else f"**Raison :** {reason}\n"
-        txt += "**Membres concernés :**\n"
+        txt += "**__Membres concernés :__**\n"
 
         for user in users:
             txt += f"• **{user.name}**#{user.discriminator}\n"
             rtxt = f"Mise en prison par {author} (Groupe) | Raison : {reason}" if reason else f"Mise en prison par {author} (Groupe)"
             await user.add_roles(jail_role, reason=rtxt)
 
-        em = discord.Embed(title="Peine de prison", color=await self.bot.get_embed_color(notify_channel),
+        em = discord.Embed(title="Peine de prison (Groupée)", color=await self.bot.get_embed_color(notify_channel),
                            description=txt)
         em.add_field(name="Sortie prévue", value=box(time.strftime('%d/%m/%Y %H:%M')))
         em.add_field(name="Auteur", value=box(str(author)))
