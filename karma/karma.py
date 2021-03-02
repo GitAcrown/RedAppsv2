@@ -392,7 +392,7 @@ class Karma(commands.Cog):
                         pass
                 if tb:
                     await ctx.send("**Channels adaptés pour la prison :**\n" + tb)
-                    await self.config.guild(guild).jail.set_raw("exclude_channels", value=chans)
+                    await self.config.guild(guild).jail_settings.set_raw("exclude_channels", value=chans)
                 else:
                     await ctx.send("Aucun channel n'a été modifié (manques de permissions ou channels déjà correctement configurés).")
             else:
@@ -403,7 +403,7 @@ class Karma(commands.Cog):
             for channel in guild.text_channels:
                 await channel.set_permissions(role, overwrite=None)
             await ctx.send("**Channels retirés** » Plus aucun channel n'accorde d'exception aux prisonniers")
-            await self.config.guild(guild).jail.clear_raw("exclude_channels")
+            await self.config.guild(guild).jail_settings.clear_raw("exclude_channels")
         else:
             await ctx.send(
                 "**Impossible** » Je n'ai pas de permissions à retirer si je n'ai pas de rôle cible (configurez un rôle prisonnier d'abord)")
