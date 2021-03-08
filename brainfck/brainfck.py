@@ -482,6 +482,39 @@ class Brainfck(commands.Cog):
             await ctx.send(
                 "**Notifications activées** • Vous recevrez des notifications lorsqu'un membre termine un de vos défis")
 
+    @commands.command(name="brainfckexemple", aliases=['bfex'])
+    async def brainfck_file_example(self, ctx):
+        """Affiche un tuto pour créer votre fichier thème pour Brainfck"""
+        txt = "Les fichiers thème sont des fichiers en **.yaml** qui suivent le format de cet exemple :\n```yaml\n" \
+              "# Paramètres obligatoires\n" \
+              "id: QJ2021  # Identifiant de votre thème, 10 caractères max\n" \
+              "name: Quiz Janvier 2021  # Nom de votre thème\n" \
+              "description: Questions de culture générale tirées du Grand Quiz de l'Appart de Janvier 2021  # Courte description du thème\n" \
+              "author_id: 172376505354158080  # Votre ID\n" \
+              "# Paramètres Optionnels\n" \
+              "custom_delay: 8  # Modifier le délai pour répondre aux questions (min. 5s), par défaut 10\n" \
+              "thumbnail: https://i.imgur.com/JpNIjwm.png   # Ajouter une image pour représenter son thème\n" \
+              "color: ffa8be  # Couleur personnalisée du thème, en HEX sans prefixe\n" \
+              "# Contenu du thème\n" \
+              "content:\n" \
+              "| Quel pays a pour capitale Taipei ?:  # Question\n" \
+              "|| image: https://www.guidesulysse.com/images/destinations/iStock-861177234.jpg  # Optionnel: Image à afficher s'il y en a une\n" \
+              "|| good: Taïwan  # Bonne réponse\n" \
+              "|| bad:  # Mauvaises réponses : minimum 3 (sélectionnées aléatoirement lors des parties)\n" \
+              "||| - Corée du Nord\n" \
+              "||| - Japon\n" \
+              "||| - Corée du Sud\n" \
+              "||| - Vietnam\n" \
+              "|| show: >  # Optionnel: Message à ajouter après avoir répondu (pour donner des détails)\n" \
+              "||| Taipei est la capitale politique, culturelle et économique *de facto* de l'île de Taïwan.```"
+
+        em = discord.Embed(title="Créer un fichier thème pour Brainfck", color=await ctx.embed_color(), description=txt)
+        em.add_field(name="Notes importantes", value="- Les fichiers doivent contenir (dans 'content') au moins 15 questions valides pour être accepté\n"
+                                                     "- Mettre à jour un fichier de thème efface tous les codes de parties liées à celui-ci\n"
+                                                     "- Les fichiers sont à enregistrer en YAML, formattage UTF-8"
+                                                     "Conseil : Utilisez un logiciel tel que Notepad++ pour éditer des fichiers YAML plus facilement")
+        await ctx.send(embed=em)
+
     @commands.group(name="brainfckset", aliases=['bfset'])
     @checks.is_owner()
     async def _brainfuck_settings(self, ctx):
