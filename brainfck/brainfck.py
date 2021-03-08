@@ -112,20 +112,20 @@ class Brainfck(commands.Cog):
         return None
 
     @commands.command(name="brainfck", aliases=["bf", "quiz"])
-    async def brainfck_play(self, ctx, pack: str = None):
+    async def brainfck_play(self, ctx, theme_invite: str = None):
         """Faire un Quiz Brainfck
 
-        <pack> = Identifiant du pack, ne pas en mettre permet de consulter la liste des packs disponibles
-        Vous pouvez aussi y rentrer une invitation de défi"""
+        <theme_invite> = Identifiant du pack ou invitation
+        Ne rien mettre affiche la liste des thèmes disponibles"""
         emcolor = await ctx.embed_color()
         confirm, cancel = self.bot.get_emoji(812451214037221439), self.bot.get_emoji(812451214179434551)
 
         if not self.loaded_packs:
             self.load_packs()
 
-        if not pack:
+        if not theme_invite:
             txt = ""
-            em = discord.Embed(title="Liste des packs disponibles")
+            em = discord.Embed(title="Liste des thèmes disponibles")
             page = 1
             for p in self.loaded_packs:
                 chunk = f"• `{p}` : {self.loaded_packs[p]['description']}\n"
@@ -142,12 +142,12 @@ class Brainfck(commands.Cog):
                 em.set_footer(text=f"Page #{page}")
                 await ctx.send(embed=em)
             else:
-                await ctx.send("**Aucun Pack de questions n'est disponible**")
+                await ctx.send("**Aucun thème n'est disponible**")
             return
 
         sessions = await self.config.Sessions()
-        packid = pack.upper() if pack.upper() in self.loaded_packs else None
-        invite = pack if pack in sessions else None
+        packid = theme_invite.upper() if theme_invite.upper() in self.loaded_packs else None
+        invite = theme_invite if theme_invite in sessions else None
 
         if invite:
             sess_author = self.bot.get_user(int(sessions[invite]['author']))
@@ -158,14 +158,14 @@ class Brainfck(commands.Cog):
             if ctx.author.id in [int(us) for us in sess_players]:
                 return await ctx.send(f"**Impossible d'y rejouer** • Votre score ({sess_players[ctx.author.id]} points)"
                                       f" figure déjà dans le classement pour cette partie !")
-            pack = self.loaded_packs[sess_pack_id]
+            theme_invite = self.loaded_packs[sess_pack_id]
             packid = sess_pack_id
-            packname = pack['name']
+            packname = theme_invite['name']
             em = discord.Embed(color=emcolor)
             em.set_footer(text="Accepter | Annuler")
-            em.add_field(name=packname, value=pack['description'])
-            if pack['pack_thumbnail']:
-                em.set_thumbnail(url=pack['pack_thumbnail'])
+            em.add_field(name=packname, value=theme_invite['description'])
+            if theme_invite['pack_thumbnail']:
+                em.set_thumbnail(url=theme_invite['pack_thumbnail'])
 
             if sess_author:
                 desc = f"**{sess_author.name}** vous a défié sur ***{packname}***"
@@ -190,11 +190,11 @@ class Brainfck(commands.Cog):
                 return await conf.delete()
 
         elif packid:
-            pack = self.loaded_packs[packid]
-            em = discord.Embed(color=emcolor, description=pack['description'], title=pack['name'])
+            theme_invite = self.loaded_packs[packid]
+            em = discord.Embed(color=emcolor, description=theme_invite['description'], title=theme_invite['name'])
             em.set_footer(text="Jouer | Annuler")
-            if pack['pack_thumbnail']:
-                em.set_thumbnail(url=pack['pack_thumbnail'])
+            if theme_invite['pack_thumbnail']:
+                em.set_thumbnail(url=theme_invite['pack_thumbnail'])
             conf = await ctx.send(embed=em)
             start_adding_reactions(conf, [confirm, cancel])
 
@@ -208,7 +208,7 @@ class Brainfck(commands.Cog):
             if react.emoji == cancel:
                 return await conf.delete()
         else:
-            return await ctx.send("**Identifiant de pack ou code de partie invalide** • Consultez la liste des packs avec `;bf` ou vérifiez que l'invitation donnée est correcte (Attention aux 'O'/0)")
+            return await ctx.send("**Identifiant de thème ou code de partie invalide** • Consultez la liste des thèmes avec `;bf` ou vérifiez que l'invitation donnée est correcte (Attention aux 'O'/0)")
 
         seed = sessions[invite]['seed'] if invite else random.randint(1, 999999)
         rng = random.Random(seed)
@@ -226,18 +226,20 @@ class Brainfck(commands.Cog):
                            'seed': seed,
                            'leaderboard': {}}
 
+        qlist = list(theme_invite['content'].keys())
         while manche <= 6:
-            question = rng.choice(tuple(pack['content'].keys()))
-            good = pack['content'][question]['good']
-            bad = rng.sample(pack['content'][question]['bad'], 3)
+            question = rng.choice(qlist)
+            qlist.remove(question)
+            good = theme_invite['content'][question]['good']
+            bad = rng.sample(theme_invite['content'][question]['bad'], 3)
             reps = [good] + bad
             rng.shuffle(reps)
             timelimit = 10
 
-            em = discord.Embed(title=f"{pack['name']} • Question #{manche}",
+            em = discord.Embed(title=f"{theme_invite['name']} • Question #{manche}",
                                description=box(question), color=emcolor)
-            if pack['content'][question]['image']:
-                em.set_image(url=pack['content'][question]['image'])
+            if theme_invite['content'][question]['image']:
+                em.set_image(url=theme_invite['content'][question]['image'])
             em.set_footer(text="Préparez-vous ...")
 
             start = await ctx.send(embed=em)
@@ -269,8 +271,8 @@ class Brainfck(commands.Cog):
                     timescore = 10
                 roundscore = round((10 - timescore) * 10)
 
-                end = discord.Embed(title=f"{pack['name']} • Question #{manche}",
-                               description=box(question), color=emcolor)
+                end = discord.Embed(title=f"{theme_invite['name']} • Question #{manche}",
+                                    description=box(question), color=emcolor)
                 reptxt = ""
 
 
@@ -320,7 +322,7 @@ class Brainfck(commands.Cog):
                     await asyncio.sleep(8)
 
         present_session['score'] = pts
-        result = discord.Embed(title=f"{pack['name']} • Fin de la partie", color=emcolor)
+        result = discord.Embed(title=f"{theme_invite['name']} • Fin de la partie", color=emcolor)
 
         if invite:
             sess_author = self.bot.get_user(int(sessions[invite]['author']))
@@ -354,13 +356,16 @@ class Brainfck(commands.Cog):
                 encour = ""
             result.description = f"Vous avez fait un score de **{pts} points**.{encour}"
             result.add_field(name="Code de la partie", value=box(sessinvite))
-            result.set_footer(text="Partagez ce code pour défier d'autres personnes sur ce pack !")
+            result.set_footer(text="Partagez ce code pour défier d'autres personnes sur ce thème !")
         await ctx.send(embed=result)
 
     @commands.command(name='bfleaderboard', aliases=['bfl'])
     async def brainfck_leaderboard(self, ctx, invite: str):
         """Affiche le leaderboard sur une partie (défi)"""
         sessions = await self.config.Sessions()
+        if not self.loaded_packs:
+            self.load_packs()
+
         if invite in sessions:
             lb = sessions[invite]['leaderboard']
             if lb:
@@ -377,7 +382,7 @@ class Brainfck(commands.Cog):
                     if len(tabl) < 20:
                         tabl.append((self.bot.get_user(int(u)) if self.bot.get_user(int(u)) else str(u), lb[u]))
                     else:
-                        em = discord.Embed(title=f"Partie #{invite} sur le pack \"{packname}\"",
+                        em = discord.Embed(title=f"Partie #{invite} sur le thème \"{packname}\"",
                                            color=await ctx.embed_color())
                         em.description = box(tabulate(tabl, headers=("Pseudo", "Score")))
                         em.set_footer(text=f"Auteur du défi : {autname} | Score : {sess_score}")
@@ -385,7 +390,7 @@ class Brainfck(commands.Cog):
                         tabl = []
 
                 if tabl:
-                    em = discord.Embed(title=f"Partie #{invite} sur le pack \"{packname}\"",
+                    em = discord.Embed(title=f"Partie #{invite} sur le thème \"{packname}\"",
                                        color=await ctx.embed_color())
                     em.description = box(tabulate(tabl, headers=("Nom", "Score")))
                     em.set_footer(text=f"Auteur : {autname} | Score : {sess_score}")
