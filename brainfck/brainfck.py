@@ -512,8 +512,8 @@ class Brainfck(commands.Cog):
         em = discord.Embed(title="Créer un fichier thème pour Brainfck", color=await ctx.embed_color(), description=txt)
         em.add_field(name="Notes importantes", value="- Les fichiers doivent contenir (dans 'content') au moins 15 questions valides pour être accepté\n"
                                                      "- Mettre à jour un fichier de thème efface tous les codes de parties liées à celui-ci\n"
-                                                     "- Les fichiers sont à enregistrer en YAML, formattage UTF-8"
-                                                     "Conseil : Utilisez un logiciel tel que Notepad++ pour éditer des fichiers YAML plus facilement")
+                                                     "- Les fichiers sont à enregistrer en YAML, formattage UTF-8\n"
+                                                     "Conseil : Même s'il est possible d'utiliser un simple Bloc-notes, utilisez un logiciel tel que Notepad++ pour éditer des fichiers YAML plus facilement")
         await ctx.send(embed=em)
 
     @commands.group(name="brainfckset", aliases=['bfset'])
