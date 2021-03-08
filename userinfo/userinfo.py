@@ -144,7 +144,8 @@ class UserInfo(commands.Cog):
                           'on_fire': {'last_seen': None,
                                       'cons_days': 0},
                           'logs': [],
-                          'bio': ""}
+                          'bio': "",
+                          'birthday': None}
         default_guild = {'user_records': {}}
         self.config.register_member(**default_member)
         self.config.register_guild(**default_guild)
@@ -157,6 +158,15 @@ class UserInfo(commands.Cog):
             logs.append((datetime.utcnow().isoformat(), desc))
             if len(logs) > 10:
                 await member.logs.set(logs[-10:])
+
+    async def get_birthday(self, user: discord.Member):
+        if not await self.config.member(user).birthday():
+            bday = self.bot.get_cog('Bday')
+            if bday:
+                if await bday.config.user(user).date():
+                    return await bday.config.user(user).date()
+            return None
+        return await self.config.member(user).birthday()
 
     @commands.group(name='card', aliases=['c'], invoke_without_command=True)
     @commands.guild_only()
@@ -285,6 +295,9 @@ class UserInfo(commands.Cog):
                 title = base_title + " • *Bio*"
                 desc = userinfo['bio'] if userinfo['bio'] else "**Description vide.**"
                 em = discord.Embed(title=title, description=desc, color=embed_color)
+                bday = await self.get_birthday(ctx.author)
+                if bday:
+                    em.add_field(name="Anniversaire", value=box(bday))
 
             else:
                 title = base_title + " • *Avatar*"
@@ -333,6 +346,31 @@ class UserInfo(commands.Cog):
         else:
             await self.config.member(ctx.author).bio.set("")
             await ctx.send("**Bio supprimée** › Votre bio a été réinitialisée")
+
+    @user_card_commands.command(name='birthday', aliases=['anniv'])
+    async def edit_user_bday(self, ctx, date: str = None):
+        """Modifier sa date d'anniversaire au format dd/mm (s'affiche dans la page "Bio")
+
+        Ne rien mettre efface la date"""
+        # -> Cross-modif avec le module Bday
+        if date:
+            try:
+                d = datetime.strptime(date, '%d/%m')
+            except:
+                return await ctx.send("**Erreur** › La date d'anniversaire doit être au format jj/mm")
+            else:
+                await self.config.member(ctx.author).birthday.set(date)
+                bday = self.bot.get_cog('Bday')
+                if bday:
+                    await bday.config.user(ctx.author).date.set(date)
+                await ctx.send(f"**Modifiée** › Vous avez indiqué être né un {date}")
+        else:
+            await self.config.member(ctx.author).birthday.set(None)
+            bday = self.bot.get_cog('Bday')
+            if bday:
+                await bday.config.user(ctx.author).date.set(None)
+                await bday.config.user(ctx.author).year.set(None)
+            await ctx.send(f"**Date retirée** › La date ne figurera plus sur votre profil")
 
     @commands.command(name="freshmeat")
     @commands.max_concurrency(1, commands.BucketType.guild)
