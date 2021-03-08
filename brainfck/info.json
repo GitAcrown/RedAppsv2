@@ -1,0 +1,11 @@
+{
+    "author": ["Acrone"],
+	"description": "Rejoignez l'aventure et défendez votre serveur contre une horde d'ennemis !",
+	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help Adventure` pour voir les commandes disponibles",
+	"short": "Combats live sur les channels textuels",
+	"tags": ["community", "fun", "economy", "games"],
+    "requirements" : [],
+    "required_cogs": {},
+	"type": "COG",
+	"end_user_data_statement": "This cog does not store personal data."
+}
