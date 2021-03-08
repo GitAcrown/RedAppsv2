@@ -111,7 +111,7 @@ class Brainfck(commands.Cog):
             return random.choice([i for i in self.loaded_packs])
         return None
 
-    @commands.command(name="brainfck", alises=["bf", "quiz"])
+    @commands.command(name="brainfck", aliases=["bf", "quiz"])
     async def brainfck_play(self, ctx, pack: str = None):
         """Faire un Quiz Brainfck
 
@@ -141,6 +141,8 @@ class Brainfck(commands.Cog):
                 em.description = txt
                 em.set_footer(text=f"Page #{page}")
                 await ctx.send(embed=em)
+            else:
+                await ctx.send("**Aucun Pack de questions n'est disponible**")
             return
 
         sessions = await self.config.Sessions()
