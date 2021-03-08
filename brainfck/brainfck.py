@@ -241,7 +241,7 @@ class Brainfck(commands.Cog):
             em.set_footer(text="Préparez-vous ...")
 
             start = await ctx.send(embed=em)
-            await asyncio.sleep((0.1 * len(question)) + 1)
+            await asyncio.sleep((0.075 * len(question)) + 1)
 
             rtxt = ""
             rdict = {}
@@ -253,7 +253,7 @@ class Brainfck(commands.Cog):
             em.set_footer(text=f"Répondez avec les emojis ci-dessous | {str(timelimit)}s")
             await start.edit(embed=em)
 
-            start_adding_reactions(conf, letters)
+            start_adding_reactions(start, letters)
             starttime = time.time()
 
             try:
@@ -291,7 +291,7 @@ class Brainfck(commands.Cog):
 
                     end.set_footer(text=f"Vous avez répondu en {round(timescore), 2}s | Score actuel = {pts}")
                 else:
-                    present_session['answers'][question] = {'answer': rdict[react.emoji],
+                    present_session['answers'][question] = {'answer': None,
                                                             'time': timescore}
                     reptxt += random.choice((f"Une absence ? La bonne réponse était **{good}** !",
                                              f"Aucune réponse ? La réponse était **{good}** !"))
