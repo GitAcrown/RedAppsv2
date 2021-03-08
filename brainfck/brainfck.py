@@ -151,7 +151,7 @@ class Brainfck(commands.Cog):
 
         if invite:
             sess_author = self.bot.get_user(int(sessions[invite]['author']))
-            if ctx.author.id == sess_author:
+            if ctx.author == sess_author:
                 return await ctx.send(f"**Impossible de jouer** • Vous êtes l'auteur de ce défi, vous ne pouvez pas vous défier vous-même !")
             sess_pack_id = sessions[invite]['pack_id']
             sess_players = sessions[invite]['leaderboard']
