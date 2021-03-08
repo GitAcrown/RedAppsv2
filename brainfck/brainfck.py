@@ -91,10 +91,17 @@ class Brainfck(commands.Cog):
             return pack['pack_id'], new
         raise InvalidFile("Le pack n'est pas formatté correctement, il manque des champs obligatoires (v. exemple)")
 
+    def filespaths(self, directory):
+        paths = []
+        for dirpath, _, filenames in os.walk(directory):
+            for f in filenames:
+                if f.endswith(".yaml"):
+                    paths.append(os.path.abspath(os.path.join(dirpath, f)))
+        return paths
+
     def load_packs(self):
         self.loaded_packs = {}
-        paths = [x for x in os.listdir(str(self.packs)) if x.endswith(".yaml")]
-        for path in paths:
+        for path in self.filespaths(str(self.packs)):
             pid, content = self.read_pack_file(path)
             self.loaded_packs[pid] = content
         return self.loaded_packs
@@ -437,3 +444,12 @@ class Brainfck(commands.Cog):
             await ctx.send(embed=em)
         else:
             await ctx.send(f"**Vide** • Aucun fichier n'est disponible")
+
+    @_brainfuck_settings.command()
+    async def reload(self, ctx):
+        """Recharge manuellement la liste des packs chargés"""
+        try:
+            self.load_packs()
+        except Exception as e:
+            await ctx.send(f"**Erreur** : `{e}`")
+            raise
