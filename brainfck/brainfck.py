@@ -262,11 +262,17 @@ class Brainfck(commands.Cog):
             reps = [good] + bad
             rng.shuffle(reps)
 
-            em = discord.Embed(title=f"{pack['name']} • Question #{manche}",
-                               description=box(question), color=emcolor)
+            if manche != 6:
+                em = discord.Embed(title=f"{pack['name']} • Question #{manche}",
+                                   description=box(question), color=emcolor)
+                em.set_footer(text="Préparez-vous ...")
+            else:
+                em = discord.Embed(title=f"{pack['name']} • Question #{manche} (BONUS)",
+                                   description=box(question), color=emcolor)
+                em.set_footer(text="Préparez-vous ... (x2 points)")
+
             if pack['content'][question]['image']:
                 em.set_image(url=pack['content'][question]['image'])
-            em.set_footer(text="Préparez-vous ...")
 
             start = await ctx.send(embed=em)
             await asyncio.sleep((0.075 * len(question)) + 1)
@@ -297,8 +303,14 @@ class Brainfck(commands.Cog):
                     timescore = 10
                 roundscore = round((10 - timescore) * 10)
 
-                end = discord.Embed(title=f"{pack['name']} • Question #{manche}",
-                                    description=box(question), color=emcolor)
+                if manche != 6:
+                    end = discord.Embed(title=f"{pack['name']} • Question #{manche}",
+                                       description=box(question), color=emcolor)
+                else:
+                    end = discord.Embed(title=f"{pack['name']} • Question #{manche} (BONUS)",
+                                       description=box(question), color=emcolor)
+                    roundscore *= 2
+
                 reptxt = ""
                 waittime = 5
 
@@ -343,7 +355,7 @@ class Brainfck(commands.Cog):
 
                 if pack['content'][question].get('show', False):
                     end.add_field(name="Détails", value=pack['content'][question]['show'])
-                    waittime += len(0.03 * len(pack['content'][question]['show']))
+                    waittime += 0.03 * len(pack['content'][question]['show'])
 
                 await start.edit(embed=end)
 
