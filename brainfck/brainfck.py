@@ -160,7 +160,8 @@ class Brainfck(commands.Cog):
             em = discord.Embed(title="Liste des thèmes disponibles", color=emcolor)
             page = 1
             for p in self.loaded_packs:
-                chunk = f"• `{p}` : {self.loaded_packs[p]['description']}\n"
+                nb = len(self.loaded_packs[p]['content'])
+                chunk = f"• `{p}` : {self.loaded_packs[p]['description']} (#{nb})\n"
                 if len(txt + chunk) < 2000:
                     txt += chunk
                 else:
