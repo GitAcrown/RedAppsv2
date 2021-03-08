@@ -315,9 +315,9 @@ class Brainfck(commands.Cog):
 
                 manche += 1
                 if not invite:
-                    await asyncio.sleep(0.05 * len(good) + 2)
+                    await asyncio.sleep(5)
                 else:
-                    await asyncio.sleep(0.05 * len(good) + 4)
+                    await asyncio.sleep(8)
 
         present_session['score'] = pts
         result = discord.Embed(title=f"{pack['name']} • Fin de la partie", color=emcolor)
