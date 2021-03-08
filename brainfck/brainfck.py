@@ -119,7 +119,7 @@ class Brainfck(commands.Cog):
             self.loaded_packs[pid] = content
         return self.loaded_packs
 
-    def reset_sessions_for(self, packid):
+   async  def reset_sessions_for(self, packid):
         sessions = await self.config.Sessions()
         for sess in sessions:
             if sessions[sess]['pack_id'] == packid:
@@ -552,7 +552,7 @@ class Brainfck(commands.Cog):
     async def resetsess(self, ctx, packid: str):
         """Reset les sessions d'un pack"""
         if packid in self.loaded_packs:
-            self.reset_sessions_for(packid)
+            await self.reset_sessions_for(packid)
             await ctx.send(f"**Reset des sessions de {packid} effectué**")
         else:
             await ctx.send("**Le pack demandé n'est pas chargé**")
