@@ -150,7 +150,7 @@ class Brainfck(commands.Cog):
         invite = pack if pack in sessions else None
 
         if invite:
-            sess_author = self.bot.get_user(sessions[invite]['author'])
+            sess_author = self.bot.get_user(int(sessions[invite]['author']))
             if ctx.author.id == sess_author:
                 return await ctx.send(f"**Impossible de jouer** • Vous êtes l'auteur de ce défi, vous ne pouvez pas vous défier vous-même !")
             sess_pack_id = sessions[invite]['pack_id']
@@ -289,7 +289,7 @@ class Brainfck(commands.Cog):
                                                  f"Manqué ! La réponse était **{good}** !",
                                                  f"Mauvaise réponse ! Il fallait répondre **{good}**"))
 
-                    end.set_footer(text=f"Vous avez répondu en {round(timescore), 2}s | Score actuel = {pts}")
+                    end.set_footer(text=f"Vous avez répondu en {round(timescore, 2)}s | Score actuel = {pts}")
                 else:
                     present_session['answers'][question] = {'answer': None,
                                                             'time': timescore}
@@ -300,7 +300,7 @@ class Brainfck(commands.Cog):
 
                 if invite:
                     reptxt += "\n"
-                    sess_author = self.bot.get_user(sessions[invite]['author'])
+                    sess_author = self.bot.get_user(int(sessions[invite]['author']))
                     sess_rep = sessions[invite]['answers'][question]['answer']
                     if sess_rep == None:
                         sess_rep = "[Aucune réponse]"
@@ -314,12 +314,16 @@ class Brainfck(commands.Cog):
                 await start.edit(embed=end)
 
                 manche += 1
+                if not invite:
+                    await asyncio.sleep(0.05 * len(good) + 2)
+                else:
+                    await asyncio.sleep(0.05 * len(good) + 4)
 
         present_session['score'] = pts
         result = discord.Embed(title=f"{pack['name']} • Fin de la partie", color=emcolor)
 
         if invite:
-            sess_author = self.bot.get_user(sessions[invite]['author'])
+            sess_author = self.bot.get_user(int(sessions[invite]['author']))
             dvname = sess_author.name if sess_author else "Votre adversaire"
             sess_score = sessions[invite]['score']
             sessions[invite]['leaderboard'][ctx.author.id] = pts
@@ -361,21 +365,22 @@ class Brainfck(commands.Cog):
             lb = sessions[invite]['leaderboard']
             if lb:
                 pack_id = sessions[invite]['pack_id']
-                auteur = self.bot.get_user(sessions[invite]['author'])
-                autname = auteur.name if auteur else "Inconnu"
+                auteur = self.bot.get_user(int(sessions[invite]['author']))
+                autname = auteur if auteur else "Inconnu"
                 pack = self.loaded_packs.get(pack_id, None)
+                sess_score = sessions[invite]['score']
                 packname = pack['name'] if pack else f"SUPPR:{pack_id}"
 
                 embeds = []
                 tabl = []
                 for u in lb:
                     if len(tabl) < 20:
-                        tabl.append((self.bot.get_user(u).name if self.bot.get_user(u) else str(u), lb[u]))
+                        tabl.append((self.bot.get_user(int(u)) if self.bot.get_user(int(u)) else str(u), lb[u]))
                     else:
                         em = discord.Embed(title=f"Partie #{invite} sur le pack \"{packname}\"",
                                            color=await ctx.embed_color())
-                        em.description = box(tabulate(tabl, headers=("Nom", "Score")))
-                        em.set_footer(text=f"Auteur : {autname}")
+                        em.description = box(tabulate(tabl, headers=("Pseudo", "Score")))
+                        em.set_footer(text=f"Auteur du défi : {autname} | Score : {sess_score}")
                         embeds.append(em)
                         tabl = []
 
