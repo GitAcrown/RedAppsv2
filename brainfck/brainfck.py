@@ -343,7 +343,7 @@ class Brainfck(commands.Cog):
 
                 if pack['content'][question].get('show', False):
                     end.add_field(name="Détails", value=pack['content'][question]['show'])
-                    waittime += len(0.03 * pack['content'][question]['show'])
+                    waittime += len(0.03 * len(pack['content'][question]['show']))
 
                 await start.edit(embed=end)
 
