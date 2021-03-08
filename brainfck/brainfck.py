@@ -119,7 +119,7 @@ class Brainfck(commands.Cog):
             self.loaded_packs[pid] = content
         return self.loaded_packs
 
-   async  def reset_sessions_for(self, packid):
+    async def reset_sessions_for(self, packid):
         sessions = await self.config.Sessions()
         for sess in sessions:
             if sessions[sess]['pack_id'] == packid:
