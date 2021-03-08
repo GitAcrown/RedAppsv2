@@ -143,6 +143,7 @@ class Brainfck(commands.Cog):
         return None
 
     @commands.command(name="brainfck", aliases=["bf", "quiz"])
+    @commands.max_concurrency(1, commands.BucketType.user)
     async def brainfck_play(self, ctx, theme_invite: str = None):
         """Faire un Quiz Brainfck
 
@@ -415,10 +416,9 @@ class Brainfck(commands.Cog):
             while newinvite in sessions:
                 sessinvite = newinvite()
             await self.config.Sessions.set_raw(sessinvite, value=present_session)
-            if pts >= 40:
-                encour = " Bien joué !"
-            elif pts >= 25:
-                encour = " Pas mal !"
+            if pts >= 500: encour = " Excellent !"
+            elif pts >= 350: encour = " Bien joué !"
+            elif pts >= 200: encour = " Pas mal."
             else:
                 encour = ""
             result.description = f"Vous avez fait un score de **{pts} points**.{encour}"
