@@ -119,6 +119,13 @@ class Brainfck(commands.Cog):
             self.loaded_packs[pid] = content
         return self.loaded_packs
 
+    def reset_sessions_for(self, packid):
+        sessions = await self.config.Sessions()
+        for sess in sessions:
+            if sessions[sess]['pack_id'] == packid:
+                await self.config.Sessions.clear_raw(sess)
+        return sessions
+
     def get_random_pack(self):
         if self.loaded_packs:
             return random.choice([i for i in self.loaded_packs])
@@ -503,6 +510,7 @@ class Brainfck(commands.Cog):
         if files:
             path = await self.save_file(ctx.message)
             await ctx.send("**Fichier sauvegardé** • Chemin = `{}`".format(path))
+
         else:
             await ctx.send("**Erreur** • Aucun fichier attaché au message")
 
@@ -537,3 +545,14 @@ class Brainfck(commands.Cog):
         except Exception as e:
             await ctx.send(f"**Erreur** : `{e}`")
             raise
+        else:
+            await ctx.send("**Pack de questions rechargés**")
+
+    @_brainfuck_settings.command()
+    async def resetsess(self, ctx, packid: str):
+        """Reset les sessions d'un pack"""
+        if packid in self.loaded_packs:
+            self.reset_sessions_for(packid)
+            await ctx.send(f"**Reset des sessions de {packid} effectué**")
+        else:
+            await ctx.send("**Le pack demandé n'est pas chargé**")
