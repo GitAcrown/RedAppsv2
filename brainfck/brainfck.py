@@ -208,7 +208,7 @@ class Brainfck(commands.Cog):
             if react.emoji == cancel:
                 return await conf.delete()
         else:
-            return await ctx.send("**Identifiant de pack invalide** • Consultez la liste des packs avec `;bf`")
+            return await ctx.send("**Identifiant de pack ou code de partie invalide** • Consultez la liste des packs avec `;bf` ou vérifiez que l'invitation donnée est correcte (Attention aux 'O'/0)")
 
         seed = sessions[invite]['seed'] if invite else random.randint(1, 999999)
         rng = random.Random(seed)
@@ -388,7 +388,7 @@ class Brainfck(commands.Cog):
                     em = discord.Embed(title=f"Partie #{invite} sur le pack \"{packname}\"",
                                        color=await ctx.embed_color())
                     em.description = box(tabulate(tabl, headers=("Nom", "Score")))
-                    em.set_footer(text=f"Auteur : {autname}")
+                    em.set_footer(text=f"Auteur : {autname} | Score : {sess_score}")
                     embeds.append(em)
 
                 if embeds:
