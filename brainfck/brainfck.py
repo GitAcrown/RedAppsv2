@@ -507,7 +507,7 @@ class Brainfck(commands.Cog):
               "... - Vietnam\n" \
               ".. show: >  # Optionnel: Message à ajouter après avoir répondu\n" \
               "... Taipei est la capitale politique, culturelle et économique *de facto* de l'île de Taïwan.\n\n" \
-              ". = Indentation```"
+              "# . = Indentation```"
 
         em = discord.Embed(title="Créer un fichier thème pour Brainfck", color=await ctx.embed_color(), description=txt)
         em.add_field(name="Notes importantes", value="- Les fichiers doivent contenir (dans 'content') au moins 15 questions valides pour être accepté\n"
