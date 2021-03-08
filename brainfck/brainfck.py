@@ -67,7 +67,7 @@ class Brainfck(commands.Cog):
             logger.info(msg=f"Erreur dans la lecture du fichier yaml : {e}", exc_info=True)
             raise ReaderError("Erreur lors de la lecture du fichier : `{}`".format(e))
 
-        if all([i in pack for i in ("pack_id", "name", "description", "author", "content")]):
+        if all([i in pack for i in ("pack_id", "name", "description", "author_id", "content")]):
             if len(pack['pack_id']) > 10:
                 raise InvalidFile("L'ID du pack est trop long (<= 10 caractères)")
 
