@@ -219,9 +219,9 @@ class Brainfck(commands.Cog):
 
         while manche <= 6:
             question = rng.choice(tuple(pack['content'].keys()))
-            good = pack['content'][question]['good']
-            bad = rng.sample(pack['content'][question]['bad'], 3)
-            reps = [good] + bad
+            true = pack['content'][question]['true']
+            false = rng.sample(pack['content'][question]['false'], 3)
+            reps = [true] + false
             rng.shuffle(reps)
             timelimit = 10
 
@@ -266,26 +266,26 @@ class Brainfck(commands.Cog):
 
 
                 if react:
-                    if rdict.get(react.emoji, None) == good:
-                        present_session['answers'][question] = {'answer': good,
+                    if rdict.get(react.emoji, None) == true:
+                        present_session['answers'][question] = {'answer': true,
                                                                 'time': timescore}
                         pts += roundscore
-                        reptxt += random.choice((f"Bravo ! La bonne réponse était **{good}** !",
-                                                 f"Bien joué ! La réponse était évidemment **{good}** !",
-                                                 f"Bonne réponse ! Il fallait répondre **{good}**"))
+                        reptxt += random.choice((f"Bravo ! La bonne réponse était **{true}** !",
+                                                 f"Bien joué ! La réponse était évidemment **{true}** !",
+                                                 f"Bonne réponse ! Il fallait répondre **{true}**"))
                     else:
                         present_session['answers'][question] = {'answer': rdict[react.emoji],
                                                                 'time': timescore}
-                        reptxt += random.choice((f"Dommage ! La bonne réponse était **{good}** !",
-                                                 f"Manqué ! La réponse était **{good}** !",
-                                                 f"Mauvaise réponse ! Il fallait répondre **{good}**"))
+                        reptxt += random.choice((f"Dommage ! La bonne réponse était **{true}** !",
+                                                 f"Manqué ! La réponse était **{true}** !",
+                                                 f"Mauvaise réponse ! Il fallait répondre **{true}**"))
 
                     end.set_footer(text=f"Vous avez répondu en {round(timescore), 2}s | Score actuel = {pts}")
                 else:
                     present_session['answers'][question] = {'answer': rdict[react.emoji],
                                                             'time': timescore}
-                    reptxt += random.choice((f"Une absence ? La bonne réponse était **{good}** !",
-                                             f"Aucune réponse ? La réponse était **{good}** !"))
+                    reptxt += random.choice((f"Une absence ? La bonne réponse était **{true}** !",
+                                             f"Aucune réponse ? La réponse était **{true}** !"))
 
                     end.set_footer(text=f"Vous n'avez pas répondu | Score actuel = {pts}")
 
@@ -297,9 +297,9 @@ class Brainfck(commands.Cog):
                         sess_rep = "[Aucune réponse]"
                     sess_time = round(sessions[invite]['answers'][question]['time'], 2)
 
-                    is_good = "(Bonne réponse)" if sess_rep == good else "(Mauvaise réponse)"
+                    is_true = "(Bonne réponse)" if sess_rep == true else "(Mauvaise réponse)"
                     advname = sess_author.name if sess_author else "Votre adversaire"
-                    reptxt += f"***{advname}*** a répondu *{sess_rep}* {is_good} en {sess_time}s"
+                    reptxt += f"***{advname}*** a répondu *{sess_rep}* {is_true} en {sess_time}s"
 
                 end.add_field(name="Réponse", value=reptxt)
                 await start.edit(embed=end)
