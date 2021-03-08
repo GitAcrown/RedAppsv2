@@ -412,7 +412,7 @@ class Brainfck(commands.Cog):
                 pass
 
         else:
-            newinvite = lambda: str(''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(6)))
+            newinvite = lambda: "&" + str(''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(6)))
             sessinvite = newinvite()
             while newinvite in sessions:
                 sessinvite = newinvite()
