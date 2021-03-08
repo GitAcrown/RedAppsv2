@@ -155,7 +155,7 @@ class Brainfck(commands.Cog):
                 return await ctx.send(f"**Impossible de jouer** • Vous êtes l'auteur de ce défi, vous ne pouvez pas vous défier vous-même !")
             sess_pack_id = sessions[invite]['pack_id']
             sess_players = sessions[invite]['leaderboard']
-            if ctx.author.id in sess_players:
+            if ctx.author.id in [int(us) for us in sess_players]:
                 return await ctx.send(f"**Impossible d'y rejouer** • Votre score ({sess_players[ctx.author.id]} points)"
                                       f" figure déjà dans le classement pour cette partie !")
             pack = self.loaded_packs[sess_pack_id]
