@@ -318,19 +318,24 @@ class UserInfo(commands.Cog):
             else:
                 await menu.edit(embed=em)
 
-            start_adding_reactions(menu, emojis)
+            start_adding_reactions(menu, emojis + ['❌'])
             try:
                 react, ruser = await self.bot.wait_for("reaction_add",
                                                       check=lambda m, u: u == ctx.author and m.message.id == menu.id,
                                                       timeout=60)
             except asyncio.TimeoutError:
-                await menu.clear_reactions()
-                em.set_footer(text=f"ID: {user.id}")
-                await menu.edit(embed=em)
+                try:
+                    await menu.clear_reactions()
+                    em.set_footer(text=f"ID: {user.id}")
+                    await menu.edit(embed=em)
+                except:
+                    pass
                 return
+            page = react.emoji
+            if page == '❌':
+                return await menu.delete()
             else:
-                page = react.emoji
-                await menu.clear_reactions()
+               await menu.clear_reactions()
 
     @user_card_commands.command(name='bio')
     async def edit_user_bio(self, ctx, *text: str):
