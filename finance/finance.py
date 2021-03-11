@@ -10,6 +10,8 @@ from datetime import datetime, timedelta
 import discord
 from discord.errors import HTTPException
 from typing import Union, List, Tuple, Literal
+
+from discord.ext import tasks
 from redbot.core import Config, commands, checks
 from redbot.core.utils import AsyncIter
 from redbot.core.utils.menus import menu, DEFAULT_CONTROLS
@@ -87,12 +89,42 @@ class Finance(commands.Cog):
                           "config": {"daily_bonus": ''}}
 
         default_guild = {"currency": "Ꞥ",
-                         "daily_bonus": 100}
+                         "daily_bonus": 100,
+                         "booster_bonus": 100,
+                         "lb_role": None}
 
         default_global = {"max_balance": 10**9}
         self.config.register_member(**default_member)
         self.config.register_guild(**default_guild)
         self.config.register_global(**default_global)
+
+        self.finance_loop.start()
+
+    @tasks.loop(minutes=30)
+    async def finance_loop(self):
+        guilds = await self.config.all_guilds()
+        for g in guilds:
+            if guilds[g]['lb_role']:
+                guild = self.bot.get_guild(g)
+                role = guild.get_role(guilds[g]['lb_role'])
+                old = [m for m in guild.members if role in m.roles]
+                first = await self.get_guild_leaderboard(guild, 1)
+                if old:
+                    old_first = old[0]
+                    if old_first != first[0].user:
+                        try:
+                            await old_first.remove_roles(role, reason="N'est plus 1er du classement économique")
+                        except:
+                            pass
+                try:
+                    await first[0].user.add_roles(role, reason="Est premier du classement économique")
+                except:
+                    logger.error(f"Impossible d'attribuer le rôle pour {first[0].user}", exc_info=True)
+
+    @finance_loop.before_loop
+    async def before_finance_loop(self):
+        logger.info('Starting finance_loop...')
+        await self.bot.wait_until_ready()
 
 
     async def migrate_from_cash(self):
@@ -453,7 +485,6 @@ class Finance(commands.Cog):
         else:
             return await ctx.send(f"**Aucune opération** • Il n'y a aucune opération à afficher pour aujourd'hui")
 
-
     @commands.command(name="bonus")
     @commands.guild_only()
     async def cash_bonus(self, ctx):
@@ -463,13 +494,21 @@ class Finance(commands.Cog):
         acc = await self.get_account(author)
         curr = await self.get_currency(ctx.guild)
         bonus = await self.config.guild(ctx.guild).daily_bonus()
+        booster = await self.config.guild(ctx.guild).booster_bonus()
         if bonus:
             if acc.config["daily_bonus"] != today:
                 await self.config.member(author).config.set_raw("daily_bonus", value=today)
-                new = await self.deposit_credits(author, bonus, reason="Bonus quotidien")
-                em = discord.Embed(color=author.color,
-                                   description=f"**+{bonus}** {curr} ont été ajoutés à votre compte au titre du bonus quotidien.",
-                                   timestamp=ctx.message.created_at)
+                if ctx.author.premium_since and booster:
+                    new = await self.deposit_credits(author, bonus + booster, reason="Bonus quotidien + Boost")
+                    em = discord.Embed(color=author.color,
+                                       description=f"**+{bonus}** {curr} ont été ajoutés à votre compte au titre du bonus quotidien.\n"
+                                                   f"**+{booster}** {curr} sont offerts en supplément du fait de votre titre de booster du serveur.",
+                                       timestamp=ctx.message.created_at)
+                else:
+                    new = await self.deposit_credits(author, bonus, reason="Bonus quotidien")
+                    em = discord.Embed(color=author.color,
+                                       description=f"**+{bonus}** {curr} ont été ajoutés à votre compte au titre du bonus quotidien.",
+                                       timestamp=ctx.message.created_at)
                 em.set_author(name=str(author), icon_url=author.avatar_url)
                 em.set_footer(text=f"Vous avez désormais {new} {curr}")
                 await ctx.send(embed=em)
@@ -520,6 +559,36 @@ class Finance(commands.Cog):
             await ctx.send(f"**Erreur** • `{e}`")
         else:
             await ctx.send(f"**Changement réalisé** • Le nouveau symbole de la monnaie sera \"{monnaie}\"")
+
+    @_bank_set.command(name="lbrole")
+    async def _bank_lb_role(self, ctx, role: discord.Role = None):
+        """Attribuer un rôle au premier du classement (MAJ. toutes les 30m)
+
+        Ne rien mettre désactive cette fonctionnalité"""
+        guild = ctx.guild
+        if role:
+            await self.config.guild(guild).lb_role.set(role.id)
+            await ctx.send(f"**Rôle configuré** • Le membre le plus riche recevra automatiquement le rôle ***{role.name}***")
+        else:
+            await self.config.guild(guild).lb_role.set(None)
+            await ctx.send(
+                f"**Rôle retiré** • Le membre le plus riche ne recevra plus de rôle")
+
+    @_bank_set.command(name='booster')
+    async def _bank_booster_bonus(self, ctx, somme: int = 100):
+        """Permet de définir l'attribution d'un bonus quotidien aux boosters du serveur
+
+        Mettre 0 désactive ce bonus"""
+        guild = ctx.guild
+        curr = await self.get_currency(guild)
+        if somme > 0:
+            await self.config.guild(guild).booster_bonus.set(somme)
+            await ctx.send(
+                f"**Bonus ajouté** • Les boosters du serveur auront un bonus quotidien de {somme} {curr}")
+        else:
+            await self.config.guild(guild).booster_bonus.set(0)
+            await ctx.send(
+                f"**Bonus retiré** • Les boosters du serveur n'auront plus de bonus quotidien")
 
     @_bank_set.command(name="dailybonus")
     async def _bank_daily_bonus(self, ctx, somme: int = 100):
