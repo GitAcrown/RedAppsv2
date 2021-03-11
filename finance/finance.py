@@ -116,10 +116,11 @@ class Finance(commands.Cog):
                             await old_first.remove_roles(role, reason="N'est plus 1er du classement économique")
                         except:
                             pass
-                try:
-                    await first[0].user.add_roles(role, reason="Est premier du classement économique")
-                except:
-                    logger.error(f"Impossible d'attribuer le rôle pour {first[0].user}", exc_info=True)
+                if role not in first[0].user.roles:
+                    try:
+                        await first[0].user.add_roles(role, reason="Est premier du classement économique")
+                    except:
+                        logger.error(f"Impossible d'attribuer le rôle pour {first[0].user}", exc_info=True)
 
     @finance_loop.before_loop
     async def before_finance_loop(self):
