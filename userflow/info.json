@@ -1,0 +1,10 @@
+{
+    "author": ["Acrone"],
+	"description": "Contrôle de l'entrée et sortie des membres du serveur",
+	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help UserFlow` pour voir les commandes disponibles",
+	"short": "Contrôle de l'entrée et sortie des membres du serveur",
+	"tags": ["community", "stats", "quit", "join"],
+    "required_cogs": {},
+	"type": "COG",
+	"end_user_data_statement": "This cog does not store personal data."
+}
