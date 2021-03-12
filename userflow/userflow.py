@@ -91,7 +91,7 @@ class UserFlow(commands.Cog):
 
             if len(msg) < 1000:
                 rules = ' '.join(regles) if regles else "Aucune"
-                msg += f"{role.id} • {rules}\n"
+                msg += f"{role.mention} • {rules}\n"
             else:
                 em = discord.Embed(color=ctx.author.color,
                                    description=msg,
