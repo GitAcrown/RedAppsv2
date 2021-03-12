@@ -28,7 +28,7 @@ class UserFlow(commands.Cog):
         self.config = Config.get_conf(self, identifier=736144321857978388, force_registration=True)
 
         default_member = {'messages_count': 0}
-        default_guild = {'join_roles': []}
+        default_guild = {'joining_roles': []}
         self.config.register_member(**default_member)
         self.config.register_guild(**default_guild)
 
@@ -39,7 +39,7 @@ class UserFlow(commands.Cog):
         all_guilds = await self.config.all_guilds()
         for g in all_guilds:
             guild = self.bot.get_guild(g)
-            data = all_guilds[g]['join_roles']
+            data = all_guilds[g]['joining_roles']
             if data:
                 for r in data:
                     role = guild.get_role(r['role'])
@@ -113,8 +113,8 @@ class UserFlow(commands.Cog):
                     else:
                         newrole['rules']['account'] = abs(nb)
 
-        data = copy(await self.config.guild(guild).join_roles())
-        async with self.config.guild(guild).join_roles() as guildroles:
+        data = copy(await self.config.guild(guild).joining_roles())
+        async with self.config.guild(guild).joining_roles() as guildroles:
             for r in data:
                 if r['role'] == role.id:
                     guildroles.remove(r)
@@ -125,8 +125,8 @@ class UserFlow(commands.Cog):
     async def delrole(self, ctx, roles: Greedy[discord.Role]):
         """Retirer un ou plusieurs rôles à donner aux nouveaux arrivants"""
         guild = ctx.guild
-        data = copy(await self.config.guild(guild).join_roles())
-        async with self.config.guild(guild).join_roles() as guildroles:
+        data = copy(await self.config.guild(guild).joining_roles())
+        async with self.config.guild(guild).joining_roles() as guildroles:
             for r in data:
                 if r['role'] in [rd.id for rd in roles]:
                     guildroles.remove(r)
@@ -140,7 +140,7 @@ class UserFlow(commands.Cog):
             cur = await self.config.member(author).messages_count()
             await self.config.member(author).messages_count.set(cur + 1)
 
-            data = await self.config.guild(message.guild).join_roles()
+            data = await self.config.guild(message.guild).joining_roles()
             if data:
                 for r in data:
                     role = message.guild.get_role(r['role'])
@@ -158,7 +158,7 @@ class UserFlow(commands.Cog):
                     return
                 await asyncio.sleep(5)
 
-        data = await self.config.guild(user.guild).join_roles()
+        data = await self.config.guild(user.guild).joining_roles()
         if data:
             for r in data:
                 role = user.guild.get_role(r['role'])
