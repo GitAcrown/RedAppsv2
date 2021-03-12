@@ -151,6 +151,13 @@ class UserFlow(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, user):
+        guild = user.guild
+        if user.pending:
+            while user.pending:
+                if user not in [m for m in self.bot.get_guild(guild.id).members]:
+                    return
+                await asyncio.sleep(5)
+
         data = await self.config.guild(user.guild).join_roles()
         if data:
             for r in data:
