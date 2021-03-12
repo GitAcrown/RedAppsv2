@@ -47,9 +47,10 @@ class UserFlow(commands.Cog):
                         tdel = self.parse_timedelta(r['rules']['delay'])
                         cond = lambda u: (u.joined_at + tdel) <= datetime.now()
                         for member in guild.members:
-                            if r['role'] not in (mr.id for mr in member.roles):
-                                if cond(member):
-                                    await member.add_roles(role, reason="Attribution auto. à l'arrivée | Condition de délai respectée")
+                            if (datetime.now() - member.joined_at).days <= 14:
+                                if r['role'] not in (mr.id for mr in member.roles):
+                                    if cond(member):
+                                        await member.add_roles(role, reason="Attribution auto. à l'arrivée | Condition de délai respectée")
 
     @userflow_loop.before_loop
     async def before_userflow_loop(self):
