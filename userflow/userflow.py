@@ -13,7 +13,7 @@ from discord.ext import tasks
 from discord.ext.commands import Greedy
 from redbot.core import Config, commands, checks
 from redbot.core.utils.chat_formatting import box
-from redbot.core.utils.menus import start_adding_reactions
+from redbot.core.utils.menus import start_adding_reactions, menu, DEFAULT_CONTROLS
 from tabulate import tabulate
 
 logger = logging.getLogger("red.RedAppsv2.userflow")
@@ -74,6 +74,39 @@ class UserFlow(commands.Cog):
     @checks.admin_or_permissions(manage_messages=True)
     async def _joining_set(self, ctx):
         """Gestion de l'arrivée des membres"""
+
+    @_joining_set.command()
+    async def listrole(self, ctx):
+        """Afficher les rôles du système et les règles attachées à ceux-ci"""
+        data = await self.config.guild(ctx.guild).joining_roles()
+        if not data:
+            return await ctx.send("**Aucun rôle n'a été configuré** : utilisez `;joinset setrole` pour en configurer un.")
+        embeds = []
+        msg = ""
+        for r in data:
+            role = ctx.guild.get_role(r['role'])
+            regles = []
+            for u in r['rules']:
+                regles.append(f"`{u}={r['rules'][u]}`")
+
+            if len(msg) < 1000:
+                rules = ' '.join(regles) if regles else "Aucune"
+                msg += f"{role.id} • {rules}\n"
+            else:
+                em = discord.Embed(color=ctx.author.color,
+                                   description=msg,
+                                   title="Rôles d'arrivée configurés")
+                embeds.append(em)
+                msg = ""
+        if msg:
+            em = discord.Embed(color=ctx.author.color,
+                               description=msg,
+                               title="Rôles d'arrivée configurés")
+            embeds.append(em)
+        if embeds:
+            await menu(ctx, embeds, DEFAULT_CONTROLS)
+        else:
+            return await ctx.send(f"**Aucun rôle** • Vous n'avez configuré aucun rôle d'arrivée sur ce serveur")
 
     @_joining_set.command()
     async def setrole(self, ctx, role: discord.Role, *rules: str):
