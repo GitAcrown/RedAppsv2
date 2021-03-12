@@ -28,7 +28,7 @@ class UserFlow(commands.Cog):
         self.config = Config.get_conf(self, identifier=736144321857978388, force_registration=True)
 
         default_member = {'messages_count': 0}
-        default_guild = {'join_roles': {}}
+        default_guild = {'join_roles': []}
         self.config.register_member(**default_member)
         self.config.register_guild(**default_guild)
 
