@@ -45,7 +45,7 @@ class UserFlow(commands.Cog):
                     role = guild.get_role(r['role'])
                     if r['rules'].get('delay'):
                         tdel = self.parse_timedelta(r['rules']['delay'])
-                        cond = lambda u: (u.joined_at + tdel) <= datetime.now()
+                        cond = lambda u: (u.joined_at + tdel) <= datetime.utcnow()
                         for member in guild.members:
                             if (datetime.now() - member.joined_at).days <= 14:
                                 if r['role'] not in (mr.id for mr in member.roles):
