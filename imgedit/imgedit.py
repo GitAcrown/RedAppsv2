@@ -14,7 +14,7 @@ import aiohttp
 import discord
 from discord.errors import HTTPException
 from typing import Union, List, Tuple, Literal, Optional
-from PIL import Image
+from PIL import Image, ImageSequence
 from bs4 import BeautifulSoup
 
 from discord.ext import tasks
@@ -87,20 +87,34 @@ class ImgEdit(commands.Cog):
             return False
 
     def add_gun(self, input_image_path, output_image_path, watermark_image_path, position, proportion):
-        try:
-            base_image = Image.open(input_image_path).convert('RGBA')
-        except:
-            base_image = Image.open(input_image_path).convert('RGB')
         watermark = Image.open(watermark_image_path).convert('RGBA')
-        width, height = base_image.size
-        watermark.thumbnail((round(width / proportion), round(height / proportion)))
-        transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
-        transparent.paste(base_image, (0, 0))
-        position = (width - watermark.size[0] - position[0], height - watermark.size[1] - position[1])
-        transparent.paste(watermark, position, mask=watermark)
-        transparent.show()
-        transparent.save(output_image_path)
-        return output_image_path
+
+        if input_image_path.endswith('.gif'):
+            base_images = Image.open(input_image_path).convert('RGBA')
+            width, height = base_images.size
+            watermark.thumbnail((round(width / proportion), round(height / proportion)))
+            frames = []
+            for frame in ImageSequence.Iterator(base_images):
+                transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+                transparent.paste(frame, (0, 0))
+                position = (width - watermark.size[0] - position[0], height - watermark.size[1] - position[1])
+                transparent.paste(watermark, position, mask=watermark)
+                frames.append(transparent)
+            frames[0].save(output_image_path, format='GIF', append_images=frames[1:], save_all=True)
+            return output_image_path
+        else:
+            try:
+                base_image = Image.open(input_image_path).convert('RGBA')
+            except:
+                base_image = Image.open(input_image_path).convert('RGB')
+            width, height = base_image.size
+            watermark.thumbnail((round(width / proportion), round(height / proportion)))
+            transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+            transparent.paste(base_image, (0, 0))
+            position = (width - watermark.size[0] - position[0], height - watermark.size[1] - position[1])
+            transparent.paste(watermark, position, mask=watermark)
+            transparent.save(output_image_path)
+            return output_image_path
 
     @commands.command()
     async def gun(self, ctx, size: Optional[float] = 2.0, *, url: str = None):
