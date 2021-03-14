@@ -69,7 +69,7 @@ class ImgEdit(commands.Cog):
         file_name, ext = os.path.splitext(os.path.basename(urlsplit(url).path))
         if not force_png:
             filename = "{}_{}{}".format(seed, file_name, ext)
-        else:
+        elif ext != ".gif":
             filename = "{}_{}.png".format(seed, file_name)
         filepath = "{}/{}".format(str(self.temp), filename)
         try:
