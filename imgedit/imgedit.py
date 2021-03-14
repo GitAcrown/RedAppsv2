@@ -64,10 +64,13 @@ class ImgEdit(commands.Cog):
             return urls[:nb]
         return []
 
-    async def download(self, url: str):
+    async def download(self, url: str, *, force_png: bool = False):
         seed = str(int(time.time()))
         file_name, ext = os.path.splitext(os.path.basename(urlsplit(url).path))
-        filename = "{}_{}{}".format(seed, file_name, ext)
+        if not force_png:
+            filename = "{}_{}{}".format(seed, file_name, ext)
+        else:
+            filename = "{}_{}.png".format(seed, file_name)
         filepath = "{}/{}".format(str(self.temp), filename)
         try:
             async with aiohttp.ClientSession() as session:
@@ -115,7 +118,7 @@ class ImgEdit(commands.Cog):
             url = [url, ctx.message]
         async with ctx.channel.typing():
             gun = bundled_data_path(self) / "GunWM.png"
-            filepath = await self.download(url[0])
+            filepath = await self.download(url[0], force_png=True)
             result = self.add_gun(filepath, filepath, gun, (0, 0), size)
             file = discord.File(result)
             try:
