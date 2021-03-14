@@ -105,7 +105,7 @@ class ImgEdit(commands.Cog):
                 transparent.paste(watermark, position, mask=watermark)
                 frames.append(transparent)
             frames[0].save(output_image_path, format='GIF', append_images=frames[1:], save_all=True, optimize=False,
-                           loop=0, duration=dur)
+                           loop=0, duration=round(dur * 0.90))
             return output_image_path
         else:
             transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
