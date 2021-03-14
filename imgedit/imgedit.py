@@ -82,8 +82,8 @@ class ImgEdit(commands.Cog):
             return False
 
     def watermark_with_transparency(self, input_image_path, output_image_path, watermark_image_path, position):
-        base_image = Image.open(input_image_path)
-        watermark = Image.open(watermark_image_path)
+        base_image = Image.open(input_image_path).convert('RGBA')
+        watermark = Image.open(watermark_image_path).convert('RGBA')
         width, height = base_image.size
         watermark.thumbnail((width / 5, height / 5))
         transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
