@@ -69,8 +69,6 @@ class ImgEdit(commands.Cog):
         file_name, ext = os.path.splitext(os.path.basename(urlsplit(url).path))
         if not force_png:
             filename = "{}_{}{}".format(seed, file_name, ext)
-        elif ext != ".gif":
-            filename = "{}_{}.gif".format(seed, file_name)
         else:
             filename = "{}_{}.png".format(seed, file_name)
         filepath = "{}/{}".format(str(self.temp), filename)
@@ -98,7 +96,7 @@ class ImgEdit(commands.Cog):
         watermark.thumbnail((round(width / proportion), round(height / proportion)))
         position = (width - watermark.size[0] - position[0], height - watermark.size[1] - position[1])
 
-        if input_image_path.endswith('.gif') or input_image_path.endswith('.gifv'):
+        if base_image.format.lower() in ('gif', 'gifv'):
             frames = []
             for frame in ImageSequence.Iterator(base_image):
                 transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
