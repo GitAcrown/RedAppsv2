@@ -85,7 +85,7 @@ class ImgEdit(commands.Cog):
         base_image = Image.open(input_image_path).convert('RGBA')
         watermark = Image.open(watermark_image_path).convert('RGBA')
         width, height = base_image.size
-        watermark.thumbnail((width / 5, height / 5))
+        watermark.thumbnail((width / 3, height / 3))
         transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
         transparent.paste(base_image, (0, 0))
         position = (width - watermark.size[0] - position[0], height - watermark.size[1] - position[1])
@@ -108,7 +108,7 @@ class ImgEdit(commands.Cog):
         async with ctx.channel.typing():
             gun = bundled_data_path(self) / "GunWM.png"
             filepath = await self.download(url[0])
-            result = self.watermark_with_transparency(filepath, filepath, gun, (1, 1))
+            result = self.watermark_with_transparency(filepath, filepath, gun, (0, 0))
             file = discord.File(result)
             try:
                 await ctx.send(file=file)
