@@ -90,30 +90,26 @@ class ImgEdit(commands.Cog):
 
     def add_gun(self, input_image_path, output_image_path, watermark_image_path, position, proportion):
         watermark = Image.open(watermark_image_path).convert('RGBA')
+        try:
+            base_image = Image.open(input_image_path).convert('RGBA')
+        except:
+            base_image = Image.open(input_image_path).convert('RGB')
+        width, height = base_image.size
+        watermark.thumbnail((round(width / proportion), round(height / proportion)))
+        position = (width - watermark.size[0] - position[0], height - watermark.size[1] - position[1])
 
         if input_image_path.endswith('.gif') or input_image_path.endswith('.gifv'):
-            base_images = Image.open(input_image_path)
-            width, height = base_images.size
-            watermark.thumbnail((round(width / proportion), round(height / proportion)))
             frames = []
-            for frame in ImageSequence.Iterator(base_images):
+            for frame in ImageSequence.Iterator(base_image):
                 transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
                 transparent.paste(frame, (0, 0))
-                position = (width - watermark.size[0] - position[0], height - watermark.size[1] - position[1])
                 transparent.paste(watermark, position, mask=watermark)
                 frames.append(transparent)
-            frames[0].save(output_image_path, format='GIF', append_images=frames[1:], save_all=True)
+            frames[0].save(output_image_path, format='GIF', append_images=frames[1:], save_all=True, loop=0)
             return output_image_path
         else:
-            try:
-                base_image = Image.open(input_image_path).convert('RGBA')
-            except:
-                base_image = Image.open(input_image_path).convert('RGB')
-            width, height = base_image.size
-            watermark.thumbnail((round(width / proportion), round(height / proportion)))
             transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
             transparent.paste(base_image, (0, 0))
-            position = (width - watermark.size[0] - position[0], height - watermark.size[1] - position[1])
             transparent.paste(watermark, position, mask=watermark)
             transparent.save(output_image_path)
             return output_image_path
