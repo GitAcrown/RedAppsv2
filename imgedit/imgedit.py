@@ -152,5 +152,6 @@ class ImgEdit(commands.Cog):
                     await ctx.send(file=file)
                 except:
                     await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (prob. trop lourde)")
+                    logger.error(msg="GUN : Impossible d'upload l'image", exc_info=True)
                 os.remove(result)
         return
