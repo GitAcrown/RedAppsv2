@@ -70,6 +70,8 @@ class ImgEdit(commands.Cog):
         if not force_png:
             filename = "{}_{}{}".format(seed, file_name, ext)
         elif ext != ".gif":
+            filename = "{}_{}.gif".format(seed, file_name)
+        else:
             filename = "{}_{}.png".format(seed, file_name)
         filepath = "{}/{}".format(str(self.temp), filename)
         try:
