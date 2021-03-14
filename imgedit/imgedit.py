@@ -97,6 +97,7 @@ class ImgEdit(commands.Cog):
         position = (width - watermark.size[0] - position[0], height - watermark.size[1] - position[1])
 
         if input_image_path.endswith('gif') or input_image_path.endswith('gifv'):
+            base_image = Image.open(input_image_path)
             frames = []
             for frame in ImageSequence.Iterator(base_image):
                 transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
