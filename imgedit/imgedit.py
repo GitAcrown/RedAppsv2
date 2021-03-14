@@ -104,7 +104,7 @@ class ImgEdit(commands.Cog):
                 transparent.paste(frame, (0, 0))
                 transparent.paste(watermark, position, mask=watermark)
                 frames.append(transparent)
-            frames[0].save(output_image_path, format='GIF', append_images=frames[1:], save_all=True, optimize=False,
+            frames[0].save(output_image_path, format='GIF', append_images=frames[1:], save_all=True,
                            loop=0, duration=round(dur * 0.90))
             return output_image_path
         else:
