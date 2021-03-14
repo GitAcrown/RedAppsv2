@@ -13,7 +13,7 @@ import aiofiles
 import aiohttp
 import discord
 from discord.errors import HTTPException
-from typing import Union, List, Tuple, Literal
+from typing import Union, List, Tuple, Literal, Optional
 from PIL import Image
 from bs4 import BeautifulSoup
 
@@ -34,6 +34,8 @@ FILES_LINKS = re.compile(
 
 class ImgEditError(Exception):
     """Classe de base pour les erreurs ImgEdit"""
+
+
 
 
 class ImgEdit(commands.Cog):
@@ -81,14 +83,14 @@ class ImgEdit(commands.Cog):
             logger.error("Error downloading", exc_info=True)
             return False
 
-    def watermark_with_transparency(self, input_image_path, output_image_path, watermark_image_path, position):
+    def add_gun(self, input_image_path, output_image_path, watermark_image_path, position, proportion):
         try:
             base_image = Image.open(input_image_path).convert('RGBA')
         except:
             base_image = Image.open(input_image_path).convert('RGB')
         watermark = Image.open(watermark_image_path).convert('RGBA')
         width, height = base_image.size
-        watermark.thumbnail((round(width / 2), round(height / 2)))
+        watermark.thumbnail((round(width / proportion), round(height / proportion)))
         transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
         transparent.paste(base_image, (0, 0))
         position = (width - watermark.size[0] - position[0], height - watermark.size[1] - position[1])
@@ -98,8 +100,11 @@ class ImgEdit(commands.Cog):
         return output_image_path
 
     @commands.command()
-    async def gun(self, ctx, url=None):
-        """Ajoute un pistolet braqué sur l'image"""
+    async def gun(self, ctx, url: Optional[str] =None, size: Optional[float] = 2.0):
+        """Ajoute un pistolet braqué sur l'image
+
+        [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)
+        [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit"""
         if not url:
             url = await self.search_for_files(ctx)
             if not url:
@@ -111,7 +116,7 @@ class ImgEdit(commands.Cog):
         async with ctx.channel.typing():
             gun = bundled_data_path(self) / "GunWM.png"
             filepath = await self.download(url[0])
-            result = self.watermark_with_transparency(filepath, filepath, gun, (0, 0))
+            result = self.add_gun(filepath, filepath, gun, (0, 0), size)
             file = discord.File(result)
             try:
                 await ctx.send(file=file)
