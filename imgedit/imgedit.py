@@ -140,11 +140,17 @@ class ImgEdit(commands.Cog):
             else:
                 filepath = await self.download(url[0], force_png=True)
 
-            result = self.add_gun(filepath, filepath, gun, (0, 0), size)
-            file = discord.File(result)
             try:
-                await ctx.send(file=file)
+                result = self.add_gun(filepath, filepath, gun, (0, 0), size)
             except:
-                await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (prob. trop lourde)")
-            os.remove(result)
+                os.remove(filepath)
+                return await ctx.send("**Erreur** • Le format de l'image donnée est invalide\n"
+                                      "Notez que les gifs Giphy et Tenor ne fonctionnent pas en tant que tel, ils doivent d'abord être téléchargés.")
+            else:
+                file = discord.File(result)
+                try:
+                    await ctx.send(file=file)
+                except:
+                    await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (prob. trop lourde)")
+                os.remove(result)
         return
