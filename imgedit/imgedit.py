@@ -91,8 +91,8 @@ class ImgEdit(commands.Cog):
     def add_gun(self, input_image_path, output_image_path, watermark_image_path, position, proportion):
         watermark = Image.open(watermark_image_path).convert('RGBA')
 
-        if input_image_path.endswith('.gif'):
-            base_images = Image.open(input_image_path).convert('RGBA')
+        if input_image_path.endswith('.gif') or input_image_path.endswith('.gifv'):
+            base_images = Image.open(input_image_path)
             width, height = base_images.size
             watermark.thumbnail((round(width / proportion), round(height / proportion)))
             frames = []
@@ -137,7 +137,11 @@ class ImgEdit(commands.Cog):
             url = [url, ctx.message]
         async with ctx.channel.typing():
             gun = bundled_data_path(self) / "GunWM.png"
-            filepath = await self.download(url[0], force_png=True)
+            if url[0].endswith('.gif') or url[0].endswith('.gifv'):
+                filepath = await self.download(url[0])
+            else:
+                filepath = await self.download(url[0], force_png=True)
+
             result = self.add_gun(filepath, filepath, gun, (0, 0), size)
             file = discord.File(result)
             try:
