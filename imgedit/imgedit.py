@@ -104,7 +104,7 @@ class ImgEdit(commands.Cog):
                 transparent.paste(frame, (0, 0))
                 transparent.paste(watermark, position, mask=watermark)
                 frames.append(transparent)
-            frames[0].save(output_image_path, format='GIF', append_images=frames[1:], save_all=True)
+            frames[0].save(output_image_path, format='GIF', append_images=frames[1:], save_all=True, loop=0)
             return output_image_path
         else:
             transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
@@ -128,8 +128,10 @@ class ImgEdit(commands.Cog):
                 return await ctx.send("**???** • Fournissez un fichier valide")
             else:
                 url = url[0]
-        else:
+        elif url.startswith('http'):
             url = [url, ctx.message]
+        else:
+            return await ctx.send("**???** • Fournissez un fichier valide")
         async with ctx.channel.typing():
             gun = bundled_data_path(self) / "GunWM.png"
             if url[0].endswith('.gif') or url[0].endswith('.gifv'):
