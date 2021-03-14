@@ -107,7 +107,10 @@ class ImgEdit(commands.Cog):
         """Ajoute un pistolet braqué sur l'image
 
         [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)
-        [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit"""
+        [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image fournie)"""
+        if size <= 0:
+            return await ctx.send("**Proportion invalide** • La valeur de proportion doit être supérieure à 0.")
+
         if not url:
             url = await self.search_for_files(ctx)
             if not url:
