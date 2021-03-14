@@ -96,7 +96,7 @@ class ImgEdit(commands.Cog):
         watermark.thumbnail((round(width / proportion), round(height / proportion)))
         position = (width - watermark.size[0] - position[0], height - watermark.size[1] - position[1])
 
-        if input_image_path.endswith('gif') or input_image_path.filename.endswith('gifv'):
+        if input_image_path.endswith('gif') or input_image_path.endswith('gifv'):
             frames = []
             for frame in ImageSequence.Iterator(base_image):
                 transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
