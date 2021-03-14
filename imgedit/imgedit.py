@@ -100,7 +100,7 @@ class ImgEdit(commands.Cog):
         return output_image_path
 
     @commands.command()
-    async def gun(self, ctx, url: Optional[str] =None, size: Optional[float] = 2.0):
+    async def gun(self, ctx, url: Optional[str] = None, *, size: float = 2.0):
         """Ajoute un pistolet braqué sur l'image
 
         [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)
