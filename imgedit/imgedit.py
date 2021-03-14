@@ -37,7 +37,6 @@ class ImgEditError(Exception):
 
 
 
-
 class ImgEdit(commands.Cog):
     """Commandes d'édition d'images"""
 
@@ -86,6 +85,17 @@ class ImgEdit(commands.Cog):
             logger.error("Error downloading", exc_info=True)
             return False
 
+    def get_avg_fps(self, PIL_Image_object):
+        PIL_Image_object.seek(0)
+        frames = duration = 0
+        while True:
+            try:
+                frames += 1
+                duration += PIL_Image_object.info['duration']
+                PIL_Image_object.seek(PIL_Image_object.tell() + 1)
+            except EOFError:
+                return frames / duration * 1000
+
     def add_gun(self, input_image_path, output_image_path, watermark_image_path, position, proportion):
         watermark = Image.open(watermark_image_path).convert('RGBA')
         try:
@@ -98,13 +108,15 @@ class ImgEdit(commands.Cog):
 
         if input_image_path.endswith('gif') or input_image_path.endswith('gifv'):
             base_image = Image.open(input_image_path)
+            dur = self.get_avg_fps(base_image)
             frames = []
             for frame in ImageSequence.Iterator(base_image):
                 transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
                 transparent.paste(frame, (0, 0))
                 transparent.paste(watermark, position, mask=watermark)
                 frames.append(transparent)
-            frames[0].save(output_image_path, format='GIF', append_images=frames[1:], save_all=True, loop=0)
+            frames[0].save(output_image_path, format='GIF', append_images=frames[1:], save_all=True, optimize=False,
+                           loop=0, duration=dur)
             return output_image_path
         else:
             transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
