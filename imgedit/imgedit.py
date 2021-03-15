@@ -236,16 +236,18 @@ class ImgEdit(commands.Cog):
 
         if input_path.endswith('gif') or input_path.endswith('gifv'):
             image = Image.open(input_path)
+            image = image.resize((final_width, final_height))
             dur = 1000 / image.info['duration']
             frames = []
             for frame in ImageSequence.Iterator(image):
                 transparent = Image.new('RGBA', (final_width, final_height), (0, 0, 0, 0))
-                transparent.paste(image, (final_width, final_height))
+                transparent.paste(frame, (final_width, final_height))
                 transparent.paste(front, (final_width, final_height), mask=front)
                 frames.append(transparent)
             frames[0].save(output_path, format='GIF', append_images=frames[1:], save_all=True,
                            loop=0, duration=round(dur * 0.90))
         else:
+            image = image.resize(final_width, final_height)
             transparent = Image.new('RGBA', (final_width, final_height), (0, 0, 0, 0))
             transparent.paste(image, (0, 0))
             transparent.paste(front, (0, 0), mask=front)
