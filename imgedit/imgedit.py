@@ -1,29 +1,17 @@
-import asyncio
+import logging
 import logging
 import os
-import random
 import re
-import string
 import time
-from copy import copy
-from datetime import datetime, timedelta
+from typing import Optional
 from urllib.parse import urlsplit
 
 import aiofiles
 import aiohttp
 import discord
-from discord.errors import HTTPException
-from typing import Union, List, Tuple, Literal, Optional
 from PIL import Image, ImageSequence, ImageOps
-from bs4 import BeautifulSoup
-
-from discord.ext import tasks
-from redbot.core import Config, commands, checks
+from redbot.core import Config, commands
 from redbot.core.data_manager import cog_data_path, bundled_data_path
-from redbot.core.utils import AsyncIter
-from redbot.core.utils.menus import menu, DEFAULT_CONTROLS
-from redbot.core.utils.chat_formatting import box, humanize_number
-from tabulate import tabulate
 
 logger = logging.getLogger("red.RedAppsv2.imgedit")
 
@@ -249,11 +237,12 @@ class ImgEdit(commands.Cog):
         return
 
     @commands.command(name='holdupr')
-    async def holdup_right(self, ctx, prpt: Optional[float] = 1.5, *, url: str = None):
+    async def holdup_right(self, ctx, prpt: Optional[float] = 1.5, url: Optional[str] = None, margin_x: int = 0, margin_y: int = 0):
         """Ajoute le pistolet braqué (3e personne) sur la droite de l'image
 
         [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image fournie)
-        [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)"""
+        [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)
+        [margin_x]/[margin_y] = Marges à ajouter entre le rebord de l'image et le pistolet"""
         if prpt <= 0:
             return await ctx.send("**Proportion invalide** • La valeur de proportion doit être supérieure à 0.")
 
@@ -275,7 +264,7 @@ class ImgEdit(commands.Cog):
                 filepath = await self.download(url[0], force_png=True)
 
             try:
-                result = self.add_wm(filepath, filepath, gun, prpt, mirrored=True)
+                result = self.add_wm(filepath, filepath, gun, prpt, mirrored=True, margin=(margin_x, margin_y))
             except:
                 os.remove(filepath)
                 return await ctx.send("**Erreur** • Le format de l'image donnée est invalide\n"
