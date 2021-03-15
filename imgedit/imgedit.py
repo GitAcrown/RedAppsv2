@@ -150,7 +150,7 @@ class ImgEdit(commands.Cog):
                         margin_x: int = 0, margin_y: int = 0):
         """Ajoute un pistolet (1e personne) braqué sur la droite de l'image
 
-        **[size]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
+        **[prpt]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
         **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
         **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source (nécéssite l'utilisation d'une URL)"""
         return await self.add_fp_gun(ctx, prpt, url, margin_x, margin_y)
@@ -160,7 +160,7 @@ class ImgEdit(commands.Cog):
                        margin_x: int = 0, margin_y: int = 0):
         """Ajoute un pistolet (1e personne) braqué sur la gauche de l'image
 
-        **[size]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
+        **[prpt]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
         **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
         **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source (nécéssite l'utilisation d'une URL)"""
         return await self.add_fp_gun(ctx, prpt, url, margin_x, margin_y, mirrored=True)
@@ -208,7 +208,7 @@ class ImgEdit(commands.Cog):
                         margin_x: int = 0, margin_y: int = 0):
         """Ajoute un pistolet (3e personne) braqué sur la droite de l'image
 
-        **[size]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
+        **[prpt]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
         **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
         **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source (nécéssite l'utilisation d'une URL)"""
         return await self.add_tp_gun(ctx, prpt, url, margin_x, margin_y, mirrored=True)
@@ -218,7 +218,7 @@ class ImgEdit(commands.Cog):
                            margin_x: int = 0, margin_y: int = 0):
         """Ajoute un pistolet (3e personne) braqué sur la gauche de l'image
 
-        **[size]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
+        **[prpt]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
         **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
         **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source (nécéssite l'utilisation d'une URL)"""
         return await self.add_tp_gun(ctx, prpt, url, margin_x, margin_y)
