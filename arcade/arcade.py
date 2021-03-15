@@ -53,12 +53,14 @@ class Arcade(commands.Cog):
         await asyncio.sleep(30)
         msg = await ctx.channel.fetch_message(msg.id)
         reaction = [r for r in msg.reactions if r.emoji == conf_emoji][0]
-        players = []
+        players = [ctx.author]
         async for user in reaction.users():
+            if user.bot:
+                continue
             if await finance.enough_credits(user, price):
                 players.append(user)
             else:
-                await ctx.send(f"{user.mention} • Fonds insuffisants sur votre compte")
+                await ctx.send(f"{user.mention} → Fonds insuffisants sur votre compte")
         return players
 
     @commands.command(name='bombparty')
@@ -74,10 +76,9 @@ class Arcade(commands.Cog):
         curr = await finance.get_currency(ctx.guild)
 
         em = discord.Embed(description=f"💣 {ctx.author.mention} a lancé une partie de **Bombparty** !\n"
-                                       f"Cliquez sur {conf_emoji} pour jouer !",
+                                       f"Cliquez sur {conf_emoji} pour jouer ! (30s)",
                            color=await ctx.embed_color())
         em.set_footer(text=f"Rejoindre la partie | Coût d'inscription : {price} {curr}")
-        em.set_thumbnail(url="https://i.imgur.com/mHl2kx6.png")
         players = await self.wait_for_players(ctx, em, price)
         if len(players) < 2:
             self.games.remove(channel.id)
