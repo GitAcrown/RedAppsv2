@@ -118,9 +118,9 @@ class Arcade(commands.Cog):
                                          "- Le temps avant l'explosion de la bombe se réduit à chaque manche jusqu'à atteindre 6s\n"
                                          "- Tant que je met pas 👍 sous votre message, continuez de faire des propositions",
                              color=await ctx.embed_color())
-        tuto_msg = await ctx.send(embed=tuto)
-        await asyncio.sleep(5)
-        await tuto_msg.delete()
+        tuto.set_footer(text="La partie va commencer...")
+        await ctx.send(embed=tuto)
+        await asyncio.sleep(6)
 
         while game:
             for p in players:
