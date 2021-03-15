@@ -86,18 +86,21 @@ class ImgEdit(commands.Cog):
             return False
 
     def add_gun(self, input_image_path, output_image_path, watermark_image_path, proportion, mirrored: bool = False):
-        position = (0, 0)
+        margin = (0, 0)
         watermark = Image.open(watermark_image_path).convert('RGBA')
         try:
             base_image = Image.open(input_image_path).convert('RGBA')
         except:
             base_image = Image.open(input_image_path).convert('RGB')
         width, height = base_image.size
+
         if mirrored:
             watermark = ImageOps.mirror(watermark)
-            position = (width, 0)
-        watermark.thumbnail((round(width / proportion), round(height / proportion)))
-        position = (width - watermark.size[0] - position[0], height - watermark.size[1] - position[1])
+            watermark.thumbnail((round(width / proportion), round(height / proportion)))
+            position = (0 + margin[0], height - margin[1] - watermark.size[1])
+        else:
+            watermark.thumbnail((round(width / proportion), round(height / proportion)))
+            position = (width - watermark.size[0] - margin[0], height - watermark.size[1] - margin[1])
 
         if input_image_path.endswith('gif') or input_image_path.endswith('gifv'):
             base_image = Image.open(input_image_path)
