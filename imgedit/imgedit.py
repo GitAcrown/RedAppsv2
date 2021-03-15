@@ -223,3 +223,69 @@ class ImgEdit(commands.Cog):
         **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source (nécéssite l'utilisation d'une URL)"""
         return await self.add_tp_gun(ctx, prpt, url, margin_x, margin_y)
 
+    def paste_image_behind(self, input_path: str, output_path: str, paste_img_path: str, *, mirror: bool = False):
+        front = Image.open(paste_img_path).convert('RGBA')
+        try:
+            image = Image.open(input_path).convert('RGBA')
+        except:
+            image = Image.open(input_path).convert('RGB')
+        final_width, final_height = front.size
+
+        if mirror:
+            front = ImageOps.mirror(front)
+
+        if input_path.endswith('gif') or input_path.endswith('gifv'):
+            image = Image.open(input_path)
+            dur = 1000 / image.info['duration']
+            frames = []
+            for frame in ImageSequence.Iterator(image):
+                transparent = Image.new('RGBA', (final_width, final_height), (0, 0, 0, 0))
+                transparent.paste(image, (final_width, final_height))
+                transparent.paste(front, (final_width, final_height), mask=front)
+                frames.append(transparent)
+            frames[0].save(output_path, format='GIF', append_images=frames[1:], save_all=True,
+                           loop=0, duration=round(dur * 0.90))
+        else:
+            transparent = Image.new('RGBA', (final_width, final_height), (0, 0, 0, 0))
+            transparent.paste(image, (final_width, final_height))
+            transparent.paste(front, (final_width, final_height), mask=front)
+            transparent.save(output_path, format='PNG')
+        return output_path
+
+    @commands.command(name='zahando', aliases=['thehand'])
+    async def za_hando(self, ctx, url: ImageFinder = None, mirror: bool = False):
+        """Ajoute Za Hando sur l'image
+
+        **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
+        **[mirror]** = Inverse le sens de Za Hando"""
+
+        if url is None:
+            url = await ImageFinder().search_for_images(ctx)
+        msg = await ctx.message.channel.send("⏳ Patientez pendant la préparation de votre image")
+
+        async with ctx.typing():
+            url = url[0]
+            filename = urlsplit(url).path.rsplit('/')[-1]
+            filepath = str(self.temp / filename)
+            try:
+                await self.download(url, filepath)
+            except:
+                await ctx.send("**Téléchargement échoué** • Réessayez d'une autre façon")
+            else:
+                gun = bundled_data_path(self) / "ZaHando.png"
+                try:
+                    task = self.paste_image_behind(filepath, filepath, str(gun), mirror=mirror)
+                except:
+                    os.remove(filepath)
+                    logger.error("Impossible de faire za_hando", exc_info=True)
+                    return await ctx.send("**Erreur** • Impossible de créer l'image demandée.")
+
+                file = discord.File(task)
+                try:
+                    await ctx.send(file=file)
+                except:
+                    await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (probablement trop lourde)")
+                    logger.error(msg="GUN : Impossible d'upload l'image", exc_info=True)
+                os.remove(filepath)
+            finally:
+                await msg.delete()
