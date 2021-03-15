@@ -152,8 +152,10 @@ class Arcade(commands.Cog):
                             win = discord.Embed(description=f"{winner.mention} a remporté la partie !\n"
                                                             f"Crédits gagnés : **{cagnotte}** {curr}")
                             win.set_footer(text=f"Vous avez désormais {new_solde} {curr}")
-                            game = False
-                            break
+                            await ctx.send(embed=win)
+                            if channel.id in self.games:
+                                self.games.remove(channel.id)
+                            return
                 else:
                     await word.add_reaction('👍')
                     used.append(word.content.lower())
