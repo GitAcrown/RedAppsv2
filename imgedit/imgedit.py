@@ -260,9 +260,9 @@ class ImgEdit(commands.Cog):
         if prpt <= 0:
             return await ctx.send("**Proportion invalide** • La valeur de proportion doit être supérieure à 0.")
 
-        if urls is None:
-            urls = await ImageFinder().search_for_images(ctx)
-        if not urls:
+        if url is None:
+            url = await ImageFinder().search_for_images(ctx)
+        if not url:
             return await ctx.send("**???** • Fournissez un fichier valide")
 
         async with ctx.channel.typing():
