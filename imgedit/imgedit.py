@@ -239,7 +239,7 @@ class ImgEdit(commands.Cog):
             image = image.resize((final_width, final_height))
             dur = 1000 / image.info['duration']
             frames = []
-            for frame in ImageSequence.Iterator(image): # Décomposition
+            for frame in ImageSequence.Iterator(image):
                 transparent = Image.new('RGBA', (final_width, final_height), (0, 0, 0, 0))
                 transparent.paste(frame, (0, 0))
                 transparent.paste(front, (0, 0), mask=front)
