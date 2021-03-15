@@ -1,8 +1,10 @@
+import asyncio
 import logging
 import logging
 import os
 import re
 import time
+from io import BytesIO
 from typing import Optional
 from urllib.parse import urlsplit
 
@@ -22,11 +24,6 @@ FILES_LINKS = re.compile(
 )
 
 
-class ImgEditError(Exception):
-    """Classe de base pour les erreurs ImgEdit"""
-
-
-
 class ImgEdit(commands.Cog):
     """Commandes d'édition d'images"""
 
@@ -38,252 +35,114 @@ class ImgEdit(commands.Cog):
         self.temp = cog_data_path(self) / "temp"
         self.temp.mkdir(exist_ok=True, parents=True)
 
-    async def search_for_files(self, ctx, nb: int = 1):
-        urls = []
-        async for message in ctx.channel.history(limit=10):
-            if message.author == ctx.author or ctx.author.permissions_in(ctx.channel).manage_messages:
-                if message.attachments:
-                    for attachment in message.attachments:
-                        urls.append([attachment.url, message])
-                    break
-                match = FILES_LINKS.match(message.content)
-                if match:
-                    urls.append((match.group(1), message))
-        if urls:
-            return urls[:nb]
-        return []
-
-    async def download(self, url: str, *, force_png: bool = False):
-        seed = str(int(time.time()))
-        file_name, ext = os.path.splitext(os.path.basename(urlsplit(url).path))
-        if not force_png:
-            filename = "{}_{}{}".format(seed, file_name, ext)
-        else:
-            filename = "{}_{}.png".format(seed, file_name)
-        filepath = "{}/{}".format(str(self.temp), filename)
+    async def download(self, url: str, path: str):
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as resp:
                     if resp.status == 200:
-                        f = await aiofiles.open(str(filepath), mode='wb')
-                        await f.write(await resp.read())
-                        await f.close()
-                    else:
-                        raise ConnectionError()
-            return filepath
-        except Exception:
-            logger.error("Error downloading", exc_info=True)
+                        data = await resp.read()
+                        with open(path, "wb") as f:
+                            f.write(data)
+                        return resp.headers.get("Content-type", "").lower()
+        except asyncio.TimeoutError:
             return False
 
-    def add_wm(self, input_image_path, output_image_path, watermark_image_path, proportion, *,
-               margin = (0, 0), mirrored: bool = False, bottom_left: bool = False):
-        watermark = Image.open(watermark_image_path).convert('RGBA')
+    async def bytes_download(self, url: str):
         try:
-            base_image = Image.open(input_image_path).convert('RGBA')
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as resp:
+                    if resp.status == 200:
+                        data = await resp.read()
+                        mime = resp.headers.get("Content-type", "").lower()
+                        b = BytesIO(data)
+                        b.seek(0)
+                        return b, mime
+                    else:
+                        return False, False
+        except asyncio.TimeoutError:
+            return False, False
+        except Exception:
+            logger.error("Impossible de télécharger en bytes-like", exc_info=True)
+            return False, False
+
+    def paste_image(self, input_path: str, output_path: str, paste_img_path: str, *,
+                    scale: float = 1, margin: tuple = (0, 0), mirror: bool = False, position: str = 'bottom_right'):
+        paste = Image.open(paste_img_path).convert('RGBA')
+        try:
+            image = Image.open(input_path).convert('RGBA')
         except:
-            base_image = Image.open(input_image_path).convert('RGB')
-        width, height = base_image.size
+            image = Image.open(input_path).convert('RGB')
+        image_width, image_height = image.size
 
-        if mirrored:
-            watermark = ImageOps.mirror(watermark)
-        watermark.thumbnail((round(width / proportion), round(height / proportion)))
+        if mirror:
+            paste = ImageOps.mirror(paste)
 
-        if bottom_left:
-            position = (0 + margin[0], height - margin[1] - watermark.size[1])
+        paste.thumbnail((round(image_width / scale), round(image_width / scale)))
+
+        if position.lower() == 'bottom_left':
+            pos = (0 + margin[0], image_height - margin[1] - paste.size[1])
+        elif position.lower() == 'top_left':
+            pos = (0 + margin[0], 0 + margin[1])
+        elif position.lower() == 'top_right':
+            pos = (image_width - margin[0] - paste[0], 0 + margin[1])
         else:
-            position = (width - watermark.size[0] - margin[0], height - watermark.size[1] - margin[1])
+            pos = (image_width - paste.size[0] - margin[0], image_height - paste.size[1] - margin[1])
 
-        if input_image_path.endswith('gif') or input_image_path.endswith('gifv'):
-            base_image = Image.open(input_image_path)
-            dur = 1000 / base_image.info['duration']
+        if input_path.endswith('gif') or input_path.endswith('gifv'):
+            image = Image.open(input_path)
+            dur = 1000 / image.info['duration']
             frames = []
-            for frame in ImageSequence.Iterator(base_image):
-                transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
+            for frame in ImageSequence.Iterator(image):
+                transparent = Image.new('RGBA', (image_width, image_height), (0, 0, 0, 0))
                 transparent.paste(frame, (0, 0))
-                transparent.paste(watermark, position, mask=watermark)
+                transparent.paste(paste, pos, mask=paste)
                 frames.append(transparent)
-            frames[0].save(output_image_path, format='GIF', append_images=frames[1:], save_all=True,
+            frames[0].save(output_path, format='GIF', append_images=frames[1:], save_all=True,
                            loop=0, duration=round(dur * 0.90))
-            return output_image_path
+            ext = frames[0].format
         else:
-            transparent = Image.new('RGBA', (width, height), (0, 0, 0, 0))
-            transparent.paste(base_image, (0, 0))
-            transparent.paste(watermark, position, mask=watermark)
-            transparent.save(output_image_path)
-            return output_image_path
+            transparent = Image.new('RGBA', (image_width, image_height), (0, 0, 0, 0))
+            transparent.paste(image, (0, 0))
+            transparent.paste(paste, pos, mask=paste)
+            transparent.save(output_path, format='PNG')
+            ext = transparent.format
+        return output_path, ext
+
 
     @commands.command(name='gunr', aliases=['gun'])
-    async def gun_right(self, ctx, prpt: Optional[float] = 1.75, *, url: str = None):
-        """Ajoute un pistolet braqué (1e personne) sur la droite de l'image
+    async def gun_right(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None):
+        """Ajoute un pistolet (1e personne) braqué sur la droite de l'image
 
         [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image fournie)
         [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)"""
-        if prpt <= 0:
-            return await ctx.send("**Proportion invalide** • La valeur de proportion doit être supérieure à 0.")
-
-        if not url:
-            url = await self.search_for_files(ctx)
-            if not url:
-                return await ctx.send("**???** • Fournissez un fichier valide")
-            else:
-                url = url[0]
-        elif url.startswith('http'):
-            url = [url, ctx.message]
-        else:
-            return await ctx.send("**???** • Fournissez un fichier valide")
-        async with ctx.channel.typing():
-            gun = bundled_data_path(self) / "GunWM.png"
-            if url[0].endswith('.gif') or url[0].endswith('.gifv'):
-                filepath = await self.download(url[0])
-            else:
-                filepath = await self.download(url[0], force_png=True)
-
-            try:
-                result = self.add_wm(filepath, filepath, gun, prpt)
-            except:
-                os.remove(filepath)
-                return await ctx.send("**Erreur** • Le format de l'image donnée est invalide\n"
-                                      "Notez que les gifs Giphy et Tenor ne fonctionnent pas en tant que tel, ils doivent d'abord être téléchargés.")
-            else:
-                file = discord.File(result)
-                try:
-                    await ctx.send(file=file)
-                except:
-                    await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (prob. trop lourde)")
-                    logger.error(msg="GUN : Impossible d'upload l'image", exc_info=True)
-                os.remove(result)
-        return
-
-    @commands.command(name='gunl')
-    async def gun_left(self, ctx, prpt: Optional[float] = 1.75, *, url: str = None):
-        """Ajoute un pistolet braqué (1e personne) sur la gauche de l'image
-
-        [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image fournie)
-        [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)"""
-        if prpt <= 0:
-            return await ctx.send("**Proportion invalide** • La valeur de proportion doit être supérieure à 0.")
-
-        if not url:
-            url = await self.search_for_files(ctx)
-            if not url:
-                return await ctx.send("**???** • Fournissez un fichier valide")
-            else:
-                url = url[0]
-        elif url.startswith('http'):
-            url = [url, ctx.message]
-        else:
-            return await ctx.send("**???** • Fournissez un fichier valide")
-        async with ctx.channel.typing():
-            gun = bundled_data_path(self) / "GunWM.png"
-            if url[0].endswith('.gif') or url[0].endswith('.gifv'):
-                filepath = await self.download(url[0])
-            else:
-                filepath = await self.download(url[0], force_png=True)
-
-            try:
-                result = self.add_wm(filepath, filepath, gun, prpt, mirrored=True, bottom_left=True)
-            except:
-                os.remove(filepath)
-                return await ctx.send("**Erreur** • Le format de l'image donnée est invalide\n"
-                                      "Notez que les gifs Giphy et Tenor ne fonctionnent pas en tant que tel, ils doivent d'abord être téléchargés.")
-            else:
-                file = discord.File(result)
-                try:
-                    await ctx.send(file=file)
-                except:
-                    await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (prob. trop lourde)")
-                    logger.error(msg="GUN : Impossible d'upload l'image", exc_info=True)
-                os.remove(result)
-        return
-
-    @commands.command(name='holdupl', aliases=['holdup', 'holup'])
-    async def holdup_left(self, ctx, prpt: Optional[float] = 1.5, *, url: str = None):
-        """Ajoute le pistolet braqué (3e personne) sur la gauche de l'image
-
-        [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image fournie)
-        [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)"""
-        if prpt <= 0:
-            return await ctx.send("**Proportion invalide** • La valeur de proportion doit être supérieure à 0.")
-
-        if not url:
-            url = await self.search_for_files(ctx)
-            if not url:
-                return await ctx.send("**???** • Fournissez un fichier valide")
-            else:
-                url = url[0]
-        elif url.startswith('http'):
-            url = [url, ctx.message]
-        else:
-            return await ctx.send("**???** • Fournissez un fichier valide")
-        async with ctx.channel.typing():
-            gun = bundled_data_path(self) / "HoldUpWM.png"
-            if url[0].endswith('.gif') or url[0].endswith('.gifv'):
-                filepath = await self.download(url[0])
-            else:
-                filepath = await self.download(url[0], force_png=True)
-
-            try:
-                result = self.add_wm(filepath, filepath, gun, prpt, bottom_left=True)
-            except:
-                os.remove(filepath)
-                return await ctx.send("**Erreur** • Le format de l'image donnée est invalide\n"
-                                      "Notez que les gifs Giphy et Tenor ne fonctionnent pas en tant que tel, ils doivent d'abord être téléchargés.")
-            else:
-                file = discord.File(result)
-                try:
-                    await ctx.send(file=file)
-                except:
-                    await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (prob. trop lourde)")
-                    logger.error(msg="GUN : Impossible d'upload l'image", exc_info=True)
-                os.remove(result)
-        return
-
-    class ValidURL:
-        def __init__(self, content: str):
-            self.content = content
-
-        @classmethod
-        async def convert(cls, ctx, argument):
-            match = FILES_LINKS.match(argument)
-            if match:
-                return cls(argument)
-            return None
-
-    @commands.command(name='holdupr')
-    async def holdup_right(self, ctx, prpt: Optional[float] = 1.5, *, url: ImageFinder = None,
-                           margin_x: int = 0, margin_y: int = 0):
-        """Ajoute le pistolet braqué (3e personne) sur la droite de l'image
-
-        [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image fournie)
-        [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)
-        [margin_x]/[margin_y] = Marges à ajouter entre le rebord de l'image et le pistolet"""
         if prpt <= 0:
             return await ctx.send("**Proportion invalide** • La valeur de proportion doit être supérieure à 0.")
 
         if url is None:
             url = await ImageFinder().search_for_images(ctx)
-        if not url:
-            return await ctx.send("**???** • Fournissez un fichier valide")
+        msg = await ctx.message.channel.send("Patientez SVP")
 
-        async with ctx.channel.typing():
-            gun = bundled_data_path(self) / "HoldUpWM.png"
-            if url[0].endswith('.gif') or url[0].endswith('.gifv'):
-                filepath = await self.download(url[0])
-            else:
-                filepath = await self.download(url[0], force_png=True)
+        async with ctx.typing():
+            b, mime = await self.bytes_download(url[0])
+            if b is False:
+                await ctx.send("**Téléchargement échoué** • Réessayez d'une autre manière")
+                return
+            await msg.delete()
+
+            gun = bundled_data_path(self) / "GunWM.png"
+            filepath = await self.download(url, str(self.temp))
 
             try:
-                result = self.add_wm(filepath, filepath, gun, prpt, mirrored=True, margin=(margin_x, margin_y))
+                task, ext = self.paste_image(filepath, filepath, str(gun), scale=prpt)
             except:
                 os.remove(filepath)
-                return await ctx.send("**Erreur** • Le format de l'image donnée est invalide\n"
-                                      "Notez que les gifs Giphy et Tenor ne fonctionnent pas en tant que tel, ils doivent d'abord être téléchargés.")
-            else:
-                file = discord.File(result)
-                try:
-                    await ctx.send(file=file)
-                except:
-                    await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (prob. trop lourde)")
-                    logger.error(msg="GUN : Impossible d'upload l'image", exc_info=True)
-                os.remove(result)
-        return
+                logger.error("Impossible de faire gun_right", exc_info=True)
+                return await ctx.send("**Erreur** • Impossible de créer l'image demandée.")
+
+            file = discord.File(task, filename=f"gun_right.{ext}")
+            try:
+                await ctx.send(file=file)
+            except:
+                await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (prob. trop lourde)")
+                logger.error(msg="GUN : Impossible d'upload l'image", exc_info=True)
+            os.remove(filepath)

@@ -63,7 +63,7 @@ class ImageFinder(Converter):
                     continue
 
         if not urls:
-            raise BadArgument("No images provided.")
+            raise BadArgument("Aucune image fournie.")
         return urls
 
     async def search_for_images(self, ctx):
@@ -76,5 +76,5 @@ class ImageFinder(Converter):
             if match:
                 urls.append(match.group(1))
         if not urls:
-            raise BadArgument("No Images found in recent history.")
+            raise BadArgument("Aucune image n'a été trouvée dans l'historique récent.")
         return urls
