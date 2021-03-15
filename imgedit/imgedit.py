@@ -126,8 +126,9 @@ class ImgEdit(commands.Cog):
         async with ctx.typing():
             url = url[0]
             filename = urlsplit(url).path.rsplit('/')[-1]
+            filepath = str(self.temp / filename)
             try:
-                filepath = await self.download(url, str(self.temp / filename))
+                await self.download(url, filepath)
             except:
                 return await ctx.send("**Téléchargement échoué** • Réessayez d'une autre façon")
 
