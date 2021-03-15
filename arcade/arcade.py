@@ -75,10 +75,15 @@ class Arcade(commands.Cog):
 
     @commands.command(name='bombparty')
     async def play_bombparty(self, ctx, hp: int = 3):
-        """Lancer une partie de Bombparty"""
+        """Lancer une partie de Bombparty
+
+        <hp> = Modifier le nombre de points de vie de départ (max. 10)"""
         channel = ctx.channel
         if channel.id in self.games:
             return await ctx.send("**Impossible** • Un jeu est déjà en cours sur ce salon !")
+        if 1 <= hp <= 10:
+            return await ctx.send("**Valeur de PV invalide** • Les joueurs doivent avoir des PV compris entre 1 et 10.")
+
         self.games.append(channel.id)
         conf_emoji = self.bot.get_emoji(812451214037221439)
         price = await self.config.guild(ctx.guild).bombparty_game_price()
