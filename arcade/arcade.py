@@ -81,7 +81,7 @@ class Arcade(commands.Cog):
         channel = ctx.channel
         if channel.id in self.games:
             return await ctx.send("**Impossible** • Un jeu est déjà en cours sur ce salon !")
-        if 1 <= hp <= 10:
+        if hp < 1 or hp > 10:
             return await ctx.send("**Valeur de PV invalide** • Les joueurs doivent avoir des PV compris entre 1 et 10.")
 
         self.games.append(channel.id)
