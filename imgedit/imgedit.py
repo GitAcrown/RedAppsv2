@@ -100,14 +100,12 @@ class ImgEdit(commands.Cog):
                 frames.append(transparent)
             frames[0].save(output_path, format='GIF', append_images=frames[1:], save_all=True,
                            loop=0, duration=round(dur * 0.90))
-            ext = frames[0].format
         else:
             transparent = Image.new('RGBA', (image_width, image_height), (0, 0, 0, 0))
             transparent.paste(image, (0, 0))
             transparent.paste(paste, pos, mask=paste)
             transparent.save(output_path, format='PNG')
-            ext = transparent.format
-        return output_path, ext
+        return output_path
 
 
     @commands.command(name='gunr', aliases=['gun'])
@@ -140,7 +138,7 @@ class ImgEdit(commands.Cog):
                     logger.error("Impossible de faire gun_right", exc_info=True)
                     return await ctx.send("**Erreur** • Impossible de créer l'image demandée.")
 
-                file = discord.File(task, filename=f"gun_right.{ext}")
+                file = discord.File(task)
                 try:
                     await ctx.send(file=file)
                 except:
