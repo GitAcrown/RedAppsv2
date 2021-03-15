@@ -82,10 +82,11 @@ class Arcade(commands.Cog):
         finance = self.bot.get_cog('Finance')
         curr = await finance.get_currency(ctx.guild)
 
-        em = discord.Embed(description=f"💣 {ctx.author.mention} a lancé une partie de **Bombparty** !\n"
+        em = discord.Embed(title="💣 **Bombparty**",
+                           description=f"{ctx.author.mention} a lancé une partie de **Bombparty** !\n"
                                        f"Cliquez sur {conf_emoji} pour jouer ! (30s)",
                            color=await ctx.embed_color())
-        em.set_footer(text=f"Rejoindre la partie | Coût d'inscription : {price} {curr}")
+        em.set_footer(text=f"Coût d'inscription : {price} {curr}")
         players = await self.wait_for_players(ctx, em, price)
         if len(players) < 2:
             self.games.remove(channel.id)
@@ -103,6 +104,9 @@ class Arcade(commands.Cog):
 
         with open(bundled_data_path(self) / 'fr-FR.json') as f:
             wordlist = json.load(f)
+
+        await ctx.send("**La partie va commencer ...**")
+        await asyncio.sleep(5)
 
         while game:
             for p in players:
