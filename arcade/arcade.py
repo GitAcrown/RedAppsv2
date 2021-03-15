@@ -53,14 +53,17 @@ class Arcade(commands.Cog):
         await asyncio.sleep(30)
         msg = await ctx.channel.fetch_message(msg.id)
         reaction = [r for r in msg.reactions if r.emoji == conf_emoji][0]
-        players = [ctx.author]
+        players = []
         async for user in reaction.users():
-            if user.bot:
-                continue
-            if await finance.enough_credits(user, price):
-                players.append(user)
-            else:
-                await ctx.send(f"{user.mention} → Fonds insuffisants sur votre compte")
+            if not user.bot:
+                if await finance.enough_credits(user, price):
+                    players.append(user)
+                else:
+                    await ctx.send(f"{user.mention} → Fonds insuffisants sur votre compte")
+
+        if ctx.author not in players:
+            players.append(ctx.author)
+
         try:
             await msg.delete(delay=3)
         except:
