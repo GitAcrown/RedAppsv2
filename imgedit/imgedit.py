@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import time
+import uuid
 from io import BytesIO
 from typing import Optional
 from urllib.parse import urlsplit
@@ -64,6 +65,12 @@ class ImgEdit(commands.Cog):
         except Exception:
             logger.error("Impossible de télécharger en bytes-like", exc_info=True)
             return False, False
+
+    def random(self, image=False, ext: str = "png"):
+        h = str(uuid.uuid4().hex)
+        if image:
+            return "{0}.{1}".format(h, ext)
+        return h
 
     def paste_image(self, input_path: str, output_path: str, paste_img_path: str, *,
                     scale: float = 1, margin: tuple = (0, 0), mirror: bool = False, position: str = 'bottom_right'):
@@ -131,7 +138,8 @@ class ImgEdit(commands.Cog):
             await msg.delete()
 
             gun = bundled_data_path(self) / "GunWM.png"
-            filepath = await self.download(url, str(self.temp))
+            filepath = await self.download(url, str(self.temp) + "/" + self.random(
+                True, ext='png' if not url.endswith('gif') else 'gif'))
 
             try:
                 task, ext = self.paste_image(filepath, filepath, str(gun), scale=prpt)
