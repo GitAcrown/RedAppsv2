@@ -107,13 +107,8 @@ class ImgEdit(commands.Cog):
             transparent.save(output_path, format='PNG')
         return output_path
 
-
-    @commands.command(name='gunr', aliases=['gun'])
-    async def gun_right(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None, margin_x: int = 0, margin_y: int = 0):
-        """Ajoute un pistolet (1e personne) braqué sur la droite de l'image
-
-        [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image fournie)
-        [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)"""
+    async def add_fp_gun(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None,
+                        margin_x: int = 0, margin_y: int = 0, *, mirrored: bool = False):
         if prpt <= 0:
             return await ctx.send("**Proportion invalide** • La valeur de proportion doit être supérieure à 0.")
 
@@ -132,7 +127,8 @@ class ImgEdit(commands.Cog):
             else:
                 gun = bundled_data_path(self) / "GunWM.png"
                 try:
-                    task = self.paste_image(filepath, filepath, str(gun), scale=prpt, margin=(margin_x, margin_y))
+                    task = self.paste_image(filepath, filepath, str(gun), scale=prpt, margin=(margin_x, margin_y),
+                                            mirror=mirrored, position='bottom_right' if not mirrored else 'bottom_left')
                 except:
                     os.remove(filepath)
                     logger.error("Impossible de faire gun_right", exc_info=True)
@@ -147,3 +143,24 @@ class ImgEdit(commands.Cog):
                 os.remove(filepath)
             finally:
                 await msg.delete()
+
+
+    @commands.command(name='gunr', aliases=['gun'])
+    async def gun_right(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None,
+                        margin_x: int = 0, margin_y: int = 0):
+        """Ajoute un pistolet (1e personne) braqué sur la droite de l'image
+
+        **[size]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
+        **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
+        **[margin_x/margin_y]** = Marges à ajouter à l'image du pistolet par rapport aux bords de l'image source"""
+        return await self.add_fp_gun(ctx, prpt, url, margin_x, margin_y)
+
+    @commands.command(name='gunl')
+    async def gun_left(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None,
+                       margin_x: int = 0, margin_y: int = 0):
+        """Ajoute un pistolet (1e personne) braqué sur la gauche de l'image
+
+        **[size]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
+        **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
+        **[margin_x/margin_y]** = Marges à ajouter à l'image du pistolet par rapport aux bords de l'image source"""
+        return await self.add_fp_gun(ctx, prpt, url, margin_x, margin_y, mirrored=True)
