@@ -152,7 +152,7 @@ class ImgEdit(commands.Cog):
 
         **[size]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
         **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
-        **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source"""
+        **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source (nécéssite l'utilisation d'une URL)"""
         return await self.add_fp_gun(ctx, prpt, url, margin_x, margin_y)
 
     @commands.command(name='gunl')
@@ -162,7 +162,7 @@ class ImgEdit(commands.Cog):
 
         **[size]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
         **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
-        **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source"""
+        **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source (nécéssite l'utilisation d'une URL)"""
         return await self.add_fp_gun(ctx, prpt, url, margin_x, margin_y, mirrored=True)
 
 
@@ -210,7 +210,7 @@ class ImgEdit(commands.Cog):
 
         **[size]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
         **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
-        **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source"""
+        **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source (nécéssite l'utilisation d'une URL)"""
         return await self.add_tp_gun(ctx, prpt, url, margin_x, margin_y, mirrored=True)
 
     @commands.command(name='holdupl', aliases=['holdup', 'holup'])
@@ -220,6 +220,6 @@ class ImgEdit(commands.Cog):
 
         **[size]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
         **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
-        **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source"""
+        **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source (nécéssite l'utilisation d'une URL)"""
         return await self.add_tp_gun(ctx, prpt, url, margin_x, margin_y)
 
