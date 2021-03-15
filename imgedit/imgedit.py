@@ -13,6 +13,8 @@ from PIL import Image, ImageSequence, ImageOps
 from redbot.core import Config, commands
 from redbot.core.data_manager import cog_data_path, bundled_data_path
 
+from .converters import ImageFinder
+
 logger = logging.getLogger("red.RedAppsv2.imgedit")
 
 FILES_LINKS = re.compile(
@@ -248,7 +250,7 @@ class ImgEdit(commands.Cog):
             return None
 
     @commands.command(name='holdupr')
-    async def holdup_right(self, ctx, prpt: Optional[float] = 1.5, *, url: Optional[ValidURL] = None,
+    async def holdup_right(self, ctx, prpt: Optional[float] = 1.5, *, url: ImageFinder = None,
                            margin_x: int = 0, margin_y: int = 0):
         """Ajoute le pistolet braqué (3e personne) sur la droite de l'image
 
@@ -258,16 +260,11 @@ class ImgEdit(commands.Cog):
         if prpt <= 0:
             return await ctx.send("**Proportion invalide** • La valeur de proportion doit être supérieure à 0.")
 
-        if not url:
-            url = await self.search_for_files(ctx)
-            if not url:
-                return await ctx.send("**???** • Fournissez un fichier valide")
-            else:
-                url = url[0]
-        elif url.startswith('http'):
-            url = [url, ctx.message]
-        else:
+        if urls is None:
+            urls = await ImageFinder().search_for_images(ctx)
+        if not urls:
             return await ctx.send("**???** • Fournissez un fichier valide")
+
         async with ctx.channel.typing():
             gun = bundled_data_path(self) / "HoldUpWM.png"
             if url[0].endswith('.gif') or url[0].endswith('.gifv'):

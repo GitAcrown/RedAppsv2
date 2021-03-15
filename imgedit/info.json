@@ -1,0 +1,14 @@
+{
+    "author": ["Acrone"],
+	"description": "Commandes d'édition d'images",
+	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help ImgEdit` pour voir les commandes disponibles",
+	"short": "Commandes d'édition d'images",
+	"tags": ["community", "fun", "economy"],
+    "requirements" : [
+		"unidecode",
+		"pillow"
+	],
+    "required_cogs": {},
+	"type": "COG",
+	"end_user_data_statement": "This cog does not store personal data."
+}
