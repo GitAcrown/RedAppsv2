@@ -109,7 +109,7 @@ class ImgEdit(commands.Cog):
 
 
     @commands.command(name='gunr', aliases=['gun'])
-    async def gun_right(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None):
+    async def gun_right(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None, margin_x: int = 0, margin_y: int = 0):
         """Ajoute un pistolet (1e personne) braqué sur la droite de l'image
 
         [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image fournie)
@@ -132,7 +132,7 @@ class ImgEdit(commands.Cog):
             else:
                 gun = bundled_data_path(self) / "GunWM.png"
                 try:
-                    task = self.paste_image(filepath, filepath, str(gun), scale=prpt)
+                    task = self.paste_image(filepath, filepath, str(gun), scale=prpt, margin=(margin_x, margin_y))
                 except:
                     os.remove(filepath)
                     logger.error("Impossible de faire gun_right", exc_info=True)
@@ -142,7 +142,7 @@ class ImgEdit(commands.Cog):
                 try:
                     await ctx.send(file=file)
                 except:
-                    await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (prob. trop lourde)")
+                    await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (probablement trop lourde)")
                     logger.error(msg="GUN : Impossible d'upload l'image", exc_info=True)
                 os.remove(filepath)
             finally:
