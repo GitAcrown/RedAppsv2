@@ -149,8 +149,10 @@ class Arcade(commands.Cog):
                         if len(players) == 1:
                             winner = players[0]
                             new_solde = await finance.deposit_credits(winner, cagnotte, reason="Bombparty remporté")
-                            win = discord.Embed(description=f"{winner.mention} a remporté la partie !\n"
-                                                            f"Crédits gagnés : **{cagnotte}** {curr}")
+                            win = discord.Embed(title="💣 **Bombparty**",
+                                                description=f"{winner.mention} a remporté la partie !\n"
+                                                            f"Crédits gagnés : **{cagnotte}** {curr}",
+                                                color=winner.color)
                             win.set_footer(text=f"Vous avez désormais {new_solde} {curr}")
                             await ctx.send(embed=win)
                             if channel.id in self.games:
