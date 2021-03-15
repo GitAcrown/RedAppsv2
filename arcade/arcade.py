@@ -146,10 +146,10 @@ class Arcade(commands.Cog):
                 await asyncio.sleep(3)
 
             table = []
-            ordered = list(reversed(sorted(health, key=lambda m: health[m])))
-            for uid in ordered:
+            ordered = sorted(health, key=lambda m: health[m])
+            for uid in list(ordered)[::-1]:
                 u = ctx.guild.get_member(uid)
-                table.append((u.name, health[u]))
+                table.append((u.name, health[uid]))
 
             bombtime = bombtime - 1 if bombtime > 8 else 7
             rnd = discord.Embed(title="💣 Bombparty • Joueurs restants",
