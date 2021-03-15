@@ -247,7 +247,7 @@ class ImgEdit(commands.Cog):
             frames[0].save(output_path, format='GIF', append_images=frames[1:], save_all=True,
                            loop=0, duration=round(dur * 0.90))
         else:
-            image = image.resize(final_width, final_height)
+            image = image.resize((final_width, final_height))
             transparent = Image.new('RGBA', (final_width, final_height), (0, 0, 0, 0))
             transparent.paste(image, (0, 0))
             transparent.paste(front, (0, 0), mask=front)
