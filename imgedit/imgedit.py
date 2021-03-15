@@ -107,6 +107,7 @@ class ImgEdit(commands.Cog):
             transparent.save(output_path, format='PNG')
         return output_path
 
+
     async def add_fp_gun(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None,
                         margin_x: int = 0, margin_y: int = 0, *, mirrored: bool = False):
         if prpt <= 0:
@@ -131,7 +132,7 @@ class ImgEdit(commands.Cog):
                                             mirror=mirrored, position='bottom_right' if not mirrored else 'bottom_left')
                 except:
                     os.remove(filepath)
-                    logger.error("Impossible de faire gun_right", exc_info=True)
+                    logger.error("Impossible de faire gun_right/gun_left", exc_info=True)
                     return await ctx.send("**Erreur** • Impossible de créer l'image demandée.")
 
                 file = discord.File(task)
@@ -144,7 +145,6 @@ class ImgEdit(commands.Cog):
             finally:
                 await msg.delete()
 
-
     @commands.command(name='gunr', aliases=['gun'])
     async def gun_right(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None,
                         margin_x: int = 0, margin_y: int = 0):
@@ -152,7 +152,7 @@ class ImgEdit(commands.Cog):
 
         **[size]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
         **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
-        **[margin_x/margin_y]** = Marges à ajouter à l'image du pistolet par rapport aux bords de l'image source"""
+        **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source"""
         return await self.add_fp_gun(ctx, prpt, url, margin_x, margin_y)
 
     @commands.command(name='gunl')
@@ -162,5 +162,64 @@ class ImgEdit(commands.Cog):
 
         **[size]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
         **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
-        **[margin_x/margin_y]** = Marges à ajouter à l'image du pistolet par rapport aux bords de l'image source"""
+        **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source"""
         return await self.add_fp_gun(ctx, prpt, url, margin_x, margin_y, mirrored=True)
+
+
+    async def add_tp_gun(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None,
+                         margin_x: int = 0, margin_y: int = 0, *, mirrored: bool = False):
+        if prpt <= 0:
+            return await ctx.send("**Proportion invalide** • La valeur de proportion doit être supérieure à 0.")
+
+        if url is None:
+            url = await ImageFinder().search_for_images(ctx)
+        msg = await ctx.message.channel.send("⏳ Patientez pendant la préparation de votre image")
+
+        async with ctx.typing():
+            url = url[0]
+            filename = urlsplit(url).path.rsplit('/')[-1]
+            filepath = str(self.temp / filename)
+            try:
+                await self.download(url, filepath)
+            except:
+                await ctx.send("**Téléchargement échoué** • Réessayez d'une autre façon")
+            else:
+                gun = bundled_data_path(self) / "HoldUpWM.png"
+                try:
+                    task = self.paste_image(filepath, filepath, str(gun), scale=prpt, margin=(margin_x, margin_y),
+                                            mirror=mirrored, position='bottom_left' if not mirrored else 'bottom_right')
+                except:
+                    os.remove(filepath)
+                    logger.error("Impossible de faire tp_gun", exc_info=True)
+                    return await ctx.send("**Erreur** • Impossible de créer l'image demandée.")
+
+                file = discord.File(task)
+                try:
+                    await ctx.send(file=file)
+                except:
+                    await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (probablement trop lourde)")
+                    logger.error(msg="GUN : Impossible d'upload l'image", exc_info=True)
+                os.remove(filepath)
+            finally:
+                await msg.delete()
+
+    @commands.command(name='holdupr')
+    async def holdup_right(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None,
+                        margin_x: int = 0, margin_y: int = 0):
+        """Ajoute un pistolet (3e personne) braqué sur la droite de l'image
+
+        **[size]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
+        **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
+        **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source"""
+        return await self.add_tp_gun(ctx, prpt, url, margin_x, margin_y, mirrored=True)
+
+    @commands.command(name='holdupl', aliases=['holdup', 'holup'])
+    async def holdup_left(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None,
+                           margin_x: int = 0, margin_y: int = 0):
+        """Ajoute un pistolet (3e personne) braqué sur la gauche de l'image
+
+        **[size]** = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
+        **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
+        **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source"""
+        return await self.add_tp_gun(ctx, prpt, url, margin_x, margin_y)
+
