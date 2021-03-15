@@ -14,7 +14,7 @@ import aiohttp
 import discord
 from discord.errors import HTTPException
 from typing import Union, List, Tuple, Literal, Optional
-from PIL import Image, ImageSequence
+from PIL import Image, ImageSequence, ImageOps
 from bs4 import BeautifulSoup
 
 from discord.ext import tasks
@@ -85,13 +85,17 @@ class ImgEdit(commands.Cog):
             logger.error("Error downloading", exc_info=True)
             return False
 
-    def add_gun(self, input_image_path, output_image_path, watermark_image_path, position, proportion):
+    def add_gun(self, input_image_path, output_image_path, watermark_image_path, proportion, mirrored: bool = False):
+        position = (0, 0)
         watermark = Image.open(watermark_image_path).convert('RGBA')
         try:
             base_image = Image.open(input_image_path).convert('RGBA')
         except:
             base_image = Image.open(input_image_path).convert('RGB')
         width, height = base_image.size
+        if mirrored:
+            watermark = ImageOps.mirror(watermark)
+            position = (width, 0)
         watermark.thumbnail((round(width / proportion), round(height / proportion)))
         position = (width - watermark.size[0] - position[0], height - watermark.size[1] - position[1])
 
@@ -114,13 +118,13 @@ class ImgEdit(commands.Cog):
             transparent.save(output_image_path)
             return output_image_path
 
-    @commands.command()
-    async def gun(self, ctx, size: Optional[float] = 2.0, *, url: str = None):
-        """Ajoute un pistolet braqué sur l'image
+    @commands.command(name='gunr', aliases=['gun'])
+    async def gun_right(self, ctx, prpt: Optional[float] = 2.0, *, url: str = None):
+        """Ajoute un pistolet braqué sur la droite de l'image
 
-        [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)
-        [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image fournie)"""
-        if size <= 0:
+        [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image fournie)
+        [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)"""
+        if prpt <= 0:
             return await ctx.send("**Proportion invalide** • La valeur de proportion doit être supérieure à 0.")
 
         if not url:
@@ -141,7 +145,49 @@ class ImgEdit(commands.Cog):
                 filepath = await self.download(url[0], force_png=True)
 
             try:
-                result = self.add_gun(filepath, filepath, gun, (0, 0), size)
+                result = self.add_gun(filepath, filepath, gun, prpt)
+            except:
+                os.remove(filepath)
+                return await ctx.send("**Erreur** • Le format de l'image donnée est invalide\n"
+                                      "Notez que les gifs Giphy et Tenor ne fonctionnent pas en tant que tel, ils doivent d'abord être téléchargés.")
+            else:
+                file = discord.File(result)
+                try:
+                    await ctx.send(file=file)
+                except:
+                    await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (prob. trop lourde)")
+                    logger.error(msg="GUN : Impossible d'upload l'image", exc_info=True)
+                os.remove(result)
+        return
+
+    @commands.command(name='gunl')
+    async def gun_left(self, ctx, prpt: Optional[float] = 2.0, *, url: str = None):
+        """Ajoute un pistolet braqué sur la gauche de l'image
+
+        [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image fournie)
+        [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)"""
+        if prpt <= 0:
+            return await ctx.send("**Proportion invalide** • La valeur de proportion doit être supérieure à 0.")
+
+        if not url:
+            url = await self.search_for_files(ctx)
+            if not url:
+                return await ctx.send("**???** • Fournissez un fichier valide")
+            else:
+                url = url[0]
+        elif url.startswith('http'):
+            url = [url, ctx.message]
+        else:
+            return await ctx.send("**???** • Fournissez un fichier valide")
+        async with ctx.channel.typing():
+            gun = bundled_data_path(self) / "GunWM.png"
+            if url[0].endswith('.gif') or url[0].endswith('.gifv'):
+                filepath = await self.download(url[0])
+            else:
+                filepath = await self.download(url[0], force_png=True)
+
+            try:
+                result = self.add_gun(filepath, filepath, gun, prpt, mirrored=True)
             except:
                 os.remove(filepath)
                 return await ctx.send("**Erreur** • Le format de l'image donnée est invalide\n"
