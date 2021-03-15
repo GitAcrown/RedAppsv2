@@ -67,7 +67,7 @@ class ImgEdit(commands.Cog):
             return False, False
 
     def paste_image(self, input_path: str, output_path: str, paste_img_path: str, *,
-                    scale: float = 1, margin: tuple = (0, 0), mirror: bool = False, position: str = 'bottom_right'):
+                    scale: float = 1.0, margin: tuple = (0, 0), mirror: bool = False, position: str = 'bottom_right'):
         paste = Image.open(paste_img_path).convert('RGBA')
         try:
             image = Image.open(input_path).convert('RGBA')
@@ -132,7 +132,7 @@ class ImgEdit(commands.Cog):
             else:
                 gun = bundled_data_path(self) / "GunWM.png"
                 try:
-                    task, ext = self.paste_image(filepath, filepath, str(gun), scale=prpt)
+                    task = self.paste_image(filepath, filepath, str(gun), scale=prpt)
                 except:
                     os.remove(filepath)
                     logger.error("Impossible de faire gun_right", exc_info=True)
