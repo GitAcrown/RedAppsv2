@@ -62,7 +62,10 @@ class Arcade(commands.Cog):
                     await ctx.send(f"{user.mention} → Fonds insuffisants sur votre compte")
 
         if ctx.author not in players:
-            players.append(ctx.author)
+            if await finance.enough_credits(ctx.author, price):
+                players.append(ctx.author)
+            else:
+                await ctx.send(f"{ctx.author.mention} → Fonds insuffisants sur votre compte")
 
         try:
             await msg.delete(delay=3)
