@@ -90,7 +90,7 @@ class Arcade(commands.Cog):
         players = await self.wait_for_players(ctx, em, price)
         if len(players) < 2:
             self.games.remove(channel.id)
-            return await ctx.send("**Nombre de joueurs insuffisants** • Ce jeu nécessite au moins 2 joueurs")
+            return await ctx.reply("**Nombre de joueurs insuffisants** • Ce jeu nécessite au moins 2 joueurs")
 
         for u in players:
             await finance.remove_credits(u, price, reason="Participation Bombparty")
