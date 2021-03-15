@@ -85,8 +85,8 @@ class ImgEdit(commands.Cog):
             logger.error("Error downloading", exc_info=True)
             return False
 
-    def add_gun(self, input_image_path, output_image_path, watermark_image_path, proportion, mirrored: bool = False):
-        margin = (0, 0)
+    def add_wm(self, input_image_path, output_image_path, watermark_image_path, proportion, *,
+               margin = (0, 0), mirrored: bool = False):
         watermark = Image.open(watermark_image_path).convert('RGBA')
         try:
             base_image = Image.open(input_image_path).convert('RGBA')
@@ -123,7 +123,7 @@ class ImgEdit(commands.Cog):
 
     @commands.command(name='gunr', aliases=['gun'])
     async def gun_right(self, ctx, prpt: Optional[float] = 2.0, *, url: str = None):
-        """Ajoute un pistolet braqué sur la droite de l'image
+        """Ajoute un pistolet braqué (1e personne) sur la droite de l'image
 
         [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image fournie)
         [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)"""
@@ -148,7 +148,7 @@ class ImgEdit(commands.Cog):
                 filepath = await self.download(url[0], force_png=True)
 
             try:
-                result = self.add_gun(filepath, filepath, gun, prpt)
+                result = self.add_wm(filepath, filepath, gun, prpt)
             except:
                 os.remove(filepath)
                 return await ctx.send("**Erreur** • Le format de l'image donnée est invalide\n"
@@ -165,7 +165,7 @@ class ImgEdit(commands.Cog):
 
     @commands.command(name='gunl')
     async def gun_left(self, ctx, prpt: Optional[float] = 2.0, *, url: str = None):
-        """Ajoute un pistolet braqué sur la gauche de l'image
+        """Ajoute un pistolet braqué (1e personne) sur la gauche de l'image
 
         [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image fournie)
         [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)"""
@@ -190,7 +190,49 @@ class ImgEdit(commands.Cog):
                 filepath = await self.download(url[0], force_png=True)
 
             try:
-                result = self.add_gun(filepath, filepath, gun, prpt, mirrored=True)
+                result = self.add_wm(filepath, filepath, gun, prpt, mirrored=True)
+            except:
+                os.remove(filepath)
+                return await ctx.send("**Erreur** • Le format de l'image donnée est invalide\n"
+                                      "Notez que les gifs Giphy et Tenor ne fonctionnent pas en tant que tel, ils doivent d'abord être téléchargés.")
+            else:
+                file = discord.File(result)
+                try:
+                    await ctx.send(file=file)
+                except:
+                    await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (prob. trop lourde)")
+                    logger.error(msg="GUN : Impossible d'upload l'image", exc_info=True)
+                os.remove(result)
+        return
+
+    @commands.command(name='holdupr', aliases=['holdup', 'holup'])
+    async def holdup_right(self, ctx, prpt: Optional[float] = 1.5, *, url: str = None):
+        """Ajoute le pistolet braqué (3e personne) sur la droite de l'image
+
+        [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image fournie)
+        [url] = URL de l'image sur laquelle appliquer le filtre (optionnel)"""
+        if prpt <= 0:
+            return await ctx.send("**Proportion invalide** • La valeur de proportion doit être supérieure à 0.")
+
+        if not url:
+            url = await self.search_for_files(ctx)
+            if not url:
+                return await ctx.send("**???** • Fournissez un fichier valide")
+            else:
+                url = url[0]
+        elif url.startswith('http'):
+            url = [url, ctx.message]
+        else:
+            return await ctx.send("**???** • Fournissez un fichier valide")
+        async with ctx.channel.typing():
+            gun = bundled_data_path(self) / "HoldUpWM.png"
+            if url[0].endswith('.gif') or url[0].endswith('.gifv'):
+                filepath = await self.download(url[0])
+            else:
+                filepath = await self.download(url[0], force_png=True)
+
+            try:
+                result = self.add_wm(filepath, filepath, gun, prpt)
             except:
                 os.remove(filepath)
                 return await ctx.send("**Erreur** • Le format de l'image donnée est invalide\n"
