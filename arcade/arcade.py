@@ -113,8 +113,14 @@ class Arcade(commands.Cog):
         with open(bundled_data_path(self) / 'fr-FR.json') as f:
             wordlist = json.load(f)
 
-        await ctx.send("**La partie va commencer ...**")
+        tuto = discord.Embed(title="💣 **Bombparty**",
+                             description="- Les mots ne peuvent pas être réutilisés\n"
+                                         "- Le temps avant l'explosion de la bombe se réduit à chaque manche jusqu'à atteindre 6s\n"
+                                         "- Tant que je met pas 👍 sous votre message, continuez de faire des propositions",
+                             color=await ctx.embed_color())
+        tuto_msg = await ctx.send(embed=tuto)
         await asyncio.sleep(5)
+        await tuto_msg.delete()
 
         while game:
             for p in players:
@@ -139,7 +145,7 @@ class Arcade(commands.Cog):
                         await begin.reply(f"{p.mention} → Temps écoulé ! **-1 PV** ({health[p.id]}/{hp})")
                     else:
                         await begin.reply(f"{p.mention} → Temps écoulé ! **-1 PV** (éliminé)")
-                        players.remove(p.id)
+                        players.remove(p)
                         if len(players) == 1:
                             winner = players[0]
                             new_solde = await finance.deposit_credits(winner, cagnotte, reason="Bombparty remporté")
@@ -159,14 +165,14 @@ class Arcade(commands.Cog):
                 u = ctx.guild.get_member(uid)
                 table.append((u.name, health[uid]))
 
-            bombtime = bombtime - 1 if bombtime > 8 else 7
+            bombtime = bombtime - 1 if bombtime >= 7 else 6
             rnd = discord.Embed(title="💣 Bombparty • Joueurs restants",
                                 description=box(tabulate(table, headers=["Membre", "Vies"])),
                                 color=await ctx.embed_color())
             rnd.set_footer(text=f"Manche #{manche} | 💣 {bombtime}s")
             manche += 1
             await ctx.send(embed=rnd)
-            await asyncio.sleep(8)
+            await asyncio.sleep(5 + (0.5 * len(players)))
 
         if channel.id in self.games:
             self.games.remove(channel.id)
