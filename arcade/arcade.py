@@ -61,6 +61,10 @@ class Arcade(commands.Cog):
                 players.append(user)
             else:
                 await ctx.send(f"{user.mention} → Fonds insuffisants sur votre compte")
+        try:
+            await msg.delete(delay=3)
+        except:
+            pass
         return players
 
     @commands.command(name='bombparty')
