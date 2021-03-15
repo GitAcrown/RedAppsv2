@@ -123,7 +123,8 @@ class ImgEdit(commands.Cog):
         msg = await ctx.message.channel.send("Patientez SVP")
 
         async with ctx.typing():
-            b, mime = await self.bytes_download(url[0])
+            url = url[0]
+            b, mime = await self.bytes_download(url)
             if b is False:
                 await ctx.send("**Téléchargement échoué** • Réessayez d'une autre manière")
                 return
