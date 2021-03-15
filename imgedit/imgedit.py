@@ -203,7 +203,7 @@ class ImgEdit(commands.Cog):
             finally:
                 await msg.delete()
 
-    @commands.command(name='holdupr')
+    @commands.command(name='holdupr', aliases=['holupr'])
     async def holdup_right(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None,
                         margin_x: int = 0, margin_y: int = 0):
         """Ajoute un pistolet (3e personne) braqué sur la droite de l'image
