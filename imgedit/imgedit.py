@@ -240,11 +240,10 @@ class ImgEdit(commands.Cog):
             dur = 1000 / image.info['duration']
             frames = []
             for frame in ImageSequence.Iterator(image):
-                tn = frame.copy()
-                tn.thumbnail((final_width, final_height), Image.ANTIALIAS)
+                frame.thumbnail((final_width, final_height), Image.ANTIALIAS)
 
                 transparent = Image.new('RGBA', (final_width, final_height), (0, 0, 0, 0))
-                transparent.paste(tn, (0, 0))
+                transparent.paste(frame, (0, 0))
                 transparent.paste(front, (0, 0), mask=front)
                 frames.append(transparent)
 
