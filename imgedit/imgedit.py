@@ -66,12 +66,6 @@ class ImgEdit(commands.Cog):
             logger.error("Impossible de télécharger en bytes-like", exc_info=True)
             return False, False
 
-    def random(self, image=False, ext: str = "png"):
-        h = str(uuid.uuid4().hex)
-        if image:
-            return "{0}.{1}".format(h, ext)
-        return h
-
     def paste_image(self, input_path: str, output_path: str, paste_img_path: str, *,
                     scale: float = 1, margin: tuple = (0, 0), mirror: bool = False, position: str = 'bottom_right'):
         paste = Image.open(paste_img_path).convert('RGBA')
@@ -131,16 +125,13 @@ class ImgEdit(commands.Cog):
 
         async with ctx.typing():
             url = url[0]
-            b, mime = await self.bytes_download(url)
-            if b is False:
-                await ctx.send("**Téléchargement échoué** • Réessayez d'une autre manière")
-                return
-            await msg.delete()
+            filename = urlsplit(url).path.rsplit('/')[-1]
+            try:
+                filepath = await self.download(url, str(self.temp / filename))
+            except:
+                return await ctx.send("**Téléchargement échoué** • Réessayez d'une autre façon")
 
             gun = bundled_data_path(self) / "GunWM.png"
-            filepath = await self.download(url, str(self.temp) + "/" + self.random(
-                True, ext='png' if not url.endswith('gif') else 'gif'))
-
             try:
                 task, ext = self.paste_image(filepath, filepath, str(gun), scale=prpt)
             except:
