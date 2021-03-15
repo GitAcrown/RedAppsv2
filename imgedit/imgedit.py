@@ -121,7 +121,7 @@ class ImgEdit(commands.Cog):
 
         if url is None:
             url = await ImageFinder().search_for_images(ctx)
-        msg = await ctx.message.channel.send("Patientez SVP")
+        msg = await ctx.message.channel.send("⏳ Patientez pendant la préparation de votre image")
 
         async with ctx.typing():
             url = url[0]
@@ -130,20 +130,22 @@ class ImgEdit(commands.Cog):
             try:
                 await self.download(url, filepath)
             except:
-                return await ctx.send("**Téléchargement échoué** • Réessayez d'une autre façon")
+                await ctx.send("**Téléchargement échoué** • Réessayez d'une autre façon")
+            else:
+                gun = bundled_data_path(self) / "GunWM.png"
+                try:
+                    task, ext = self.paste_image(filepath, filepath, str(gun), scale=prpt)
+                except:
+                    os.remove(filepath)
+                    logger.error("Impossible de faire gun_right", exc_info=True)
+                    return await ctx.send("**Erreur** • Impossible de créer l'image demandée.")
 
-            gun = bundled_data_path(self) / "GunWM.png"
-            try:
-                task, ext = self.paste_image(filepath, filepath, str(gun), scale=prpt)
-            except:
+                file = discord.File(task, filename=f"gun_right.{ext}")
+                try:
+                    await ctx.send(file=file)
+                except:
+                    await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (prob. trop lourde)")
+                    logger.error(msg="GUN : Impossible d'upload l'image", exc_info=True)
                 os.remove(filepath)
-                logger.error("Impossible de faire gun_right", exc_info=True)
-                return await ctx.send("**Erreur** • Impossible de créer l'image demandée.")
-
-            file = discord.File(task, filename=f"gun_right.{ext}")
-            try:
-                await ctx.send(file=file)
-            except:
-                await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (prob. trop lourde)")
-                logger.error(msg="GUN : Impossible d'upload l'image", exc_info=True)
-            os.remove(filepath)
+            finally:
+                await msg.delete()
