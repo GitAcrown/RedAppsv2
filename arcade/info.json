@@ -1,0 +1,11 @@
+{
+    "author": ["Acrone"],
+	"description": "Compilation de mini-jeux multijoueurs",
+	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help Arcade` pour voir les commandes disponibles",
+	"short": "Compilation de mini-jeux multijoueurs",
+	"tags": ["community", "fun", "economy", "games"],
+    "requirements" : [],
+    "required_cogs": {},
+	"type": "COG",
+	"end_user_data_statement": "This cog does not store personal data."
+}
