@@ -236,8 +236,20 @@ class ImgEdit(commands.Cog):
                 os.remove(result)
         return
 
+    class ValidURL:
+        def __init__(self, content: str):
+            self.content = content
+
+        @classmethod
+        async def convert(cls, ctx, argument):
+            match = FILES_LINKS.match(argument)
+            if match:
+                return cls(argument)
+            return None
+
     @commands.command(name='holdupr')
-    async def holdup_right(self, ctx, prpt: Optional[float] = 1.5, url: Optional[str] = None, margin_x: int = 0, margin_y: int = 0):
+    async def holdup_right(self, ctx, prpt: Optional[float] = 1.5, *, url: Optional[ValidURL] = None,
+                           margin_x: int = 0, margin_y: int = 0):
         """Ajoute le pistolet braqué (3e personne) sur la droite de l'image
 
         [size] = Proportion du pistolet, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image fournie)
