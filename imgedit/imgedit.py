@@ -223,6 +223,63 @@ class ImgEdit(commands.Cog):
         **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image du pistolet par rapport aux bords de l'image source (nécéssite l'utilisation d'une URL)"""
         return await self.add_tp_gun(ctx, prpt, url, margin_x, margin_y)
 
+    async def add_vibecheck(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None,
+                         margin_x: int = 0, margin_y: int = 0, *, mirrored: bool = False):
+        if prpt <= 0:
+            return await ctx.send("**Proportion invalide** • La valeur de proportion doit être supérieure à 0.")
+
+        if url is None:
+            url = await ImageFinder().search_for_images(ctx)
+        msg = await ctx.message.channel.send("⏳ Patientez pendant la préparation de votre image")
+
+        async with ctx.typing():
+            url = url[0]
+            filename = urlsplit(url).path.rsplit('/')[-1]
+            filepath = str(self.temp / filename)
+            try:
+                await self.download(url, filepath)
+            except:
+                await ctx.send("**Téléchargement échoué** • Réessayez d'une autre façon")
+            else:
+                gun = bundled_data_path(self) / "VibecheckVM.png"
+                try:
+                    task = self.paste_image(filepath, filepath, str(gun), scale=prpt, margin=(margin_x, margin_y),
+                                            mirror=mirrored, position='bottom_left' if not mirrored else 'bottom_right')
+                except:
+                    os.remove(filepath)
+                    logger.error("Impossible de faire vibcheck", exc_info=True)
+                    return await ctx.send("**Erreur** • Impossible de créer l'image demandée.")
+
+                file = discord.File(task)
+                try:
+                    await ctx.send(file=file)
+                except:
+                    await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image (probablement trop lourde)")
+                    logger.error(msg="Vibecheck : Impossible d'upload l'image", exc_info=True)
+                os.remove(filepath)
+            finally:
+                await msg.delete()
+
+    @commands.command(name='vibecheckr', aliases=['vbr'])
+    async def vibecheck_right(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None,
+                           margin_x: int = 0, margin_y: int = 0):
+        """Ajoute la main Vibecheck à droite de l'image
+
+        **[prpt]** = Proportion de la main, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
+        **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
+        **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image de la main par rapport aux bords de l'image source (nécéssite l'utilisation d'une URL)"""
+        return await self.add_vibecheck(ctx, prpt, url, margin_x, margin_y, mirrored=True)
+
+    @commands.command(name='vibecheckl', aliases=['vbl', 'vibecheck'])
+    async def vibecheck_left(self, ctx, prpt: Optional[float] = 1.75, url: ImageFinder = None,
+                              margin_x: int = 0, margin_y: int = 0):
+        """Ajoute la main Vibecheck à gauche de l'image
+
+        **[prpt]** = Proportion de la main, plus le chiffre est élevé plus il sera petit (1 = à la proportion de l'image source)
+        **[url]** = URL de l'image sur laquelle appliquer le filtre (optionnel)
+        **[margin_x/margin_y]** = Marges à ajouter (en pixels) à l'image de la main par rapport aux bords de l'image source (nécéssite l'utilisation d'une URL)"""
+        return await self.add_vibecheck(ctx, prpt, url, margin_x, margin_y)
+
     def paste_image_behind(self, input_path: str, output_path: str, paste_img_path: str, *, mirror: bool = False):
         front = Image.open(paste_img_path).convert('RGBA')
         try:
