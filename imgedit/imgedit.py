@@ -241,7 +241,7 @@ class ImgEdit(commands.Cog):
             except:
                 await ctx.send("**Téléchargement échoué** • Réessayez d'une autre façon")
             else:
-                gun = bundled_data_path(self) / "VibecheckVM.png"
+                gun = bundled_data_path(self) / "VibecheckWM.png"
                 try:
                     task = self.paste_image(filepath, filepath, str(gun), scale=prpt, margin=(margin_x, margin_y),
                                             mirror=mirrored, position='bottom_left' if not mirrored else 'bottom_right')
