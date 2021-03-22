@@ -13,10 +13,10 @@ import webcolors
 import extcolors
 
 import discord
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 from discord.utils import get as discord_get
 from redbot.core import Config, commands, checks
-from redbot.core.data_manager import cog_data_path
+from redbot.core.data_manager import cog_data_path, bundled_data_path
 from .converters import ImageFinder
 
 
@@ -51,6 +51,8 @@ class HexColor(commands.Cog):
 
         self.temp = cog_data_path(self) / "temp"  # Pour stocker l'img de profil temporairement
         self.temp.mkdir(exist_ok=True, parents=True)
+
+        self.FONT = str(bundled_data_path(self) / "squared.ttf")
 
     async def create_guild_color(self, guild: discord.Guild, color: str) -> discord.Role:
         """Crée un rôle avec la couleur demandée et le range si le délimiteur est configuré
@@ -241,14 +243,15 @@ class HexColor(commands.Cog):
         num_colors = len(colors)
         palette = Image.new('RGB', (swatchsize * num_colors, swatchsize))
         draw = ImageDraw.Draw(palette)
+        myFont = ImageFont.truetype(self.FONT, 8)
 
         posx = 0
         for color in colors:
             draw.rectangle([posx, 0, posx + swatchsize, swatchsize], fill=color)
-            w, h = draw.textsize(str(color))
+            w, h = draw.textsize(str(color), font=myFont)
             draw.rectangle([posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2, posx + (swatchsize / 2) + w / 2,
                             (swatchsize / 2) + h / 2], fill="black")
-            draw.text((posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2), str(color), fill="white")
+            draw.text((posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2), str(color), fill="white", font=myFont)
             posx = posx + swatchsize
 
         del draw
@@ -260,14 +263,15 @@ class HexColor(commands.Cog):
         num_colors = len(colors)
         palette = Image.new('RGB', (swatchsize * num_colors, swatchsize))
         draw = ImageDraw.Draw(palette)
+        myFont = ImageFont.truetype(self.FONT, 10)
 
         posx = 0
         for color in colors:
             draw.rectangle([posx, 0, posx + swatchsize, swatchsize], fill=color)
-            w, h = draw.textsize(colors_map[color])
+            w, h = draw.textsize(colors_map[color], font=myFont)
             draw.rectangle([posx + (swatchsize / 2) - w / 1.75, (swatchsize / 2) - h / 1.75, posx + (swatchsize / 2) + w / 1.75,
-                            (swatchsize / 2) + h / 1.75], fill="black")
-            draw.text((posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2), colors_map[color], fill="white")
+                            (swatchsize / 2) + h / 1.75], fill="white")
+            draw.text((posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2), colors_map[color], fill="black", font=myFont)
             posx = posx + swatchsize
 
         del draw
@@ -518,7 +522,7 @@ class HexColor(commands.Cog):
                 await ctx.send("**Téléchargement échoué** • Réessayez d'une autre façon")
 
             colors = await self.extract_colors(filepath, limit=nb)
-            self.show_palette([i[0] for i in colors], palette_path, swatchsize=200)
+            self.show_palette([i[0] for i in colors], palette_path)
             await msg.delete()
             file = discord.File(palette_path)
             try:
