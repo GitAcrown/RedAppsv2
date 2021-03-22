@@ -269,8 +269,8 @@ class HexColor(commands.Cog):
         for color in colors:
             draw.rectangle([posx, 0, posx + swatchsize, swatchsize], fill=color)
             w, h = draw.textsize(colors_map[color], font=myFont)
-            draw.rectangle([posx + (swatchsize / 2) - w / 1.5, (swatchsize / 2) - h / 1.5, posx + (swatchsize / 2) + w / 1.5,
-                            (swatchsize / 2) + h / 1.5], fill="white")
+            draw.rectangle([posx + (swatchsize / 2) - w / 1.75, (swatchsize / 2) - h / 1.75, posx + (swatchsize / 2) + w / 1.75,
+                            (swatchsize / 2) + h / 1.75], fill="white")
             draw.text((posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2), colors_map[color], fill="black", font=myFont)
             posx = posx + swatchsize
 
