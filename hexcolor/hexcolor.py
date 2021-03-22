@@ -269,8 +269,8 @@ class HexColor(commands.Cog):
         for color in colors:
             draw.rectangle([posx, 0, posx + swatchsize, swatchsize], fill=color)
             w, h = draw.textsize(colors_map[color], font=myFont)
-            draw.rectangle([posx + (swatchsize / 2) - w / 1.25, (swatchsize / 2) - h / 1.25, posx + (swatchsize / 2) + w / 1.25,
-                            (swatchsize / 2) + h / 1.25], fill="white")
+            draw.rectangle([posx + (swatchsize / 2) - w / 1.5, (swatchsize / 2) - h / 1.5, posx + (swatchsize / 2) + w / 1.5,
+                            (swatchsize / 2) + h / 1.5], fill="white")
             draw.text((posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2), colors_map[color], fill="black", font=myFont)
             posx = posx + swatchsize
 
@@ -393,6 +393,9 @@ class HexColor(commands.Cog):
         __Commande globale__ : l'inventaire est commun à tous les serveurs"""
         user = ctx.author
         inv = copy(await self.config.user(user).colors())
+        if len(name) > 10:
+            return await ctx.send("**Nom invalide** • Ce nom est trop long (10 caractères max.).")
+
         if name not in inv:
 
             if len(inv) == 10:
