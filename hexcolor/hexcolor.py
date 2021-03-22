@@ -71,9 +71,11 @@ class HexColor(commands.Cog):
         """Recycle un ancien rôle coloré en lui attribuant une nouvelle couleur
 
         Retourne le rôle modifié"""
+        await self.remove_color_from_cache(target_role.guild, str(target_role.color))
         rolename = self.format_color(color, "#")
         new_color = int(self.format_color(color, '0x'), base=16)
         await target_role.edit(name=rolename, color=new_color, reason="Recyclage du rôle coloré")
+        await self.add_color_to_cache(target_role.guild, new_color)
         return target_role
 
     async def safe_clear_guild_color(self, guild: discord.Guild, color: str) -> bool:
@@ -445,7 +447,7 @@ class HexColor(commands.Cog):
             await ctx.reply(f"**Couleur supprimée** • *{name}* ne figurera plus dans votre inventaire",
                             mention_author=False)
         else:
-            await ctx.send("**Nom invalide** • Vous avez déjà une couleur sauvegardée sous ce nom.")
+            await ctx.send("**Nom invalide** • Vous n'avez pas de couleur sauvegardée sous ce nom.")
 
     @set_user_color.command(name="inventory", aliases=['inv'])
     async def inventory_custom_color(self, ctx):
@@ -518,7 +520,7 @@ class HexColor(commands.Cog):
             colors = await self.extract_colors(filepath, limit=nb)
             self.show_palette([i[0] for i in colors], palette_path)
             await msg.delete()
-            file = discord.File(filename)
+            file = discord.File(palette_path)
             try:
                 await ctx.reply(file=file, mention_author=False)
             except:
