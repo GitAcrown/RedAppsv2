@@ -258,20 +258,20 @@ class HexColor(commands.Cog):
         palette.save(outfile, "PNG")
 
     def repr_colors_inventory(self, colors_map: dict, outfile: str):
-        swatchsize = 100
+        swatchsize = 200
         colors = [c for c in colors_map]
         num_colors = len(colors)
         palette = Image.new('RGB', (swatchsize * num_colors, swatchsize))
         draw = ImageDraw.Draw(palette)
-        myFont = ImageFont.truetype(self.FONT, 18)
+        myFont = ImageFont.truetype(self.FONT, 32)
 
         posx = 0
         for color in colors:
             draw.rectangle([posx, 0, posx + swatchsize, swatchsize], fill=color)
             w, h = draw.textsize(colors_map[color], font=myFont)
             draw.rectangle([posx + (swatchsize / 2) - w / 1.75, (swatchsize / 2) - h / 1.75, posx + (swatchsize / 2) + w / 1.75,
-                            (swatchsize / 2) + h / 1.75], fill="white")
-            draw.text((posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2), colors_map[color], fill="black", font=myFont)
+                            (swatchsize / 2) + h / 1.75], fill="black")
+            draw.text((posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2), colors_map[color], fill="white", font=myFont)
             posx = posx + swatchsize
 
         del draw
