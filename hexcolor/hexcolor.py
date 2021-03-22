@@ -430,7 +430,7 @@ class HexColor(commands.Cog):
             if name in inv:
                 couleur = inv[name]
                 role = await self.set_member_color(ctx.author, couleur)
-                em = discord.Embed(description=f"Vous avez désormais la couleur **{role.name}**", color=role.color)
+                em = discord.Embed(description=f"Vous avez désormais la couleur **{role.name}** (chargée depuis *{name}*)", color=role.color)
                 if not await self.is_color_displayed(ctx.author, role):
                     em.set_footer(
                         text="⚠️ Attention, la couleur demandée ne pourra s'afficher qu'après avoir retiré le rôle coloré hiérarchiquement supérieur !")
