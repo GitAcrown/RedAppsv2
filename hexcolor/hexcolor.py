@@ -463,19 +463,22 @@ class HexColor(commands.Cog):
         notif = await ctx.send("⏳ Veuillez patienter pendant la génération d'une représentation des couleurs de votre inventaire...")
         async with ctx.channel.typing():
             inv = await self.config.user(user).colors()
-            path = str(self.temp)
-            filename = path + "/colorinventory_{}.png".format(user.id)
-            self.repr_colors_inventory({inv[c]: c for c in inv}, filename)
+            if inv:
+                path = str(self.temp)
+                filename = path + "/colorinventory_{}.png".format(user.id)
+                self.repr_colors_inventory({inv[c]: c for c in inv}, filename)
 
-            await notif.delete()
-            file = discord.File(filename)
-            try:
-                await ctx.reply("**Voici votre inventaire :**", file=file, mention_author=False)
-            except:
-                await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image de l'inventaire, désolé.")
-                logger.error(msg="Inventory_custom_color : Impossible d'upload l'image représentative de l'inventaire",
-                             exc_info=True)
-            os.remove(filename)
+                await notif.delete()
+                file = discord.File(filename)
+                try:
+                    await ctx.reply("**Voici votre inventaire :**", file=file, mention_author=False)
+                except:
+                    await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image de l'inventaire, désolé.")
+                    logger.error(msg="Inventory_custom_color : Impossible d'upload l'image représentative de l'inventaire",
+                                 exc_info=True)
+                os.remove(filename)
+            else:
+                await ctx.send("**Inventaire vide** • Commencez à mettre des couleurs dans votre inventaire avec `colorme save` !")
 
     @set_user_color.command(name="remove")
     async def remove_color(self, ctx):
@@ -525,18 +528,20 @@ class HexColor(commands.Cog):
                 await ctx.send("**Téléchargement échoué** • Réessayez d'une autre façon")
 
             colors = await self.extract_colors(filepath, limit=nb)
-            self.show_palette([i[0] for i in colors], palette_path)
-            await msg.delete()
-            file = discord.File(palette_path)
-            try:
-                await ctx.reply(file=file, mention_author=False)
-            except:
-                await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image de la palette.")
-                logger.error(msg="palette : Impossible d'upload l'image palette",
-                             exc_info=True)
+            if colors:
+                self.show_palette([i[0] for i in colors], palette_path)
+                await msg.delete()
+                file = discord.File(palette_path)
+                try:
+                    await ctx.reply(file=file, mention_author=False)
+                except:
+                    await ctx.send("**Impossible** • Je n'ai pas réussi à upload l'image de la palette.")
+                    logger.error(msg="palette : Impossible d'upload l'image palette",
+                                 exc_info=True)
+                os.remove(palette_path)
+            else:
+                await ctx.reply("**Impossible** • Je n'ai pas réussi à créer une palette depuis cette image.")
             os.remove(filepath)
-            os.remove(palette_path)
-
 
     @commands.group(name="colorset")
     @commands.guild_only()
