@@ -263,8 +263,8 @@ class HexColor(commands.Cog):
         for color in colors:
             draw.rectangle([posx, 0, posx + swatchsize, swatchsize], fill=color)
             w, h = draw.textsize(colors_map[color])
-            draw.rectangle([posx + (swatchsize / 2) - w, (swatchsize / 2) - h, posx + (swatchsize / 2) + w,
-                            (swatchsize / 2) + h], fill="black")
+            draw.rectangle([posx + (swatchsize / 2) - w / 1.75, (swatchsize / 2) - h / 1.75, posx + (swatchsize / 2) + w / 1.75,
+                            (swatchsize / 2) + h / 1.75], fill="black")
             draw.text((posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2), colors_map[color], fill="white")
             posx = posx + swatchsize
 
@@ -442,7 +442,7 @@ class HexColor(commands.Cog):
         if name in inv:
             del inv[name]
             await self.config.user(user).colors.set(inv)
-            await ctx.reply(embed=f"**Couleur supprimée** • *{name}* ne figurera plus dans votre inventaire",
+            await ctx.reply(f"**Couleur supprimée** • *{name}* ne figurera plus dans votre inventaire",
                             mention_author=False)
         else:
             await ctx.send("**Nom invalide** • Vous avez déjà une couleur sauvegardée sous ce nom.")
@@ -516,7 +516,7 @@ class HexColor(commands.Cog):
                 await ctx.send("**Téléchargement échoué** • Réessayez d'une autre façon")
 
             colors = await self.extract_colors(filepath, limit=nb)
-            self.show_palette(colors, palette_path)
+            self.show_palette([i[0] for i in colors], palette_path)
             await msg.delete()
             file = discord.File(filename)
             try:
