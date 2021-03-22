@@ -183,7 +183,7 @@ class HexColor(commands.Cog):
                     break
             if del_roles:
                 await user.remove_roles(*del_roles)
-                await self.safe_bulk_clear_guild_colors(guild, del_roles)
+                await self.safe_bulk_clear_guild_colors(guild, [r.name for r in del_roles])
 
             if not role:
                 role = await self.create_guild_color(guild, color)
@@ -278,8 +278,7 @@ class HexColor(commands.Cog):
     async def set_user_color(self, ctx, couleur: str):
         """Gestion de votre rôle de couleur
 
-        __**Options :**__
-        `colorme custom` (par défaut) : Changer la couleur selon un code hexadécimal (ex. *#fefefe*) ou un nom CSS3/HTML (ex. *lightgray*)
+        `colorme custom` : Changer la couleur selon un code hexadécimal (ex. *#fefefe*) ou un nom CSS3/HTML (ex. *lightgray*)
         `colorme avatar` : Applique la couleur dominante de votre avatar
         `colorme random` : Applique une couleur aléatoire
         `colorme copy` : Copie la couleur d'un autre membre
@@ -687,7 +686,7 @@ class HexColor(commands.Cog):
 
     @_color_settings.command(name="getcache")
     @checks.is_owner()
-    async def get_color_cache(self, ctx):
+    async def get_colors_cache(self, ctx):
         """Affiche ce que contient le cache des rôles de couleur"""
         roles = await self.config.guild(ctx.guild).roles()
         txt = "\n".join([discord_get(ctx.guild.roles, name=r) for r in roles])
