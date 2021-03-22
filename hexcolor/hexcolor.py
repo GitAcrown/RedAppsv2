@@ -456,7 +456,7 @@ class HexColor(commands.Cog):
             inv = await self.config.user(user).colors()
             path = str(self.temp)
             filename = path + "/colorinventory_{}.png".format(user.id)
-            self.repr_colors_inventory({c: inv[c] for c in inv}, filename)
+            self.repr_colors_inventory({inv[c]: c for c in inv}, filename)
 
             await notif.delete()
             file = discord.File(filename)
@@ -504,7 +504,7 @@ class HexColor(commands.Cog):
             return await ctx.send("**Impossible** • Vous ne pouvez générer qu'entre 1 et 10 couleurs")
         if url is None:
             url = await ImageFinder().search_for_images(ctx)
-        msg = await ctx.message.channel.send("⏳ Veuillez patienter durant la génération de votre palette de couleurs")
+        msg = await ctx.message.channel.send("⏳ Veuillez patienter durant la génération de votre palette de couleurs (peut être long pour les grosses images)")
         async with ctx.typing():
             url = url[0]
             filename = urlsplit(url).path.rsplit('/')[-1]
