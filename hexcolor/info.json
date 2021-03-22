@@ -1,0 +1,13 @@
+{
+	"author": ["Acrone", "Maglatranir"],
+	"description": "Création et gestion de rôles colorés personnalisés",
+	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help` pour voir les commandes disponibles",
+	"short": "Gestion automatique de rôles colorés personnalisés",
+	"tags": ["community", "roles", "color"],
+	"requirements" : [
+		"extcolors",
+		"webcolors"
+    ],
+	"type": "COG",
+	"end_user_data_statement": "This cog stores no user data // Ce module ne stocke aucune donnée de membre"
+}
