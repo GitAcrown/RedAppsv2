@@ -52,7 +52,7 @@ class HexColor(commands.Cog):
         self.temp = cog_data_path(self) / "temp"  # Pour stocker l'img de profil temporairement
         self.temp.mkdir(exist_ok=True, parents=True)
 
-        self.FONT = str(bundled_data_path(self) / "squared.ttf")
+        self.FONT = str(bundled_data_path(self) / "Pixellari.ttf")
 
     async def create_guild_color(self, guild: discord.Guild, color: str) -> discord.Role:
         """Crée un rôle avec la couleur demandée et le range si le délimiteur est configuré
@@ -249,8 +249,8 @@ class HexColor(commands.Cog):
         for color in colors:
             draw.rectangle([posx, 0, posx + swatchsize, swatchsize], fill=color)
             w, h = draw.textsize(str(color), font=myFont)
-            draw.rectangle([posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2, posx + (swatchsize / 2) + w / 2,
-                            (swatchsize / 2) + h / 2], fill="black")
+            draw.rectangle([posx + (swatchsize / 2) - w / 1.75, (swatchsize / 2) - h / 1.75, posx + (swatchsize / 2) + w / 1.75,
+                            (swatchsize / 2) + h / 1.75], fill="black")
             draw.text((posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2), str(color), fill="white", font=myFont)
             posx = posx + swatchsize
 
