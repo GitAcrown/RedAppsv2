@@ -518,7 +518,7 @@ class HexColor(commands.Cog):
                 await ctx.send("**Téléchargement échoué** • Réessayez d'une autre façon")
 
             colors = await self.extract_colors(filepath, limit=nb)
-            self.show_palette([i[0] for i in colors], palette_path)
+            self.show_palette([i[0] for i in colors], palette_path, swatchsize=200)
             await msg.delete()
             file = discord.File(palette_path)
             try:
