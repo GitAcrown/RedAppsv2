@@ -237,15 +237,15 @@ class HexColor(commands.Cog):
 
     def show_palette(self, colors, outfile, *, swatchsize=100):
         num_colors = len(colors)
-        palette = Image.new('RGBA', (swatchsize * num_colors, swatchsize))
-        draw = ImageDraw.Draw(palette, 'RGBA')
+        palette = Image.new('RGB', (swatchsize * num_colors, swatchsize))
+        draw = ImageDraw.Draw(palette)
 
         posx = 0
         for color in colors:
             draw.rectangle([posx, 0, posx + swatchsize, swatchsize], fill=color)
             w, h = draw.textsize(str(color))
             draw.rectangle([posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2, posx + (swatchsize / 2) + w / 2,
-                            (swatchsize / 2) + h / 2], fill=(0, 0, 0, 127))
+                            (swatchsize / 2) + h / 2], fill="black")
             draw.text((posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2), str(color), fill="white")
             posx = posx + swatchsize
 
@@ -256,15 +256,15 @@ class HexColor(commands.Cog):
         swatchsize = 100
         colors = [c for c in colors_map]
         num_colors = len(colors)
-        palette = Image.new('RGBA', (swatchsize * num_colors, swatchsize))
-        draw = ImageDraw.Draw(palette, 'RGBA')
+        palette = Image.new('RGB', (swatchsize * num_colors, swatchsize))
+        draw = ImageDraw.Draw(palette)
 
         posx = 0
         for color in colors:
             draw.rectangle([posx, 0, posx + swatchsize, swatchsize], fill=color)
             w, h = draw.textsize(colors_map[color])
             draw.rectangle([posx + (swatchsize / 2) - w, (swatchsize / 2) - h, posx + (swatchsize / 2) + w,
-                            (swatchsize / 2) + h], fill=(0, 0, 0, 127))
+                            (swatchsize / 2) + h], fill="black")
             draw.text((posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2), colors_map[color], fill="white")
             posx = posx + swatchsize
 
@@ -369,7 +369,7 @@ class HexColor(commands.Cog):
                 "**Interdit** • Vous ne figurez pas sur la whitelist des gens autorisés à utiliser cette commande.")
 
         async with ctx.channel.typing():
-            couleur = self.format_color(target.color, '#')
+            couleur = self.format_color(str(target.color), '#')
             role = await self.set_member_color(ctx.author, couleur)
             em = discord.Embed(description=f"Vous avez désormais la couleur **{role.name}** (copiée sur {target.mention})",
                                color=role.color)
@@ -393,7 +393,7 @@ class HexColor(commands.Cog):
                 return  await ctx.send("**Inventaire plein** • Vous avez déjà atteint le nombre maximal de couleurs enregistrées (10).\n"
                                        "Effacez-en quelques unes avec `colorme forget` !")
 
-            color = color if color else user.color
+            color = color if color else str(user.color)
             if self.format_color(color):
                 color = self.format_color(color, "#")
                 inv[name] = color
