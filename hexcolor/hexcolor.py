@@ -243,7 +243,7 @@ class HexColor(commands.Cog):
         num_colors = len(colors)
         palette = Image.new('RGB', (swatchsize * num_colors, swatchsize))
         draw = ImageDraw.Draw(palette)
-        myFont = ImageFont.truetype(self.FONT, 20)
+        myFont = ImageFont.truetype(self.FONT, 36)
 
         posx = 0
         for color in colors:
@@ -263,14 +263,14 @@ class HexColor(commands.Cog):
         num_colors = len(colors)
         palette = Image.new('RGB', (swatchsize * num_colors, swatchsize))
         draw = ImageDraw.Draw(palette)
-        myFont = ImageFont.truetype(self.FONT, 16)
+        myFont = ImageFont.truetype(self.FONT, 18)
 
         posx = 0
         for color in colors:
             draw.rectangle([posx, 0, posx + swatchsize, swatchsize], fill=color)
             w, h = draw.textsize(colors_map[color], font=myFont)
-            draw.rectangle([posx + (swatchsize / 2) - w / 1.75, (swatchsize / 2) - h / 1.75, posx + (swatchsize / 2) + w / 1.75,
-                            (swatchsize / 2) + h / 1.75], fill="white")
+            draw.rectangle([posx + (swatchsize / 2) - w / 1.25, (swatchsize / 2) - h / 1.25, posx + (swatchsize / 2) + w / 1.25,
+                            (swatchsize / 2) + h / 1.25], fill="white")
             draw.text((posx + (swatchsize / 2) - w / 2, (swatchsize / 2) - h / 2), colors_map[color], fill="black", font=myFont)
             posx = posx + swatchsize
 
