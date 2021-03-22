@@ -75,7 +75,7 @@ class HexColor(commands.Cog):
         rolename = self.format_color(color, "#")
         new_color = int(self.format_color(color, '0x'), base=16)
         await target_role.edit(name=rolename, color=new_color, reason="Recyclage du rôle coloré")
-        await self.add_color_to_cache(target_role.guild, new_color)
+        await self.add_color_to_cache(target_role.guild, color)
         return target_role
 
     async def safe_clear_guild_color(self, guild: discord.Guild, color: str) -> bool:
