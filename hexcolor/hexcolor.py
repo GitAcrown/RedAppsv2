@@ -26,6 +26,7 @@ logger = logging.getLogger("red.RedAppsv2.HexColor")
 class HexColorError(Exception):
     """Classe de base des erreurs HexColor"""
 
+
 class ColorExtractError(HexColorError):
     """Soulevée lorsqu'il y a eu une erreur dans l'extraction des couleurs d'une image"""
 
@@ -60,13 +61,13 @@ class HexColor(commands.Cog):
         role = discord_get(guild.roles, name=rolename)
         if not role:
             rolecolor = int(self.format_color(color, '0x'), base=16)
-            self.add_color_to_cache(guild, color)
+            await self.add_color_to_cache(guild, color)
             role = await guild.create_role(name=rolename, color=discord.Colour(rolecolor),
                                            reason="Création de rôle de couleur", mentionable=False)
             await self.sort_role(guild, role)
         return role
 
-    async def replace_guild_color(self, guild: discord.Guild, target_role: discord.Role, color: str) -> discord.Role:
+    async def replace_guild_color(self, target_role: discord.Role, color: str) -> discord.Role:
         """Recycle un ancien rôle coloré en lui attribuant une nouvelle couleur
 
         Retourne le rôle modifié"""
@@ -82,7 +83,7 @@ class HexColor(commands.Cog):
         if role:
             if not self.get_members_with(role):
                 await role.delete(reason="Suppression de rôle de couleur obsolète")
-                self.remove_color_from_cache(guild, color)
+                await self.remove_color_from_cache(guild, color)
                 return True
         return False
 
@@ -98,7 +99,7 @@ class HexColor(commands.Cog):
             if role:
                 if not self.get_members_with(role):
                     await role.delete(reason="Suppression de rôle de couleur obsolète")
-                    self.remove_color_from_cache(guild, name)
+                    await self.remove_color_from_cache(guild, name)
                     logs.append(name)
         return logs
 
@@ -133,12 +134,12 @@ class HexColor(commands.Cog):
                 members.append(member)
         return members
 
-    def add_color_to_cache(self, guild: discord.Guild, hex_color: str):
+    async def add_color_to_cache(self, guild: discord.Guild, hex_color: str):
         name = self.format_color(hex_color, "#")
         rolecolor = self.format_color(hex_color, "0x")
         await self.config.guild(guild).roles.set_raw(name, value=rolecolor)
 
-    def remove_color_from_cache(self, guild: discord.Guild, hex_color: str):
+    async def remove_color_from_cache(self, guild: discord.Guild, hex_color: str):
         name = self.format_color(hex_color, "#")
         try:
             await self.config.guild(guild).roles.clear_raw(name)
@@ -177,7 +178,7 @@ class HexColor(commands.Cog):
             role = None
             for r in user_colored_roles:
                 if self.get_members_with(r) == [user]:
-                    role = await self.replace_guild_color(guild, r, color)
+                    role = await self.replace_guild_color(r, color)
                     del_roles.remove(r)
                     break
             if del_roles:
@@ -609,7 +610,7 @@ class HexColor(commands.Cog):
         await self.config.guild(guild).clear_raw("roles")
         for role in guild.roles:
             if role.name.startswith("#") and self.format_color(role.name):
-                self.add_color_to_cache(guild, role.name)
+                await self.add_color_to_cache(guild, role.name)
                 count += 1
         await ctx.send(f"**Rafrachissement terminé** • {count} rôles ont été rajoutés au cache et sont maintenant considérés par le bot")
 
