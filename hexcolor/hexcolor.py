@@ -239,11 +239,11 @@ class HexColor(commands.Cog):
                 return p
         return "n."
 
-    def show_palette(self, colors, outfile, *, swatchsize=100):
+    def show_palette(self, colors, outfile, *, swatchsize=200):
         num_colors = len(colors)
         palette = Image.new('RGB', (swatchsize * num_colors, swatchsize))
         draw = ImageDraw.Draw(palette)
-        myFont = ImageFont.truetype(self.FONT, 8)
+        myFont = ImageFont.truetype(self.FONT, 20)
 
         posx = 0
         for color in colors:
@@ -263,7 +263,7 @@ class HexColor(commands.Cog):
         num_colors = len(colors)
         palette = Image.new('RGB', (swatchsize * num_colors, swatchsize))
         draw = ImageDraw.Draw(palette)
-        myFont = ImageFont.truetype(self.FONT, 10)
+        myFont = ImageFont.truetype(self.FONT, 16)
 
         posx = 0
         for color in colors:
