@@ -714,7 +714,7 @@ class HexColor(commands.Cog):
     async def set_extcolor_limit(self, ctx, value: int):
         """Modifie le nombre par défaut de couleurs extraites par Extcolor"""
         if value > 0:
-            await self.config.extcolor_limit.set(value)
+            await self.config.extcolors_limit.set(value)
             await ctx.send(f"L'extracteur de couleurs pourra extraire par défaut {value} couleurs des images.")
         else:
             await ctx.send(f"Valeur invalide, elle doit être positive.")
@@ -724,7 +724,7 @@ class HexColor(commands.Cog):
     async def set_extcolor_tolerance(self, ctx, value: int):
         """Modifie la tolérance (en %) supporté par Extcolor, càd la qualité de détail d'extraction des couleurs"""
         if 0 <= value <= 100:
-            await self.config.extcolor_tolerance.set(value)
+            await self.config.extcolors_tolerance.set(value)
             await ctx.send(f"L'extracteur de couleurs utilisera désormais une tolérance de {value}.")
         else:
             await ctx.send(f"Valeur invalide, elle doit être comprise entre 0 et 100 (%).")
