@@ -38,7 +38,7 @@ class Fortune(commands.Cog):
         self.config.register_member(**default_member)
 
     @commands.command(name="fortune", aliases=['f'])
-    @commands.cooldown(1, 5, commands.BucketType.member)
+    @commands.cooldown(1, 3, commands.BucketType.member)
     async def get_fortune(self, ctx):
         """Obtenez un fortune cookie parmis ceux proposés par la communauté"""
         guild, author = ctx.guild, ctx.author
@@ -91,7 +91,7 @@ class Fortune(commands.Cog):
                            f"Contribuez à en ajouter de nouveaux avec `;addfortune` !")
 
     @commands.command(name="addfortune", aliases=['addf'])
-    @commands.cooldown(1, 30, commands.BucketType.member)
+    @commands.cooldown(1, 10, commands.BucketType.member)
     async def add_fortune(self, ctx, *, msg: str):
         """Propose un nouveau fortune cookie unique à ajouter au serveur
 
