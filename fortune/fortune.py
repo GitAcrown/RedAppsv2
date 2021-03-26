@@ -100,7 +100,7 @@ class Fortune(commands.Cog):
         config = await self.config.guild(guild).all()
 
         if len(msg) >= 10:
-            all_cookies = (config['cookies'][c]['text'].lower() for c in config['cookies'])
+            all_cookies = [c['text'].lower() for c in config['cookies']]
             dist = process.extractOne(msg.lower(), all_cookies, score_cutoff=91)
             if dist:
                 return await ctx.send("**Message de basse qualité** • Un fortune cookie similaire se trouve déjà dans mes fichiers. "
