@@ -80,7 +80,7 @@ class Fortune(commands.Cog):
                     await msg.clear_reactions()
                     await finance.deposit_credits(seller, config['reward'], reason="Récompense fortune cookie")
                     em.set_footer(text=str(seller) + f" +{config['reward']}{curr}", icon_url=seller.avatar_url)
-                    await msg.edit(embed=em)
+                    await msg.edit(embed=em, mention_author=False)
                 else:
                     return await msg.clear_reactions()
             else:
