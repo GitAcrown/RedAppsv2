@@ -101,7 +101,7 @@ class Fortune(commands.Cog):
         guild, author = ctx.guild, ctx.author
         config = await self.config.guild(guild).all()
 
-        if len(msg) >= 10:
+        if 10 <= len(msg) <= 1000:
             all_cookies = [c['text'].lower() for c in config['cookies']]
             dist = process.extractOne(msg.lower(), all_cookies, score_cutoff=91)
             if dist:
@@ -114,7 +114,7 @@ class Fortune(commands.Cog):
             await ctx.reply("**Fortune cookie ajouté** • Vous serez récompensé si la personne qui l'achète en est satisfaite.", mention_author=False)
             await ctx.message.delete(delay=20)
         else:
-            await ctx.send("**Trop court** • Essayez de faire un message d'au moins 10 caractères.")
+            await ctx.send("**Longueur invalide** • Le message doit faire entre 10 et 1000 caractères.")
 
     @commands.group(name="fortuneset")
     @checks.mod_or_permissions(manage_messages=True)
