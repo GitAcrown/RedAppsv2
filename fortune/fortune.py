@@ -49,8 +49,9 @@ class Fortune(commands.Cog):
 
         cooldown = await self.config.member(author).cookie_last()
         if cooldown + config['delay'] > time.time():
+            td = humanize_timedelta(seconds=int((cooldown + config['delay']) - time.time()))
             return await ctx.send(f"**Cooldown** • Vous devez attendre encore "
-                                  f"{humanize_timedelta(seconds=int(time.time() - (cooldown + config['delay'])))} avant de pouvoir acheter un autre fortune cookie")
+                                  f"{td} avant de pouvoir acheter un autre fortune cookie")
 
         cookies = config['cookies']
         if cookies:
@@ -148,6 +149,20 @@ class Fortune(commands.Cog):
                 f"**Valeur modifiée** • Il sera possible d'acheter un fortune cookie qu'une fois toutes les {val} secondes.")
         else:
             await ctx.send(f"**Valeur invalide** • Le délai doit être supérieur ou égal à 0 secondes.")
+
+    @fortune_settings.command()
+    async def resetcd(self, ctx, users: commands.Greedy[discord.Member]):
+        """Reset le cooldown de membres pour l'achat d'un fortune cookie"""
+        for user in users:
+            await self.config.member(user).cookie_last.set(0)
+        await ctx.send(f"**Cooldowns reset** • Les membres sélectionnés peuvent dès à présent racheter un fortune cookie.")
+
+    @fortune_settings.command()
+    async def clearall(self, ctx):
+        """Supprime tous les fortune cookies du serveur"""
+        await self.config.guild(ctx.guild).clear_raw('cookies')
+        await ctx.send(
+            f"**Fortune cookies supprimés** • La liste est désormais vide.")
 
 
 
