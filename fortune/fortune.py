@@ -60,7 +60,7 @@ class Fortune(commands.Cog):
                 async with self.config.guild(guild).cookies() as cks:
                     cks.remove(select)
 
-                em = discord.Embed(description=f"🥠 ***{select['text']}***", color=author.color)
+                em = discord.Embed(description=f"🥠 *{select['text']}*", color=author.color)
 
                 seller = guild.get_member(select['author'])
 
