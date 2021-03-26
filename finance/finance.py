@@ -541,7 +541,6 @@ class Finance(commands.Cog):
             em = discord.Embed(color=await self.bot.get_embed_color(ctx.channel),
                                description=box(tabulate(tbl, headers=["Membre", "Solde"])))
             if not found:
-                invok =
                 em.add_field(name="Votre rang",
                              value=box("#" + str(await self.get_leaderboard_position_for(ctx.author)) +
                                        f" ({int(await self.get_account(ctx.author))})"))
