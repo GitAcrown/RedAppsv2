@@ -393,7 +393,7 @@ class Finance(commands.Cog):
     async def get_guild_total_credits(self, guild: discord.Guild) -> int:
         """Renvoie la valeur totale des crédits en circulation sur le serveur visé"""
         users = await self.config.all_members(guild)
-        return sum([u['balance'] for u in users])
+        return sum([users[u]['balance'] for u in users])
 
 
     async def utils_parse_timedelta(self, time_string: str) -> timedelta:
@@ -541,11 +541,12 @@ class Finance(commands.Cog):
             em = discord.Embed(color=await self.bot.get_embed_color(ctx.channel),
                                description=box(tabulate(tbl, headers=["Membre", "Solde"])))
             if not found:
+                invok =
                 em.add_field(name="Votre rang",
                              value=box("#" + str(await self.get_leaderboard_position_for(ctx.author)) +
                                        f" ({int(await self.get_account(ctx.author))})"))
             em.set_author(name=f"🏆 Leaderboard de {ctx.guild.name}", icon_url=ctx.guild.icon_url)
-            em.set_footer(text=f"Total : {await self.get_guild_total_credits(ctx.guild)} {self.get_currency(ctx.guild)}")
+            em.set_footer(text=f"Total : {await self.get_guild_total_credits(ctx.guild)} {await self.get_currency(ctx.guild)}")
             try:
                 await ctx.send(embed=em)
             except HTTPException:
