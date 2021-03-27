@@ -85,7 +85,9 @@ class Fortune(commands.Cog):
                     em.set_footer(text=str(seller) + f" +{config['reward']}{curr}", icon_url=seller.avatar_url)
                     await msg.edit(embed=em, mention_author=False)
                 else:
-                    return await msg.clear_reactions()
+                    await msg.clear_reactions()
+                    em.set_footer(text=str(seller) + f" +0{curr}", icon_url=seller.avatar_url)
+                    await msg.edit(embed=em, mention_author=False)
             else:
                 await ctx.send(f"**Solde insuffisant** • Un fortune cookie coûte **{config['price']}**{curr} sur ce serveur.")
         else:
