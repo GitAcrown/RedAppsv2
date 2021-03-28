@@ -59,7 +59,7 @@ class Fortune(commands.Cog):
         if cooldown + config['delay'] > time.time():
             td = humanize_timedelta(seconds=int((cooldown + config['delay']) - time.time()))
             return await ctx.send(f"**Cooldown** • Vous devez attendre encore "
-                                  f"{td} avant de pouvoir acheter un autre fortune cookie")
+                                  f"{td} avant de pouvoir acheter un autre fortune cookie.")
 
         cookies = config['cookies']
         if cookies:
@@ -74,7 +74,7 @@ class Fortune(commands.Cog):
                 if 'http' in select['text']:
                     scan = re.compile(r'(https?://\S*\.\S*)', re.DOTALL | re.IGNORECASE).findall(select['text'])
                     if scan:
-                        em.set_image(url=scan[0])
+                        em.set_thumbnail(url=scan[0])
 
                 em.set_footer(text=f"Vous avez payé {config['price']}{curr}")
 
@@ -137,13 +137,14 @@ class Fortune(commands.Cog):
             dist = process.extractOne(msg.lower(), all_cookies, score_cutoff=91)
             if dist:
                 return await ctx.send("**Message de basse qualité** • Un fortune cookie similaire se trouve déjà dans mes fichiers. "
-                                      "Copier/coller des messages similaires en masse ne fonctionnera pas 🤡.")
+                                      "Copier/coller des messages similaires en masse ne fonctionnera pas 🤡")
 
             async with self.config.guild(guild).cookies() as cks:
                 cookie = {'text': msg, 'author': author.id}
                 cks.append(cookie)
-            await ctx.reply(f"**Fortune cookie ajouté** • Vous obtiendrez {config['reward']}{curr} si le membre upvote votre message.", mention_author=False)
+            rep = await ctx.reply(f"**Fortune cookie ajouté** • Vous obtiendrez {config['reward']}{curr} si le membre upvote votre message.", mention_author=False)
             await ctx.message.delete(delay=15)
+            await rep.delete(delay=15)
         else:
             await ctx.send("**Longueur invalide** • Le message doit faire entre 10 et 1000 caractères.")
 
@@ -153,7 +154,8 @@ class Fortune(commands.Cog):
         """Affiche les meilleurs contributeurs aux fortune cookies du serveur"""
         guild = ctx.guild
         members = await self.config.all_members(guild)
-        clst = [(member, (members[member]['stats']['like'] / members[member]['stats']['dislike'])) for member in members if members[member]['stats']['dislike'] > 0]
+        ratio = lambda m: round(members[m]['stats']['like'] / max((members[m]['stats']['dislike'], 1)), 2)
+        clst = [(member, ratio(member)) for member in members]
         clst_sorted = sorted(clst, key=operator.itemgetter(1), reverse=True)
 
         tbl = []
@@ -224,9 +226,3 @@ class Fortune(commands.Cog):
         await self.config.guild(ctx.guild).clear_raw('cookies')
         await ctx.send(
             f"**Fortune cookies supprimés** • La liste est désormais vide.")
-
-
-
-
-
-
