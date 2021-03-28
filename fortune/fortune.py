@@ -1,6 +1,9 @@
 import asyncio
 import json
 import logging
+import operator
+import re
+
 import yaml
 import random
 import os
@@ -32,15 +35,20 @@ class Fortune(commands.Cog):
         default_guild = {'cookies': [],
                          'price': 50,
                          'reward': 20,
-                         'delay': 21600} # 6 heures
-        default_member = {'cookie_last': 0}
+                         'delay': 21600}  # = 6 heures
+        default_member = {'cookie_last': 0,
+                          'stats': {'like': 0,
+                                    'dislike': 0}}
         self.config.register_guild(**default_guild)
         self.config.register_member(**default_member)
 
     @commands.command(name="fortune", aliases=['f'])
     @commands.cooldown(1, 3, commands.BucketType.member)
     async def get_fortune(self, ctx):
-        """Obtenez un fortune cookie parmis ceux proposés par la communauté"""
+        """Obtenez un fortune cookie parmis ceux ajoutés par la communauté (contre des crédits)
+
+        Ils sont uniques et n'apparaîtront qu'une seule fois
+        Vous pouvez en proposer avec `;addfortune`"""
         guild, author = ctx.guild, ctx.author
         finance = self.bot.get_cog('Finance')
         curr = await finance.get_currency(guild)
@@ -62,6 +70,12 @@ class Fortune(commands.Cog):
 
 
                 em = discord.Embed(description=f"🥠 *{select['text']}*", color=author.color)
+
+                if 'http' in select['text']:
+                    scan = re.compile(r'(https?://\S*\.\S*)', re.DOTALL | re.IGNORECASE).findall(select['text'])
+                    if scan:
+                        em.set_image(url=scan[0])
+
                 em.set_footer(text=f"Vous avez payé {config['price']}{curr}")
 
                 seller = guild.get_member(select['author'])
@@ -81,12 +95,24 @@ class Fortune(commands.Cog):
 
                 if react.emoji == approve and seller:
                     await msg.clear_reactions()
-                    await finance.deposit_credits(seller, config['reward'], reason="Récompense fortune cookie")
+                    await finance.deposit_credits(seller, config['reward'], reason="Upvote fortune cookie")
                     em.set_footer(text=str(seller) + f" +{config['reward']}{curr}", icon_url=seller.avatar_url)
                     await msg.edit(embed=em, mention_author=False)
+
+                    seller_stats = await self.config.member(seller).stats()
+                    seller_stats['like'] += 1
+                    await self.config.member(seller).stats.set(seller_stats)
+                elif react.emoji == disapprove and seller:
+                    await msg.clear_reactions()
+                    em.set_footer(text=str(seller), icon_url=seller.avatar_url)
+                    await msg.edit(embed=em, mention_author=False)
+
+                    seller_stats = await self.config.member(seller).stats()
+                    seller_stats['dislike'] += 1
+                    await self.config.member(seller).stats.set(seller_stats)
                 else:
                     await msg.clear_reactions()
-                    em.set_footer(text=str(seller) + f" +0{curr}", icon_url=seller.avatar_url)
+                    em.set_footer(text=str(seller), icon_url=seller.avatar_url)
                     await msg.edit(embed=em, mention_author=False)
             else:
                 await ctx.send(f"**Solde insuffisant** • Un fortune cookie coûte **{config['price']}**{curr} sur ce serveur.")
@@ -99,9 +125,12 @@ class Fortune(commands.Cog):
     async def add_fortune(self, ctx, *, msg: str):
         """Propose un nouveau fortune cookie unique à ajouter au serveur
 
-        Vous serez récompensé d'un certain montant si la personne qui l'obtient décide de voter en votre faveur"""
+        Vous serez récompensé d'un certain montant si la personne qui l'obtient décide d'Upvoter votre message
+        Si vous mettez l'URL d'une image, celle-ci sera affichée directement"""
         guild, author = ctx.guild, ctx.author
         config = await self.config.guild(guild).all()
+        finance = self.bot.get_cog('Finance')
+        curr = await finance.get_currency(guild)
 
         if 10 <= len(msg) <= 1000:
             all_cookies = [c['text'].lower() for c in config['cookies']]
@@ -113,10 +142,37 @@ class Fortune(commands.Cog):
             async with self.config.guild(guild).cookies() as cks:
                 cookie = {'text': msg, 'author': author.id}
                 cks.append(cookie)
-            await ctx.reply("**Fortune cookie ajouté** • Vous serez récompensé si la personne qui l'achète en est satisfaite.", mention_author=False)
-            await ctx.message.delete(delay=20)
+            await ctx.reply(f"**Fortune cookie ajouté** • Vous obtiendrez {config['reward']}{curr} si le membre upvote votre message.", mention_author=False)
+            await ctx.message.delete(delay=15)
         else:
             await ctx.send("**Longueur invalide** • Le message doit faire entre 10 et 1000 caractères.")
+
+    @commands.command(name="bestfortune", aliases=['bestf'])
+    @commands.cooldown(1, 10, commands.BucketType.member)
+    async def best_of_fortune(self, ctx, top: int = 10):
+        """Affiche les meilleurs contributeurs aux fortune cookies du serveur"""
+        guild = ctx.guild
+        members = await self.config.all_members(guild)
+        clst = [(member, (members[member]['stats']['like'] / members[member]['stats']['dislike'])) for member in members if members[member]['stats']['dislike'] > 0]
+        clst_sorted = sorted(clst, key=operator.itemgetter(1), reverse=True)
+
+        tbl = []
+        for l in clst_sorted[:top]:
+            user = guild.get_member(l[0])
+            if user:
+                tbl.append([str(user), l[1]])
+
+        if tbl:
+            em = discord.Embed(color=await self.bot.get_embed_color(ctx.channel),
+                               description=box(tabulate(tbl, headers=["Membre", "Ratio"])))
+            em.set_footer(text="Ratio = Like / Dislike")
+            try:
+                await ctx.send(embed=em)
+            except:
+                await ctx.send(
+                    "**Classement trop long** • Réduisez le paramètre [top].")
+        else:
+            await ctx.send("**Aucun classement** • Il n'y a pas encore eu assez de statistiques pour créer un classement.")
 
     @commands.group(name="fortuneset")
     @checks.mod_or_permissions(manage_messages=True)
