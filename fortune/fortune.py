@@ -164,8 +164,9 @@ class Fortune(commands.Cog):
 
         if tbl:
             em = discord.Embed(color=await self.bot.get_embed_color(ctx.channel),
-                               description=box(tabulate(tbl, headers=["Membre", "Ratio"])))
-            em.set_footer(text="Ratio = Like / Dislike")
+                               description=box(tabulate(tbl, headers=["Membre", "Ratio"])),
+                               timestamp=ctx.message.created_at)
+            em.set_footer(text="Ratio = like / dislike")
             try:
                 await ctx.send(embed=em)
             except:
