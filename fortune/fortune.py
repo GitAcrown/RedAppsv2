@@ -74,7 +74,7 @@ class Fortune(commands.Cog):
                 if 'http' in select['text']:
                     scan = re.compile(r'(https?://\S*\.\S*)', re.DOTALL | re.IGNORECASE).findall(select['text'])
                     if scan:
-                        em.set_thumbnail(url=scan[0])
+                        em.set_image(url=scan[0])
 
                 em.set_footer(text=f"Vous avez payé {config['price']}{curr}")
 
@@ -165,7 +165,7 @@ class Fortune(commands.Cog):
                 tbl.append([str(user), l[1]])
 
         if tbl:
-            em = discord.Embed(color=await self.bot.get_embed_color(ctx.channel),
+            em = discord.Embed(title="Meilleurs contributeurs", color=await self.bot.get_embed_color(ctx.channel),
                                description=box(tabulate(tbl, headers=["Membre", "Ratio"])),
                                timestamp=ctx.message.created_at)
             em.set_footer(text="Ratio = like / dislike")
