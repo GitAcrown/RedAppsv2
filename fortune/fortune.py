@@ -75,6 +75,11 @@ class Fortune(commands.Cog):
                     scan = re.compile(r'(https?://\S*\.\S*)', re.DOTALL | re.IGNORECASE).findall(select['text'])
                     if scan:
                         em.set_image(url=scan[0])
+                        name = scan[0].split('/')[-1]
+                        if "?" in name:
+                            name = name.split('?')[0]
+                        txt = select['text'].replace(scan[0], f"[{name}]({scan[0]})")
+                        em.description = f"🥠 *{txt}*"
 
                 em.set_footer(text=f"Vous avez payé {config['price']}{curr}")
 
