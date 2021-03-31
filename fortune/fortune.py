@@ -116,6 +116,7 @@ class Fortune(commands.Cog):
                 em.set_footer(text=f"Vous avez payé {config['price']}{curr}")
 
                 seller = guild.get_member(cookie['author'])
+                result_footer = str(seller) if seller else str(seller.id)
 
                 msg = await ctx.reply(embed=em, mention_author=False)
                 await self.config.member(author).cookie_last.set(time.time())
@@ -131,7 +132,6 @@ class Fortune(commands.Cog):
                     return await msg.clear_reactions()
 
                 if react.emoji == approve and seller:
-                    result_footer = str(seller)
                     await msg.clear_reactions()
                     if len(cookie['logs']) < 1:
                         await finance.deposit_credits(seller, config['rewards'][0], reason="Upvote fortune cookie")
@@ -150,7 +150,6 @@ class Fortune(commands.Cog):
                     await self.config.member(seller).stats.set(seller_stats)
 
                 elif react.emoji == disapprove and seller:
-                    result_footer = str(seller)
                     if len(cookie['logs']) > 0:
                         result_footer += " ♻️"
 
@@ -174,11 +173,14 @@ class Fortune(commands.Cog):
                     em.set_footer(text=str(seller), icon_url=seller.avatar_url)
                     await msg.edit(embed=em, mention_author=False)
 
+                cookie['logs'].append(time.time())
+
                 if cookie['created'] + config['cookie_exp'] <= time.time():
                     await self.config.guild(guild).COOKIES.clear_raw(key)
-                else:
-                    cookie['logs'].append(time.time())
-                    await self.config.guild(guild).COOKIES.set_raw(key, value=cookie)
+                    em.set_footer(text=result_footer + " ⌛",
+                                  icon_url=seller.avatar_url)
+                    return
+                await self.config.guild(guild).COOKIES.set_raw(key, value=cookie)
             else:
                 await ctx.send(
                     f"**Solde insuffisant** • Un fortune cookie coûte **{config['price']}**{curr} sur ce serveur.")
