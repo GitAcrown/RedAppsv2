@@ -144,6 +144,7 @@ class Fortune(commands.Cog):
                         await finance.deposit_credits(seller, config['rewards'][1],
                                                       reason="Upvote fortune cookie (repost)")
                         result_footer += " ♻️"
+
                     em.set_footer(text=str(seller) + f" +{config['rewards'][1]}{curr}",
                                   icon_url=seller.avatar_url)
                     await msg.edit(embed=em, mention_author=False)
@@ -154,6 +155,9 @@ class Fortune(commands.Cog):
 
                 elif react.emoji == disapprove and seller:
                     result_footer = str(seller)
+                    if len(cookie['logs']) <= 1:
+                        result_footer += " ♻️"
+
                     await msg.clear_reactions()
                     em.set_footer(text=str(seller), icon_url=seller.avatar_url)
                     await msg.edit(embed=em, mention_author=False)
