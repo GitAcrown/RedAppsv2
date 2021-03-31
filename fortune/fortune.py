@@ -93,7 +93,7 @@ class Fortune(commands.Cog):
             except IndexError:
                 return 0
 
-        cookies = (c for c in config['COOKIES'] if last_posted(c) + config['cookie_delay'] < time.time())
+        cookies = [c for c in config['COOKIES'] if last_posted(c) + config['cookie_delay'] < time.time()]
         if cookies:
             if await finance.enough_credits(author, config['price']):
                 key = random.choice(cookies)
