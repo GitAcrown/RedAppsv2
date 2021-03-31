@@ -89,11 +89,11 @@ class Fortune(commands.Cog):
 
         def last_posted(k):
             try:
-                return config['COOKIES'][k]['logs'][-1]
+                return k[-1]
             except IndexError:
                 return 0
 
-        cookies = [c for c in config['COOKIES'] if last_posted(c) + config['cookie_delay'] < time.time()]
+        cookies = [c for c in config['COOKIES'] if last_posted(config['COOKIES'][c]['logs']) + config['cookie_delay'] <= time.time()]
         if cookies:
             if await finance.enough_credits(author, config['price']):
                 key = random.choice(cookies)
@@ -177,7 +177,7 @@ class Fortune(commands.Cog):
                 await ctx.send(
                     f"**Solde insuffisant** • Un fortune cookie coûte **{config['price']}**{curr} sur ce serveur.")
         else:
-            await ctx.send(f"**Stock vide** • Il n'y a plus de fortune cookie à acheter.\n"
+            await ctx.send(f"**Stock vide** • Il n'y a plus de fortune cookie à acheter pour le moment.\n"
                            f"Contribuez à en ajouter de nouveaux avec `;addfortune` !")
 
     @commands.command(name="addfortune", aliases=['addf'])
@@ -185,7 +185,6 @@ class Fortune(commands.Cog):
     async def add_fortune(self, ctx, *, msg: str):
         """Ajouter un nouveau fortune cookie au serveur
 
-        **Notes :**
         - Vous êtes récompensé lorsqu'un membre upvote votre message
         - Les URL sont formattés automatiquement et les images peuvent s'afficher directement dans l'embed
         - Les cookies expirent automatiquement au bout d'un certain délai (défini par les modérateurs)
@@ -309,7 +308,7 @@ class Fortune(commands.Cog):
         Par défaut 1 jour"""
         guild = ctx.guild
         if val >= 0:
-            await self.config.guild(guild).cookie_exp.set(val)
+            await self.config.guild(guild).cookie_delay.set(val)
             await ctx.send(
                 f"**Valeur modifiée** • Un cookie pourra réapparaître après {val} secondes.")
         else:
