@@ -135,6 +135,7 @@ class Fortune(commands.Cog):
                     emfish.set_footer(text="🐟")
                     await fish.edit(embed=emfish)
                     await asyncio.sleep(2)
+                    approve, disapprove = self.bot.get_emoji(826962351797829692), self.bot.get_emoji(826962351714074625)
                     await fish.delete(delay=15)
 
                 msg = await ctx.reply(embed=em, mention_author=False)
