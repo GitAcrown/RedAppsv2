@@ -136,15 +136,16 @@ class Fortune(commands.Cog):
                     return await msg.clear_reactions()
 
                 if react.emoji == approve and seller:
+                    result_footer = str(seller) + f" +{config['rewards'][1]}{curr}"
                     await msg.clear_reactions()
                     if len(cookie['logs']) <= 1:
                         await finance.deposit_credits(seller, config['rewards'][0], reason="Upvote fortune cookie")
-                        em.set_footer(text=str(seller) + f" +{config['rewards'][0]}{curr}", icon_url=seller.avatar_url)
                     else:
                         await finance.deposit_credits(seller, config['rewards'][1],
                                                       reason="Upvote fortune cookie (repost)")
-                        em.set_footer(text=str(seller) + f" +{config['rewards'][1]}{curr} ♻️",
-                                      icon_url=seller.avatar_url)
+                        result_footer += " ♻️"
+                    em.set_footer(text=str(seller) + f" +{config['rewards'][1]}{curr}",
+                                  icon_url=seller.avatar_url)
                     await msg.edit(embed=em, mention_author=False)
 
                     seller_stats = await self.config.member(seller).stats()
@@ -152,6 +153,7 @@ class Fortune(commands.Cog):
                     await self.config.member(seller).stats.set(seller_stats)
 
                 elif react.emoji == disapprove and seller:
+                    result_footer = str(seller)
                     await msg.clear_reactions()
                     em.set_footer(text=str(seller), icon_url=seller.avatar_url)
                     await msg.edit(embed=em, mention_author=False)
@@ -163,7 +165,7 @@ class Fortune(commands.Cog):
                     cookie['malus'] += 1
                     if cookie['malus'] >= 3:
                         await self.config.guild(guild).COOKIES.clear_raw(key)
-                        em.set_footer(text=em.footer['text'] + " 🗑️",
+                        em.set_footer(text=result_footer + " 🗑️",
                                       icon_url=seller.avatar_url)
                         await msg.edit(embed=em, mention_author=False)
                         return
