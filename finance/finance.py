@@ -511,9 +511,19 @@ class Finance(commands.Cog):
                                                    f"**+{booster}** {curr} sont offerts en supplément du fait de votre titre de booster du serveur.",
                                        timestamp=ctx.message.created_at)
                 else:
+                    # new = await self.deposit_credits(author, bonus, reason="Bonus quotidien")
+                    # em = discord.Embed(color=author.color,
+                    # description=f"**+{bonus}** {curr} ont été ajoutés à votre compte au titre du bonus quotidien.",
+                    # timestamp=ctx.message.created_at)
+
                     new = await self.deposit_credits(author, bonus, reason="Bonus quotidien")
+                    fakebonus = bonus * 10
+                    diff = fakebonus - bonus
+                    fakemsg = random.choice((f"Malheureusement, vous recevez une amende de {diff}{curr}, on vous versera alors que {bonus}{curr}...",
+                                             f"Etant donné votre richesse, vous êtes imposé à hauteur de {diff}{curr}, le versement est donc que de {bonus}{curr}.",
+                                             f"Non attendez, on me dit que c'est une erreur, on vous a donné {diff} de trop. Vous aurez que {bonus}{curr}..."))
                     em = discord.Embed(color=author.color,
-                                       description=f"**+{bonus}** {curr} ont été ajoutés à votre compte au titre du bonus quotidien.",
+                                       description=f"**+{fakebonus}** {curr} ont été ajoutés à votre compte au titre du bonus quotidien.\n{fakemsg}",
                                        timestamp=ctx.message.created_at)
                 em.set_author(name=str(author), icon_url=author.avatar_url)
                 em.set_footer(text=f"Vous avez désormais {new} {curr}")
