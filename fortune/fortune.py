@@ -134,6 +134,7 @@ class Fortune(commands.Cog):
                     await asyncio.sleep(10)
                     emfish.set_footer(text="🐟")
                     await fish.edit(embed=emfish)
+                    await asyncio.sleep(2)
                     await fish.delete(delay=15)
 
                 msg = await ctx.reply(embed=em, mention_author=False)
