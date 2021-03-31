@@ -163,6 +163,9 @@ class Fortune(commands.Cog):
                     cookie['malus'] += 1
                     if cookie['malus'] >= 3:
                         await self.config.guild(guild).COOKIES.clear_raw(key)
+                        em.set_footer(text=em.footer['text'] + " 🗑️",
+                                      icon_url=seller.avatar_url)
+                        await msg.edit(embed=em, mention_author=False)
                         return
                 else:
                     await msg.clear_reactions()
