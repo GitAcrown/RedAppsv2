@@ -179,7 +179,7 @@ class Fortune(commands.Cog):
                     await self.config.guild(guild).COOKIES.clear_raw(key)
                     em.set_footer(text=result_footer + " ⌛",
                                   icon_url=seller.avatar_url)
-                    return
+                    return await msg.edit(embed=em, mention_author=False)
                 await self.config.guild(guild).COOKIES.set_raw(key, value=cookie)
             else:
                 await ctx.send(
