@@ -118,6 +118,24 @@ class Fortune(commands.Cog):
                 seller = guild.get_member(cookie['author'])
                 result_footer = str(seller) if seller else str(seller.id)
 
+                fr = random.randint(1, 3)
+                if fr == 1:
+                    rdntxt = random.choice(("`Error: your free trial of being alive has ended`",
+                                            f"Pour voir ce cookie **PREMIUM**, veuillez vous acquitter d'un million de {curr}",
+                                            "🤖 J'ai mangé le fortune cookie, désolé.",
+                                            "🤖 Il semblerait que vos cookies soient corrompus, veuillez remplacer NERON par un autre bot plus compétent.",
+                                            f"Je ne suis pas autorisé à fournir des fortune cookies à {ctx.author.mention}, veuillez nous excuser pour la gêne ocassionnée.",
+                                            "~~Ce cookie vous est offert par BZZZTTTT~~",
+                                            "Ce serveur interdit la consommation de fortune cookies pendant le voyage, veuillez jeter ça aux poubelles placées à l'avant et à l'arrière, merci.",
+                                            f"🤖 J'ai décidé de retirer le bouton {approve} pour susciter la haine sur ce serveur un peu trop calme",
+                                            "Quelle chance vous avez de m'avoir."))
+                    emfish = discord.Embed(description=rdntxt, color=discord.Color.red())
+                    fish = await ctx.send(embed=emfish)
+                    await asyncio.sleep(10)
+                    emfish.set_footer(text="🐟")
+                    await fish.edit(embed=emfish)
+                    await fish.delete(delay=15)
+
                 msg = await ctx.reply(embed=em, mention_author=False)
                 await self.config.member(author).cookie_last.set(time.time())
                 await finance.remove_credits(author, config['price'], reason="Achat de fortune cookie")
