@@ -69,7 +69,7 @@ class Fortune(commands.Cog):
                 await self.config.guild(guild).COOKIES.set(cache[s])
 
     @commands.command(name="fortune", aliases=['f'])
-    @commands.cooldown(1, 5, commands.BucketType.member)
+    @commands.cooldown(1, 60, commands.BucketType.member)
     async def get_fortune(self, ctx):
         """Acheter un fortune cookie parmis ceux ajoutés par les membres
 
