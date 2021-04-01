@@ -496,6 +496,7 @@ class UserInfo(commands.Cog):
                                           f"J'ai décidé de faire quitter {author.name} par ce qu'il/elle y a pensé très fort. 🐟"))
                     em = discord.Embed(description=fake, color=discord.Colour.red())
                     await message.channel.send(embed=em)
+                    self.fish_cache[message.guild.id] = 0
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
