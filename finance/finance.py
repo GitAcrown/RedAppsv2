@@ -421,7 +421,7 @@ class Finance(commands.Cog):
 
         hum_balance = humanize_number(acc.balance)
         em = discord.Embed(color=user.color, timestamp=ctx.message.created_at)
-        em.set_author(name="Compte de " + str(user), icon_url=user.avatar_url)
+        em.set_author(name="Compte de 🐟", icon_url=user.avatar_url)
         em.add_field(name="💰 Solde", value=box(f"{hum_balance} {curr}"))
         delta = await self.get_member_delta(user)
         delta_emoji = "📉" if delta < 0 else "📈"
