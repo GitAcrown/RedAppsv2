@@ -13,7 +13,7 @@ import aiofiles
 import aiohttp
 import discord
 from PIL import Image, ImageSequence, ImageOps
-from redbot.core import Config, commands
+from redbot.core import Config, commands, checks
 from redbot.core.data_manager import cog_data_path, bundled_data_path
 
 from .converters import ImageFinder
@@ -351,3 +351,34 @@ class ImgEdit(commands.Cog):
                 os.remove(filepath)
             finally:
                 await msg.delete()
+
+    @commands.command(name="nswfswitch")
+    @checks.mod_or_permissions(manage_messages=True)
+    async def timed_nsfw(self, ctx):
+        """Active temporairement la balise NSFW sur le channel actuel"""
+        channel = ctx.channel
+        conf = self.bot.get_emoji(812451214037221439)
+        inv = self.bot.get_emoji(812451214179434551)
+
+        if type(channel) != discord.TextChannel:
+            return await ctx.send("**Salon cible invalide** • Cette commande n'est valable que pour les salons écrits")
+
+        if channel.is_nsfw():
+            await channel.edit(nsfw=False, reason="Suppression de la balise NSFW (rétablissement)")
+            return await ctx.reply(f"🔞{inv} {channel.mention} n'est plus **NSFW** (Rétablissement de son statut d'origine)",
+                                   mention_author=None, delete_after=15)
+
+        await channel.edit(nsfw=True, reason="Activation temporaire du NSFW")
+        await ctx.reply(f"🔞{conf} {channel.mention} est temporairement **NSFW**",
+                        mention_author=None, delete_after=10)
+
+        first = True
+        while True:
+            try:
+                msg = await self.bot.wait_for('message',
+                                               timeout=60 if first else 20,
+                                               check=lambda m: m.channel == channel and m.author == ctx.author and m.attachments)
+            except asyncio.TimeoutError:
+                await channel.edit(nsfw=False, reason="Retour à la normale (Non-NSFW)")
+                return await ctx.reply(f"🔞{inv} {channel.mention} n'est plus **NSFW**",
+                                       mention_author=None, delete_after=10)
