@@ -124,12 +124,15 @@ class Fortune(commands.Cog):
                     rdntxt = random.choice(("`Error: your free trial of being alive has ended`",
                                             f"Pour voir ce cookie **PREMIUM**, veuillez vous acquitter d'un million de {curr}",
                                             "🤖 J'ai mangé le fortune cookie, désolé.",
-                                            "🤖 Il semblerait que vos cookies soient corrompus, veuillez remplacer NERON par un autre bot plus compétent.",
+                                            "🤖 Oups, il semblerait que vos cookies soient corrompus, tant pis.",
                                             f"Je ne suis pas autorisé à fournir des fortune cookies à {ctx.author.mention}, veuillez nous excuser pour la gêne ocassionnée.",
-                                            "~~Ce cookie vous est offert par BZZZTTTT~~",
-                                            "Ce serveur interdit la consommation de fortune cookies pendant le voyage, veuillez jeter ça aux poubelles placées à l'avant et à l'arrière, merci.",
-                                            f"🤖 J'ai décidé de retirer le bouton {approve} pour susciter la haine sur ce serveur un peu trop calme",
-                                            "Quelle chance vous avez de m'avoir."))
+                                            "Ce serveur interdit la consommation de fortune cookies pendant le voyage, veuillez jeter ça aux poubelles placées à l'avant et à l'arrière du salon, merci.",
+                                            f"🤖 J'ai décidé de retirer le bouton {approve} dans une tentative de créer la discorde, vive le chaos.",
+                                            "Quelle chance vous avez de m'avoir franchement.",
+                                            "Vous voulez une médaille ? Tenez 🏅 la médaille du loser qui gaspille ses crédits.",
+                                            "Je prépare votre cookie garanti sans OGM...",
+                                            "Le membre ayant créé le cookie a été banni suite à des accusations de terrorisme, votre cookie attendra la fin de son interrogatoire.",
+                                            "**Vous vous empoisonnez avec le fortune cookie et vous perdez tous vos crédits.**"))
                     emfish = discord.Embed(description=rdntxt, color=discord.Color.red())
                     fish = await ctx.send(embed=emfish)
                     await asyncio.sleep(10)
