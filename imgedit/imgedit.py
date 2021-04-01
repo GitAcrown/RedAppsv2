@@ -381,10 +381,13 @@ class ImgEdit(commands.Cog):
                                                timeout=60 if first else 20,
                                                check=lambda m: m.channel == channel and m.author == ctx.author and m.attachments)
             except asyncio.TimeoutError:
-                await channel.edit(nsfw=False, reason="Retour à la normale (Non-NSFW)")
+                if channel.is_nsfw():
+                    await channel.edit(nsfw=False, reason="Retour à la normale (Non-NSFW)")
                 try:
                     await ctx.message.delete()
                 except Exception:
                     pass
                 return await ctx.reply(f"🔞{inv} {channel.mention} n'est plus **NSFW**",
                                        mention_author=None, delete_after=10)
+            if msg.attachments:
+                first = False
