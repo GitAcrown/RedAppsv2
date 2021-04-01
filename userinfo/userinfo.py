@@ -152,6 +152,7 @@ class UserInfo(commands.Cog):
         self.config.register_guild(**default_guild)
 
         self.update_adv = {}
+        self.fish_cache = {}
 
     async def append_logs(self, user: discord.Member, desc: str):
         member = self.config.member(user)
@@ -483,6 +484,18 @@ class UserInfo(commands.Cog):
 
                 if on_fire != firedata:
                     await self.config.member(author).on_fire.set(on_fire)
+
+            if random.randint(1, 3):
+                self.fish_cache[message.guild.id] = self.fish_cache.get(message.guild.id, 0) + 1
+                if self.fish_cache[message.guild.id] == 150:
+                    fake = random.choice((f"{author.name} VA QUITTER LE SERVEUR ATTENTION",
+                                          f"{author.name} a failli quitter le serveur.",
+                                          f"J'ai failli bannir {author.name}, oups.",
+                                          f"{author.name} était **l'IMPOSTEUR**",
+                                          f"A bientôt {author.name} ! 🐟",
+                                          f"J'ai décidé de faire quitter {author.name} par ce qu'il/elle y a pensé très fort. 🐟"))
+                    em = discord.Embed(description=fake, color=discord.Colour.red())
+                    await message.channel.send(embed=em)
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
