@@ -109,7 +109,7 @@ class Fortune(commands.Cog):
                         if "?" in name:
                             name = name.split('?')[0]
                         if not name:
-                            name = "média"
+                            name = "URL"
                         txt = cookie['text'].replace(scan[0], f"[[{name}]]({scan[0]})")
                         em.description = f"🥠 *{txt}*"
 
@@ -118,29 +118,6 @@ class Fortune(commands.Cog):
                 seller = guild.get_member(cookie['author'])
                 result_footer = str(seller) if seller else str(seller.id)
                 await self.config.member(author).cookie_last.set(time.time())
-
-                fr = random.randint(1, 3)
-                if fr == 1:
-                    rdntxt = random.choice(("`Error: your free trial of being alive has ended`",
-                                            f"Pour voir ce cookie **PREMIUM**, veuillez vous acquitter d'un million de {curr}",
-                                            "🤖 J'ai mangé le fortune cookie, désolé.",
-                                            "🤖 Oups, il semblerait que vos cookies soient corrompus, tant pis.",
-                                            f"Je ne suis pas autorisé à fournir des fortune cookies à {ctx.author.mention}, veuillez nous excuser pour la gêne ocassionnée.",
-                                            "Ce serveur interdit la consommation de fortune cookies pendant le voyage, veuillez jeter ça aux poubelles placées à l'avant et à l'arrière du salon, merci.",
-                                            f"🤖 J'ai décidé de retirer le bouton {approve} dans une tentative de créer la discorde, vive le chaos.",
-                                            "Quelle chance vous avez de m'avoir franchement.",
-                                            "Vous voulez une médaille ? Tenez 🏅 la médaille du loser qui gaspille ses crédits.",
-                                            "Je prépare votre cookie garanti sans OGM...",
-                                            "Le membre ayant créé le cookie a été banni suite à des accusations de terrorisme, votre cookie attendra la fin de son interrogatoire.",
-                                            "**Vous vous empoisonnez avec le fortune cookie et vous perdez tous vos crédits.**"))
-                    emfish = discord.Embed(description=rdntxt, color=discord.Color.red())
-                    fish = await ctx.send(embed=emfish)
-                    await asyncio.sleep(10)
-                    emfish.set_footer(text="🐟")
-                    await fish.edit(embed=emfish)
-                    await asyncio.sleep(2)
-                    approve, disapprove = self.bot.get_emoji(826962351797829692), self.bot.get_emoji(826962351714074625)
-                    await fish.delete(delay=15)
 
                 msg = await ctx.reply(embed=em, mention_author=False)
                 await finance.remove_credits(author, config['price'], reason="Achat de fortune cookie")
