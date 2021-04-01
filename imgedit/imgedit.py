@@ -370,7 +370,7 @@ class ImgEdit(commands.Cog):
             return await ctx.reply(f"🔞{inv} {channel.mention} n'est plus **NSFW** (Rétablissement de son statut d'origine)",
                                    mention_author=None, delete_after=15)
 
-        await channel.edit(nsfw=True, reason="Activation temporaire du NSFW")
+        await channel.edit(nsfw=True, reason="Activation temporaire du NSFW (~60s)")
         await ctx.reply(f"🔞{conf} {channel.mention} est temporairement **NSFW**",
                         mention_author=None, delete_after=10)
 
@@ -382,5 +382,9 @@ class ImgEdit(commands.Cog):
                                                check=lambda m: m.channel == channel and m.author == ctx.author and m.attachments)
             except asyncio.TimeoutError:
                 await channel.edit(nsfw=False, reason="Retour à la normale (Non-NSFW)")
+                try:
+                    await ctx.message.delete()
+                except Exception:
+                    pass
                 return await ctx.reply(f"🔞{inv} {channel.mention} n'est plus **NSFW**",
                                        mention_author=None, delete_after=10)
