@@ -117,6 +117,7 @@ class Fortune(commands.Cog):
 
                 seller = guild.get_member(cookie['author'])
                 result_footer = str(seller) if seller else str(seller.id)
+                await self.config.member(author).cookie_last.set(time.time())
 
                 fr = random.randint(1, 3)
                 if fr == 1:
@@ -139,7 +140,6 @@ class Fortune(commands.Cog):
                     await fish.delete(delay=15)
 
                 msg = await ctx.reply(embed=em, mention_author=False)
-                await self.config.member(author).cookie_last.set(time.time())
                 await finance.remove_credits(author, config['price'], reason="Achat de fortune cookie")
 
                 start_adding_reactions(msg, [approve, disapprove])
