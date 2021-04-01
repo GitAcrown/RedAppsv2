@@ -379,7 +379,7 @@ class ImgEdit(commands.Cog):
             try:
                 msg = await self.bot.wait_for('message',
                                                timeout=60 if first else 20,
-                                               check=lambda m: m.channel == channel and m.author == ctx.author and m.attachments)
+                                               check=lambda m: m.channel == channel and m.attachments)
             except asyncio.TimeoutError:
                 if channel.is_nsfw():
                     await channel.edit(nsfw=False, reason="Retour à la normale (Non-NSFW)")
