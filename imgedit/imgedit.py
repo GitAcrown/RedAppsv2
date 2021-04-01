@@ -352,7 +352,7 @@ class ImgEdit(commands.Cog):
             finally:
                 await msg.delete()
 
-    @commands.command(name="nswfswitch")
+    @commands.command(name="nsfwswitch")
     @checks.mod_or_permissions(manage_messages=True)
     async def timed_nsfw(self, ctx):
         """Active temporairement la balise NSFW sur le channel actuel"""
