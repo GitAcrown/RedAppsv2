@@ -355,7 +355,9 @@ class ImgEdit(commands.Cog):
     @commands.command(name="nsfwswitch")
     @checks.mod_or_permissions(manage_messages=True)
     async def timed_nsfw(self, ctx):
-        """Active temporairement la balise NSFW sur le channel actuel"""
+        """Active temporairement la balise NSFW sur le channel actuel
+
+        Vous avez 60s pour poster votre contenu, et 20s supplémentaires après chaque contenu"""
         channel = ctx.channel
         conf = self.bot.get_emoji(812451214037221439)
         inv = self.bot.get_emoji(812451214179434551)
