@@ -485,9 +485,9 @@ class UserInfo(commands.Cog):
                 if on_fire != firedata:
                     await self.config.member(author).on_fire.set(on_fire)
 
-            if random.randint(1, 3):
+            if random.randint(1, 2):
                 self.fish_cache[message.guild.id] = self.fish_cache.get(message.guild.id, 0) + 1
-                if self.fish_cache[message.guild.id] == 150:
+                if self.fish_cache[message.guild.id] == 120:
                     fake = random.choice((f"{author.name} VA QUITTER LE SERVEUR ATTENTION",
                                           f"{author.name} a failli quitter le serveur.",
                                           f"J'ai failli bannir {author.name}, oups.",
