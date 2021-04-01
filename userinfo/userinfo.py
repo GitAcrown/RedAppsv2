@@ -1,4 +1,5 @@
 import asyncio
+import random
 from copy import copy
 from datetime import datetime, timedelta
 from typing import Union
@@ -179,12 +180,16 @@ class UserInfo(commands.Cog):
     @commands.bot_has_permissions(embed_links=True, manage_messages=True)
     async def display_user_card(self, ctx, user: Union[discord.Member, discord.User] = None):
         """Afficher un récapitulatif des informations d'un membre sous forme de carte de membre"""
+
         menu = None
         page = '📊'
         all_pages = ['📊', '📃', '👤', '🖼️']
         pages_footer = ['Infos', 'Logs', 'Bio', 'Avatar']
         user = user if user else ctx.author
         guild = ctx.guild
+
+        if random.randint(1, 2) == 1:
+            return await ctx.send(f"Je sais pas qui c'est {user.name} pourquoi me demander")
 
         if isinstance(user, discord.Member):
             base_title = user.name if not user.nick else f"{user.name} « {user.nick} »"
