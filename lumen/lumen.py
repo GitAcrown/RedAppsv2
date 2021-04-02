@@ -93,6 +93,8 @@ class Lumen(commands.Cog):
             plot = movie['plot'][0].split('::')[0] if '::' in movie['plot'][0] else movie['plot'][0]
         else:
             plot = ''
+        if title != movie['title']:
+            plot = f"**VO :** __*{movie['title']}*__\n\n{plot}"
         rating = f"{movie.get('rating', '?')} ({movie.get('votes', 0)})"
         em = discord.Embed(title="**{}** ({}, {})".format(title, kind, movie['year']),
                            description=plot,
