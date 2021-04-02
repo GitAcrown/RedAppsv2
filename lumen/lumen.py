@@ -91,9 +91,9 @@ class Lumen(commands.Cog):
         em = discord.Embed(title="**{}** ({}, {})".format(title, kind, movie['year']),
                            description=plot,
                            color=IMDB_Color)
-        em.add_field(name="Note", value=box(rating))
         if movie.get('genres', False):
             em.add_field(name="Genre", value=box(', '.join(movie['genres'])))
+        em.add_field(name="Note", value=box(rating))
         if movie.get('runtimes', False):
             runtime = movie['runtimes'] if type(movie['runtimes']) in (str, int) else movie['runtimes'][0]
             em.add_field(name="Durée", value=box(runtime + 'm'))
@@ -165,7 +165,7 @@ class Lumen(commands.Cog):
                     return None
 
                 if react.emoji == '✅':
-                    await menu.clear_reactions()
+                    await menu.delete()
                     return movies[current][0]
                 elif react.emoji == '⬅️':
                     current = current - 1 if current > 0 else len(movies) - 1
@@ -195,8 +195,9 @@ class Lumen(commands.Cog):
             movie = await self.fetch_movie_menu(ctx, search)
 
         if movie:
-            if movie.get('kind', 'movie') in ('tv series', 'tv miniseries'):
-                embed = self.get_serie_embed(movie, f"\"{search}\"")
-            else:
-                embed = self.get_movie_embed(movie, f"\"{search}\"")
+            async with ctx.typing():
+                if movie.get('kind', 'movie') in ('tv series', 'tv miniseries'):
+                    embed = self.get_serie_embed(movie, f"\"{search}\"")
+                else:
+                    embed = self.get_movie_embed(movie, f"\"{search}\"")
             await ctx.send(embed=embed)
