@@ -61,7 +61,10 @@ class Lumen(commands.Cog):
 
         title = self.get_local_title(movie.movieID, lang_country)
         kind = movie['kind'].capitalize() if movie['kind'] not in FR_TR else FR_TR[movie['kind']]
-        plot = movie['plot'][0].split('::')[0] if '::' in movie['plot'][0] else movie['plot'][0]
+        if movie.get('plot', False):
+            plot = movie['plot'][0].split('::')[0] if '::' in movie['plot'][0] else movie['plot'][0]
+        else:
+            plot = ''
         em = discord.Embed(title="**{}** ({}, {})".format(title, kind, movie['year']),
                            description=plot,
                            color=IMDB_Color)
