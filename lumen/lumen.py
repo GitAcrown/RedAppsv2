@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Union
+from typing import Union, Optional
 import discord
 from redbot.core import Config, commands
 import imdb
@@ -134,7 +134,7 @@ class Lumen(commands.Cog):
         em.add_field(name="Nb. épisodes", value=box(len_episodes))
         return em
 
-    async def fetch_movie_menu(self, ctx, search: str) -> Union[None, imdb.Movie.Movie]:
+    async def fetch_movie_menu(self, ctx, search: str, cutoff: int = 3) -> Union[None, imdb.Movie.Movie]:
         db = imdb.IMDb()
         local_lang = 'France' if not ctx.guild else await self.config.guild(ctx.guild).imdb_country()
 
@@ -143,7 +143,7 @@ class Lumen(commands.Cog):
             return None
 
         if len(results) > 1:
-            results = results[:3]
+            results = results[:cutoff]
             p = 1
             total = len(results)
             movies = []
@@ -187,9 +187,10 @@ class Lumen(commands.Cog):
         return results[0].movieID
 
     @commands.command(name="imdbsearch", aliases=['imdbs'])
-    async def search_on_imdb(self, ctx, *, search: str):
+    async def search_on_imdb(self, ctx, nb: Optional[int], *, search: str):
         """Recherche des termes sur la base de données IMDb
 
+        <nb> = Nombre de résultats à afficher (peut augmenter le temps d'affichage)
         Il est possible d'entrer directement l'ID IMDb du contenu recherché"""
         if search.isdigit():
             db = imdb.IMDb()
@@ -200,7 +201,7 @@ class Lumen(commands.Cog):
                     logger.error(e, exc_info=True)
                     return await ctx.send("**Aucun résultat** • Vérifiez l'identifiant IMDb donné")
         else:
-            movie = await self.fetch_movie_menu(ctx, search)
+            movie = await self.fetch_movie_menu(ctx, search, nb)
 
         if movie:
             async with ctx.typing():
