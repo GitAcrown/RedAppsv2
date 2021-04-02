@@ -44,6 +44,27 @@ class Lumen(commands.Cog):
                         return c['title']
         return db.get_movie(movie_id)['title'] if db.get_movie(movie_id) else ''
 
+    def get_fast_embed(self, movie: Union[str, int, imdb.Movie.Movie], add_footer: str = '', *,
+                        lang_country: str = 'France'):
+        db = imdb.IMDb()
+        if type(movie) != imdb.Movie.Movie:
+            try:
+                movie = db.get_movie(movie)
+            except imdb.IMDbError as e:
+                logger.error(e, exc_info=True)
+                return None
+
+        if add_footer != '':
+            add_footer = f' · {add_footer}'
+
+        title = self.get_local_title(movie.movieID, lang_country)
+        kind = movie['kind'].capitalize() if movie['kind'] not in FR_TR else FR_TR[movie['kind']]
+        em = discord.Embed(description="**{}** ({}, {})".format(title, kind, movie['year']),
+                           color=IMDB_Color)
+        em.set_footer(text=f"IMDb{add_footer}", icon_url=IMDB_Image)
+        em.set_thumbnail(url=movie['cover url'])
+        return em
+
     def get_movie_embed(self, movie: Union[str, int, imdb.Movie.Movie], add_footer: str = '', *,
                         lang_country: str = 'France'):
         db = imdb.IMDb()
@@ -117,7 +138,7 @@ class Lumen(commands.Cog):
 
             async with ctx.typing():
                 for m in results:
-                    movies.append((m, self.get_movie_embed(m, add_footer=f'Page {p}/{total}', lang_country=local_lang)))
+                    movies.append((m, self.get_fast_embed(m, add_footer=f'Page {p}/{total}', lang_country=local_lang)))
                     p += 1
 
             current = 0
