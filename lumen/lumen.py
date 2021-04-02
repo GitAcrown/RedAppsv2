@@ -1,20 +1,8 @@
 import asyncio
 import logging
-import logging
-import os
-import re
-import time
-import uuid
-from io import BytesIO
-from typing import Optional, Union
-from urllib.parse import urlsplit
-
-import aiofiles
-import aiohttp
+from typing import Union
 import discord
-from PIL import Image, ImageSequence, ImageOps
-from redbot.core import Config, commands, checks
-from redbot.core.data_manager import cog_data_path, bundled_data_path
+from redbot.core import Config, commands
 import imdb
 from redbot.core.utils.chat_formatting import box
 from redbot.core.utils.menus import start_adding_reactions
