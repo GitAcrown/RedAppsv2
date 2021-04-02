@@ -96,30 +96,32 @@ class Fortune(commands.Cog):
         cookies = [c for c in config['COOKIES'] if last_posted(config['COOKIES'][c]['logs']) + config['cookie_delay'] <= time.time()]
         if cookies:
             if await finance.enough_credits(author, config['price']):
-                key = random.choice(cookies)
-                cookie = config['COOKIES'][key]
+                async with ctx.typing():
+                    key = random.choice(cookies)
+                    cookie = config['COOKIES'][key]
 
-                em = discord.Embed(description=f"🥠 *{cookie['text']}*", color=author.color)
+                    em = discord.Embed(description=f"🥠 *{cookie['text']}*", color=author.color)
 
-                if 'http' in cookie['text']:
-                    scan = re.compile(r'(https?://\S*\.\S*)', re.DOTALL | re.IGNORECASE).findall(cookie['text'])
-                    if scan:
-                        em.set_image(url=scan[0])
-                        name = scan[0].split('/')[-1]
-                        if "?" in name:
-                            name = name.split('?')[0]
-                        if not name:
-                            name = "URL"
-                        txt = cookie['text'].replace(scan[0], f"[[{name}]]({scan[0]})")
-                        em.description = f"🥠 *{txt}*"
+                    if 'http' in cookie['text']:
+                        scan = re.compile(r'(https?://\S*\.\S*)', re.DOTALL | re.IGNORECASE).findall(cookie['text'])
+                        if scan:
+                            em.set_image(url=scan[0])
+                            name = scan[0].split('/')[-1]
+                            if "?" in name:
+                                name = name.split('?')[0]
+                            if not name:
+                                name = "URL"
+                            txt = cookie['text'].replace(scan[0], f"[[{name}]]({scan[0]})")
+                            em.description = f"🥠 *{txt}*"
 
-                em.set_footer(text=f"Vous avez payé {config['price']}{curr}")
+                    em.set_footer(text=f"Vous avez payé {config['price']}{curr}")
 
-                seller = guild.get_member(cookie['author'])
-                result_footer = str(seller) if seller else str(seller.id)
-                await self.config.member(author).cookie_last.set(time.time())
+                    seller = guild.get_member(cookie['author'])
+                    result_footer = str(seller) if seller else str(seller.id)
+                    await self.config.member(author).cookie_last.set(time.time())
 
-                msg = await ctx.reply(embed=em, mention_author=False)
+                    msg = await ctx.reply(embed=em, mention_author=False)
+
                 await finance.remove_credits(author, config['price'], reason="Achat de fortune cookie")
 
                 start_adding_reactions(msg, [approve, disapprove])
