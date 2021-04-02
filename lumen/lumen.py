@@ -69,7 +69,7 @@ class Lumen(commands.Cog):
         if movie.get('genres', False):
             em.add_field(name="Genre", value=', '.join(movie['genres']))
         if movie.get('runtimes', False):
-            em.add_field(name="Durée", value=box(movie['runtimes'] + 'm'))
+            em.add_field(name="Durée", value=box(str(movie['runtimes']) + 'm'))
         em.set_footer(text=f"IMDb{add_footer}", icon_url=IMDB_Image)
         em.set_thumbnail(url=movie['cover url'])
         return em
@@ -160,11 +160,12 @@ class Lumen(commands.Cog):
         Il est possible d'entrer directement l'ID IMDb du contenu recherché"""
         if search.isdigit():
             db = imdb.IMDb()
-            try:
-                movie = db.get_movie(search)
-            except imdb.IMDbError as e:
-                logger.error(e, exc_info=True)
-                return await ctx.send("**Aucun résultat** • Vérifiez l'identifiant IMDb donné")
+            async with ctx.typing():
+                try:
+                    movie = db.get_movie(search)
+                except imdb.IMDbError as e:
+                    logger.error(e, exc_info=True)
+                    return await ctx.send("**Aucun résultat** • Vérifiez l'identifiant IMDb donné")
         else:
             movie = await self.fetch_movie_menu(ctx, search)
 
