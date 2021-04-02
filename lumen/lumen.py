@@ -142,7 +142,7 @@ class Lumen(commands.Cog):
 
         results = db.search_movie(search)
         if not results:
-            return None
+            return False
 
         if len(results) > 1:
             results = results[:cutoff]
@@ -215,6 +215,8 @@ class Lumen(commands.Cog):
                 else:
                     embed = self.get_movie_embed(movie, f"\"{search}\"")
             await ctx.send(embed=embed)
+        elif movie == False:
+            await ctx.send("**Aucun résultat** • Vérifiez l'orthographe et réessayez")
 
     @commands.command(name="imdb")
     async def imdb_info(self, ctx, *, search: str):
