@@ -68,9 +68,10 @@ class Lumen(commands.Cog):
                            color=IMDB_Color)
         em.add_field(name="Note", value=box(rating))
         if movie.get('genres', False):
-            em.add_field(name="Genre", value=', '.join(movie['genres']))
+            em.add_field(name="Genre", value=box(', '.join(movie['genres'])))
         if movie.get('runtimes', False):
-            em.add_field(name="Durée", value=box(str(movie['runtimes']) + 'm'))
+            runtime = movie['runtimes'] if type(movie['runtimes']) in (str, int) else movie['runtimes'][0]
+            em.add_field(name="Durée", value=box(runtime + 'm'))
         em.set_footer(text=f"IMDb{add_footer}", icon_url=IMDB_Image)
         em.set_thumbnail(url=movie['cover url'])
         return em
@@ -111,7 +112,7 @@ class Lumen(commands.Cog):
         if len(results) > 1:
             results = results[:3]
             p = 1
-            total = []
+            total = len(results)
             movies = []
 
             async with ctx.typing():
