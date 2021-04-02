@@ -136,7 +136,7 @@ class Lumen(commands.Cog):
         em.add_field(name="Nb. épisodes", value=box(len_episodes))
         return em
 
-    async def fetch_movie_menu(self, ctx, search: str, cutoff: int = 3) -> Union[None, imdb.Movie.Movie]:
+    async def fetch_movie_menu(self, ctx, search: str, cutoff: int = 3) -> Union[bool, None, imdb.Movie.Movie]:
         db = imdb.IMDb()
         local_lang = 'France' if not ctx.guild else await self.config.guild(ctx.guild).imdb_country()
 
