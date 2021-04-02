@@ -168,16 +168,13 @@ class Lumen(commands.Cog):
                     await menu.clear_reactions()
                     return movies[current][0]
                 elif react.emoji == '⬅️':
-                    await menu.remove_reaction(ruser, '⬅️')
                     current = current - 1 if current > 0 else len(movies) - 1
                 elif react.emoji == '➡️':
-                    await menu.remove_reaction(ruser, '⬅️')
                     current = current + 1 if current < (len(movies) - 1) else 0
                 elif react.emoji == '❎':
                     await menu.delete()
                     return None
-                else:
-                    await menu.remove_reaction(ruser, react.emoji)
+                await menu.remove_reaction(react.emoji, ruser)
 
         return results[0].movieID
 
