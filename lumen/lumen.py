@@ -37,10 +37,10 @@ class Lumen(commands.Cog):
         db = imdb.IMDb()
         data = db.get_movie_akas(movie_id)
         if data:
-            countries = data['data'].get('raw akas', [])
-            if countries:
+            if 'raw akas' in data['data']:
+                countries = data['data']['raw akas']
                 for c in countries:
-                    if country.lower() in c['countries'].lower():
+                    if country.lower() in c.get('countries', '').lower():
                         return c['title']
         return db.get_movie(movie_id)['title'] if db.get_movie(movie_id) else ''
 
