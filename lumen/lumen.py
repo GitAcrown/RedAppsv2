@@ -38,9 +38,10 @@ class Lumen(commands.Cog):
         data = db.get_movie_akas(movie_id)
         if data:
             countries = data['data'].get('raw akas', [])
-            for c in countries:
-                if country.lower() in c['countries'].lower():
-                    return c['title']
+            if countries:
+                for c in countries:
+                    if country.lower() in c['countries'].lower():
+                        return c['title']
         return db.get_movie(movie_id)['title'] if db.get_movie(movie_id) else ''
 
     def get_movie_embed(self, movie: Union[str, int, imdb.Movie.Movie], add_footer: str = '', *,
@@ -108,6 +109,7 @@ class Lumen(commands.Cog):
             return None
 
         if len(results) > 1:
+            results = results[:3]
             p = 1
             total = []
             movies = []
