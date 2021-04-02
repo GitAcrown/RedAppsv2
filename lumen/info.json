@@ -1,0 +1,13 @@
+{
+    "author": ["Acrone"],
+	"description": "Base de données IMdb et programmation de streams",
+	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help Lumen` pour voir les commandes disponibles",
+	"short": "Base de données IMdb et programmation de streams",
+	"tags": ["utility", "stream", "tools", "movies"],
+    "requirements" : [
+		"git+https://github.com/alberanid/imdbpy"
+	],
+    "required_cogs": {},
+	"type": "COG",
+	"end_user_data_statement": "This cog does not store personal data."
+}
