@@ -15,7 +15,9 @@ IMDB_Image = 'https://i.imgur.com/KzDQlv5.png'
 FR_TR = {
     'movie': 'Film',
     'tv series': 'Série TV',
-    'tv miniseries': 'Mini-série TV'
+    'tv miniseries': 'Mini-série TV',
+    'video game': 'Jeu vidéo',
+    'episode': 'Episode'
 }
 
 
