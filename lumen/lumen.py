@@ -184,7 +184,7 @@ class Lumen(commands.Cog):
 
         return results[0].movieID
 
-    @commands.command(name="imdbsearch", aliases=['simdb'])
+    @commands.command(name="imdbsearch", aliases=['imdbs'])
     async def search_on_imdb(self, ctx, *, search: str):
         """Recherche des termes sur la base de données IMDb
 
