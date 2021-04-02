@@ -49,17 +49,21 @@ class Lumen(commands.Cog):
         db = imdb.IMDb()
         if type(movie) != imdb.Movie.Movie:
             try:
-                movie = db.get_movie(movie)
+                movie = db.get_movie(movie, info=['plot'])
             except imdb.IMDbError as e:
                 logger.error(e, exc_info=True)
                 return None
+        else:
+            db.update(movie, 'plot')
 
         if add_footer != '':
             add_footer = f' · {add_footer}'
 
         title = self.get_local_title(movie.movieID, lang_country)
         kind = movie['kind'].capitalize() if movie['kind'] not in FR_TR else FR_TR[movie['kind']]
-        em = discord.Embed(description="**{}** ({}, {})".format(title, kind, movie['year']),
+        plot = movie['plot'][0].split('::')[0] if '::' in movie['plot'][0] else movie['plot'][0]
+        em = discord.Embed(title="**{}** ({}, {})".format(title, kind, movie['year']),
+                           description=plot,
                            color=IMDB_Color)
         em.set_footer(text=f"IMDb{add_footer}", icon_url=IMDB_Image)
         em.set_thumbnail(url=movie['cover url'])
@@ -94,7 +98,7 @@ class Lumen(commands.Cog):
             runtime = movie['runtimes'] if type(movie['runtimes']) in (str, int) else movie['runtimes'][0]
             em.add_field(name="Durée", value=box(runtime + 'm'))
         em.set_footer(text=f"IMDb{add_footer}", icon_url=IMDB_Image)
-        em.set_thumbnail(url=movie['cover url'])
+        em.set_thumbnail(url=movie['full-size cover url'])
         return em
 
     def get_serie_embed(self, serie: Union[str, int, imdb.Movie.Movie], add_footer: str = '', *,
