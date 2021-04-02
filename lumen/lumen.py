@@ -220,7 +220,9 @@ class Lumen(commands.Cog):
 
     @commands.command(name="imdb")
     async def imdb_info(self, ctx, *, search: str):
-        """Recherche un film ou une série sur IMDb"""
+        """Recherche un film ou une série sur IMDb
+
+        Il est possible d'entrer directement l'ID IMDb du contenu recherché"""
         db = imdb.IMDb()
         if search.isdigit():
             async with ctx.typing():
