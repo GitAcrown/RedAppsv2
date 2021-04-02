@@ -184,9 +184,9 @@ class Lumen(commands.Cog):
 
         return results[0].movieID
 
-    @commands.command(name="imdb")
+    @commands.command(name="imdbsearch", aliases=['simdb'])
     async def search_on_imdb(self, ctx, *, search: str):
-        """Recherche un film/série sur la base de données IMDb
+        """Recherche des termes sur la base de données IMDb
 
         Il est possible d'entrer directement l'ID IMDb du contenu recherché"""
         if search.isdigit():
@@ -207,3 +207,28 @@ class Lumen(commands.Cog):
                 else:
                     embed = self.get_movie_embed(movie, f"\"{search}\"")
             await ctx.send(embed=embed)
+
+    @commands.command(name="imdb")
+    async def imdb_info(self, ctx, *, search: str):
+        """Recherche un film ou une série sur IMDb"""
+        db = imdb.IMDb()
+        if search.isdigit():
+            async with ctx.typing():
+                try:
+                    movie = db.get_movie(search)
+                except imdb.IMDbError as e:
+                    logger.error(e, exc_info=True)
+                    return await ctx.send("**Aucun résultat** • Vérifiez l'identifiant IMDb donné")
+        else:
+            movie = db.search_movie(search)
+            if movie:
+                movie = movie[0]
+            else:
+                return await ctx.send("**Aucun résultat** • Vérifiez l'orthographe et réessayez")
+
+        async with ctx.typing():
+            if movie.get('kind', 'movie') in ('tv series', 'tv miniseries'):
+                embed = self.get_serie_embed(movie, f"\"{search}\"")
+            else:
+                embed = self.get_movie_embed(movie, f"\"{search}\"")
+        await ctx.send(embed=embed)
