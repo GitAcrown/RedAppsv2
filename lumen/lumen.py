@@ -192,8 +192,8 @@ class Lumen(commands.Cog):
 
         <nb> = Nombre de résultats à afficher (peut augmenter le temps d'affichage)
         Il est possible d'entrer directement l'ID IMDb du contenu recherché"""
-        if nb > 5:
-            nb = 5
+        if nb > 10:
+            nb = 10
 
         if search.isdigit():
             db = imdb.IMDb()
