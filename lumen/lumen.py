@@ -203,5 +203,3 @@ class Lumen(commands.Cog):
             else:
                 embed = self.get_movie_embed(movie, f"\"{search}\"")
             await ctx.send(embed=embed)
-        else:
-            await ctx.send("**Aucun résultat** • Vérifiez l'orthographe et réessayez")
