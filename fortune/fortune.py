@@ -403,7 +403,7 @@ class Fortune(commands.Cog):
                     except asyncio.TimeoutError:
                         return await msg.clear_reactions()
 
-                    if react == confirm:
+                    if react.emoji == confirm:
                         await msg.clear_reactions()
                         await self.config.guild(ctx.guild).COOKIES.clear_raw(cook)
                         em.description = str(confirm) + " **Supprimé avec succès**".upper()
