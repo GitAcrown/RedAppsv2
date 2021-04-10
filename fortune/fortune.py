@@ -117,7 +117,7 @@ class Fortune(commands.Cog):
                             txt = cookie['text'].replace(scan[0], f"[[{name}]]({scan[0]})")
                             em.description = f"🥠 {txt}"
 
-                    footer = f"Payé : {config['price']}{curr}"
+                    footer = f"Vous avez payé {config['price']}{curr}"
                     em.set_footer(text=footer)
 
                     seller = guild.get_member(cookie['author'])
