@@ -37,6 +37,7 @@ class Fortune(commands.Cog):
 
                          'price': 50,
                          'rewards': (20, 5),
+                         'superlike': 10,
 
                          'cooldown': 3600,
 
@@ -77,7 +78,9 @@ class Fortune(commands.Cog):
         guild, author = ctx.guild, ctx.author
         finance = self.bot.get_cog('Finance')
         curr = await finance.get_currency(guild)
-        approve, disapprove = self.bot.get_emoji(825055082076569679), self.bot.get_emoji(825055082084958218)
+        approve, disapprove, superlike = self.bot.get_emoji(825055082076569679), \
+                                          self.bot.get_emoji(825055082084958218), \
+                                          self.bot.get_emoji(830271845352734771)
 
         config = await self.config.guild(guild).all()
 
@@ -114,7 +117,8 @@ class Fortune(commands.Cog):
                             txt = cookie['text'].replace(scan[0], f"[[{name}]]({scan[0]})")
                             em.description = f"🥠 *{txt}*"
 
-                    em.set_footer(text=f"Vous avez payé {config['price']}{curr}")
+                    footer = f"Payé : {config['price']}{curr} | Superlike pour {config['superlike']}{curr} ?" if config['superlike'] != 0 else f"Payé : {config['price']}{curr}"
+                    em.set_footer(text=footer)
 
                     seller = guild.get_member(cookie['author'])
                     result_footer = str(seller) if seller else str(seller.id)
@@ -150,6 +154,34 @@ class Fortune(commands.Cog):
                     seller_stats = await self.config.member(seller).stats()
                     seller_stats['like'] += 1
                     await self.config.member(seller).stats.set(seller_stats)
+
+                    if config['superlike'] > 0:
+                        start_adding_reactions(msg, [superlike])
+                        try:
+                            react, ruser = await self.bot.wait_for("reaction_add",
+                                                                   check=lambda m,
+                                                                                u: u == ctx.author and m.message.id == msg.id,
+                                                                   timeout=30)
+                        except asyncio.TimeoutError:
+                            return await msg.remove_reaction(superlike, self.bot.user)
+
+                        if react.emoji == superlike and await finance.enough_credits(ctx.author, config['superlike']):
+                            await msg.remove_reaction(superlike, self.bot.user)
+                            await finance.remove_credits(ctx.author, config['superlike'], reason="Tips de superlike fortune cookie")
+                            await finance.deposit_credits(seller, config['superlike'], reason="Superlike fortune cookie")
+                            result_footer += f" [Superlike +{config['superlike']}{curr}]"
+                            em.set_footer(text=result_footer,
+                                          icon_url=seller.avatar_url)
+                            await msg.edit(embed=em, mention_author=False)
+
+                            seller_stats['like'] += 1
+                            await self.config.member(seller).stats.set(seller_stats)
+                        else:
+                            await msg.remove_reaction(superlike, self.bot.user)
+                            result_footer += f" [Crédits insuffisants pour Superlike]"
+                            em.set_footer(text=result_footer,
+                                          icon_url=seller.avatar_url)
+                            await msg.edit(embed=em, mention_author=False)
 
                 elif react.emoji == disapprove and seller:
                     if len(cookie['logs']) > 0:
@@ -269,6 +301,18 @@ class Fortune(commands.Cog):
             await ctx.send(f"**Valeur modifiée** • Les fortunes cookies coûteront désormais {val} crédits.")
         else:
             await ctx.send(f"**Valeur invalide** • Le prix du fortune cookie doit être supérieur ou égal à 0 crédits.")
+
+    @fortune_settings.command()
+    async def superlike(self, ctx, val: int = 10):
+        """Changer le montant du superlike (tips supplémentaire), 0 pour désactiver cette fonctionnalité
+
+        Par défaut 10"""
+        guild = ctx.guild
+        if val >= 0:
+            await self.config.guild(guild).superlike.set(val)
+            await ctx.send(f"**Valeur modifiée** • Les superlike de fortunes cookies coûteront désormais {val} crédits.")
+        else:
+            await ctx.send(f"**Valeur invalide** • Le superlike d'un fortune cookie doit être supérieur ou égal à 0 crédits.")
 
     @fortune_settings.command()
     async def rewards(self, ctx, first: int = 20, repost: int = 5):
