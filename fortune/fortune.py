@@ -117,7 +117,7 @@ class Fortune(commands.Cog):
                             txt = cookie['text'].replace(scan[0], f"[[{name}]]({scan[0]})")
                             em.description = f"🥠 *{txt}*"
 
-                    footer = f"Payé : {config['price']}{curr} | Superlike pour {config['superlike']}{curr} ?" if config['superlike'] != 0 else f"Payé : {config['price']}{curr}"
+                    footer = f"Payé : {config['price']}{curr}"
                     em.set_footer(text=footer)
 
                     seller = guild.get_member(cookie['author'])
@@ -147,7 +147,7 @@ class Fortune(commands.Cog):
                                                       reason="Upvote fortune cookie (repost)")
                         result_footer += f" +{config['rewards'][1]}{curr} ♻️"
 
-                    em.set_footer(text=result_footer,
+                    em.set_footer(text=result_footer + f" | Superlike pour {config['superlike']}{curr} ?",
                                   icon_url=seller.avatar_url)
                     await msg.edit(embed=em, mention_author=False)
 
