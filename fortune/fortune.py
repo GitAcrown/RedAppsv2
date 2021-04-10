@@ -147,7 +147,7 @@ class Fortune(commands.Cog):
                                                       reason="Upvote fortune cookie (repost)")
                         result_footer += f" +{config['rewards'][1]}{curr} ♻️"
 
-                    em.set_footer(text=result_footer + f"\nSuperlike pour {config['superlike']}{curr} ?",
+                    em.set_footer(text=result_footer + f"\n» Superlike pour {config['superlike']}{curr} ?",
                                   icon_url=seller.avatar_url)
                     await msg.edit(embed=em, mention_author=False)
 
@@ -172,7 +172,7 @@ class Fortune(commands.Cog):
                             await msg.clear_reactions()
                             await finance.remove_credits(ctx.author, config['superlike'], reason="Tips de superlike fortune cookie")
                             await finance.deposit_credits(seller, config['superlike'], reason="Superlike fortune cookie")
-                            result_footer += f"\nSuperlike : +{config['superlike']}{curr}"
+                            result_footer += f"\n» Superlike : +{config['superlike']}{curr}"
                             em.set_footer(text=result_footer,
                                           icon_url=seller.avatar_url)
                             await msg.edit(embed=em, mention_author=False)
@@ -181,7 +181,7 @@ class Fortune(commands.Cog):
                             await self.config.member(seller).stats.set(seller_stats)
                         else:
                             await msg.remove_reaction(superlike, self.bot.user)
-                            result_footer += f"\nCrédits insuffisants pour Superlike\n"
+                            result_footer += f"\n» Crédits insuffisants pour Superlike\n"
                             em.set_footer(text=result_footer,
                                           icon_url=seller.avatar_url)
                             await msg.edit(embed=em, mention_author=False)
