@@ -373,6 +373,48 @@ class Fortune(commands.Cog):
                 f"**Valeur invalide** • Le délai doit être supérieur ou égal à 0s.")
 
     @fortune_settings.command()
+    async def delete(self, ctx, *, texte: str):
+        """Supprimer un fortune cookie
+
+        Entrez une partie du texte puis confirmez le cookie pour le supprimer"""
+        config = await self.config.guild(ctx.guild).all()
+        all_cookies = [config['COOKIES'][c]['text'].lower() for c in config['COOKIES']]
+        dist = process.extractOne(texte.lower(), all_cookies, score_cutoff=75)
+        emcolor = await ctx.embed_color()
+        confirm, cancel = self.bot.get_emoji(812451214037221439), self.bot.get_emoji(812451214179434551)
+        if dist:
+            txt = dist[0]
+            for cook in config['COOKIES']:
+                if config['COOKIES'][cook]['text'].lower() == txt:
+                    cookie = config['COOKIES'][cook]
+                    em = discord.Embed(title="Supprimer un fortune cookie", description=box(cookie['text']),
+                                       color=emcolor)
+                    seller = ctx.guild.get_member(cookie['author'])
+                    seller = str(seller) if seller else str(cookie['author'])
+                    em.set_footer(text=f"Confirmez-vous la suppression de ce cookie de {seller} ?")
+                    msg = await ctx.send(embed=em)
+
+                    start_adding_reactions(msg, [confirm, cancel])
+                    try:
+                        react, ruser = await self.bot.wait_for("reaction_add",
+                                                               check=lambda m,
+                                                                            u: u == ctx.author and m.message.id == msg.id,
+                                                               timeout=30)
+                    except asyncio.TimeoutError:
+                        return await msg.clear_reactions()
+
+                    if react == confirm:
+                        await msg.clear_reactions()
+                        await self.config.guild(ctx.guild).COOKIES.clear_raw(cook)
+                        em.description = str(confirm) + " **Supprimé avec succès**".upper()
+                        em.set_footer(text="Le cookie a été supprimé")
+                        return await msg.edit(embed=em, mention_author=False)
+                    else:
+                        return await msg.delete()
+
+        await ctx.send("**Introuvable** • Donnez une partie du texte pour que je puisse le trouver")
+
+    @fortune_settings.command()
     async def resetcd(self, ctx, users: commands.Greedy[discord.Member]):
         """Reset le cooldown de membres pour l'achat d'un fortune cookie"""
         for user in users:
