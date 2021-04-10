@@ -166,7 +166,7 @@ class Fortune(commands.Cog):
                             return await msg.remove_reaction(superlike, self.bot.user)
 
                         if react.emoji == superlike and await finance.enough_credits(ctx.author, config['superlike']):
-                            await msg.remove_reaction(superlike, self.bot.user)
+                            await msg.clear_reactions()
                             await finance.remove_credits(ctx.author, config['superlike'], reason="Tips de superlike fortune cookie")
                             await finance.deposit_credits(seller, config['superlike'], reason="Superlike fortune cookie")
                             result_footer += f" [Superlike +{config['superlike']}{curr}]"
