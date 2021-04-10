@@ -161,7 +161,7 @@ class Fortune(commands.Cog):
                             react, ruser = await self.bot.wait_for("reaction_add",
                                                                    check=lambda m,
                                                                                 u: u == ctx.author and m.message.id == msg.id,
-                                                                   timeout=30)
+                                                                   timeout=15)
                         except asyncio.TimeoutError:
                             em.set_footer(text=result_footer,
                                           icon_url=seller.avatar_url)
