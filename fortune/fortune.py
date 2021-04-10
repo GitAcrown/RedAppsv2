@@ -103,7 +103,7 @@ class Fortune(commands.Cog):
                     key = random.choice(cookies)
                     cookie = config['COOKIES'][key]
 
-                    em = discord.Embed(description=f"🥠 *{cookie['text']}*", color=author.color)
+                    em = discord.Embed(description=f"🥠 {cookie['text']}", color=author.color)
 
                     if 'http' in cookie['text']:
                         scan = re.compile(r'(https?://\S*\.\S*)', re.DOTALL | re.IGNORECASE).findall(cookie['text'])
@@ -115,7 +115,7 @@ class Fortune(commands.Cog):
                             if not name:
                                 name = "URL"
                             txt = cookie['text'].replace(scan[0], f"[[{name}]]({scan[0]})")
-                            em.description = f"🥠 *{txt}*"
+                            em.description = f"🥠 {txt}"
 
                     footer = f"Payé : {config['price']}{curr}"
                     em.set_footer(text=footer)
