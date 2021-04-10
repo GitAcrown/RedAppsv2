@@ -147,7 +147,7 @@ class Fortune(commands.Cog):
                                                       reason="Upvote fortune cookie (repost)")
                         result_footer += f" +{config['rewards'][1]}{curr} ♻️"
 
-                    em.set_footer(text=result_footer + f" | Superlike pour {config['superlike']}{curr} ?",
+                    em.set_footer(text=result_footer + f"\nSuperlike pour {config['superlike']}{curr} ?",
                                   icon_url=seller.avatar_url)
                     await msg.edit(embed=em, mention_author=False)
 
@@ -163,13 +163,16 @@ class Fortune(commands.Cog):
                                                                                 u: u == ctx.author and m.message.id == msg.id,
                                                                    timeout=30)
                         except asyncio.TimeoutError:
+                            em.set_footer(text=result_footer,
+                                          icon_url=seller.avatar_url)
+                            await msg.edit(embed=em, mention_author=False)
                             return await msg.remove_reaction(superlike, self.bot.user)
 
                         if react.emoji == superlike and await finance.enough_credits(ctx.author, config['superlike']):
                             await msg.clear_reactions()
                             await finance.remove_credits(ctx.author, config['superlike'], reason="Tips de superlike fortune cookie")
                             await finance.deposit_credits(seller, config['superlike'], reason="Superlike fortune cookie")
-                            result_footer += f" [Superlike +{config['superlike']}{curr}]"
+                            result_footer += f"\nSuperlike : +{config['superlike']}{curr}"
                             em.set_footer(text=result_footer,
                                           icon_url=seller.avatar_url)
                             await msg.edit(embed=em, mention_author=False)
@@ -178,7 +181,7 @@ class Fortune(commands.Cog):
                             await self.config.member(seller).stats.set(seller_stats)
                         else:
                             await msg.remove_reaction(superlike, self.bot.user)
-                            result_footer += f" [Crédits insuffisants pour Superlike]"
+                            result_footer += f"\nCrédits insuffisants pour Superlike\n"
                             em.set_footer(text=result_footer,
                                           icon_url=seller.avatar_url)
                             await msg.edit(embed=em, mention_author=False)
