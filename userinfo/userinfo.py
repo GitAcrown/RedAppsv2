@@ -188,7 +188,7 @@ class UserInfo(commands.Cog):
         user = user if user else ctx.author
         guild = ctx.guild
 
-        if random.randint(1, 30) == 1:
+        if random.randint(1, 50) == 1:
             return await ctx.send(f"Je sais pas qui c'est {user.name} pourquoi me demander")
 
         if isinstance(user, discord.Member):
