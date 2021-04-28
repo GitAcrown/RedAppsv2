@@ -43,6 +43,8 @@ class Reposts(commands.Cog):
                                         'roles': [],
                                         'links_greedy': [],
                                         'links_lazy': []},
+                         'autodelete': {'greedy': [],
+                                        'lazy': []},
                          'delete_after': False,
                          'cache': {},
 
@@ -144,6 +146,42 @@ class Reposts(commands.Cog):
             await self.config.guild(guild).delete_after.set(False)
             await ctx.send(
                 f"**Délai de suppression retiré** • Les reposts détectés ne seront plus supprimés.")
+ 
+    @_reposts.command()
+    async def autodelete(self, ctx, lien: str = None):
+        """Ajouter/retirer une URL à blacklister
+        
+        Ne rien mettre affiche une liste
+        Mettre * à la fin de l'URL signifie que tous les URL commençant par votre texte seront supprimés automatiquement"""
+        guild = ctx.guild
+        links = await self.config.guild(guild).autodelete()
+        if lien:
+            if '*' in lien:
+                lien = lien.replace('*', '')
+                if lien not in links['lazy']:
+                    links['lazy'].append(lien)
+                    await ctx.send(f"**Lien ajouté** • Les liens commençant par `{lien}` seront automatiquement supprimés.")
+                else:
+                    links['lazy'].remove(lien)
+                    await ctx.send(f"**Lien retiré** • Les liens commençant par `{lien}` ne seront plus automatiquement supprimés.")
+            elif lien in links['greedy']:
+                links['greedy'].remove(lien)
+                await ctx.send(f"**Lien retiré** • Le lien `{lien}` ne sera plus supprimé automatiquement.")
+            elif lien not in links['greedy']:
+                links['greedy'].append(lien)
+                await ctx.send(f"**Lien ajouté** • Le lien `{lien}` sera désormais supprimé automatiquement.")
+            else:
+                await ctx.send(f"**Commande invalide** : réessayez.")
+            await self.config.guild(guild).autodelete.set(links)
+        else:
+            txt = ""
+            for l in links['greedy']:
+                txt += f"- `{l}`\n"
+            for m in links['lazy']:
+                txt += f"- `{m}*`\n"
+            txt = txt if txt else "Aucune autosuppression de lien n'a été configurée"
+            em = discord.Embed(title="Liens à supprimer automatiquement", description=txt)
+            await ctx.send(embed=em)
 
     @_reposts.group(name="whitelist")
     async def reposts_whitelist(self, ctx):
@@ -302,6 +340,7 @@ class Reposts(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.guild:
+            scan = None
             guild = message.guild
             if await self.config.guild(guild).toggled():
                 content = message.content
@@ -334,6 +373,19 @@ class Reposts(commands.Cog):
                                     raise discord.DiscordException(f"Impossible d'ajouter un emoji au message {message.id}")
                         else:
                             await self.config.guild(guild).cache.set_raw(url, value=[r])
+                            
+            autodel = await self.config.guild(guild).autodelete()
+            if autodel['lazy'] or autodel['greedy']:
+                if not scan:
+                    scan = re.compile(r'(https?://\S*\.\S*)', re.DOTALL | re.IGNORECASE).findall(content)
+                if scan:
+                    for url in scan:
+                        if url in autodel['greedy'] or [l for l in autodel['lazy'] if url.startswith(l)]:
+                            try:
+                                await message.delete()
+                            except:
+                                 raise discord.DiscordException(f"Impossible de supprimer le message {message.id}")
+                
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
