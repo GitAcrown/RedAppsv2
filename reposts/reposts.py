@@ -147,7 +147,7 @@ class Reposts(commands.Cog):
             await ctx.send(
                 f"**Délai de suppression retiré** • Les reposts détectés ne seront plus supprimés.")
  
-    @_reposts.command()
+    @commands.command()
     async def autodelete(self, ctx, lien: str = None):
         """Ajouter/retirer une URL à blacklister
         
