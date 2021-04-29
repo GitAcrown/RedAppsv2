@@ -281,6 +281,27 @@ class Canva(commands.Cog):
             new_canva = {'url': url, 'rscale': relative_scale, 'relative_margin_x': margin_x, 'relative_margin_y': margin_y, 'transparency': transparency}
             await self.config.guild(ctx.guild).canvas.set_raw(canva_id, value=new_canva)
         await ctx.send(f"**Canva ajouté** • Vous pouvez désormais l'utiliser avec `;canva {canva_id}`.")
+        
+    @manage_canva.command(name='edit')
+    @commands.bot_has_guild_permissions(manage_messages=True)
+    async def edit_canva(self, ctx, canva_id: str, relative_scale: int = 50, margin_x: int = 0, margin_y: int = 0, transparency: Union[int, float] = 0):
+        """Editer les paramètres initiaux d'un canva
+        
+         __Paramètres initiaux__
+        `relative_scale` = Echelle relative du canva par rapport à la taille de l'image support
+        `margin_x` / `margin_y` = Marges relatives (en %) du canva par rapport à l'image support
+        `transparency` = Pourcentage de transparence du canva (0-100%)
+        
+        Pour modifier l'URL, supprimez le canva et ajoutez-le avec la nouvelle URL"""
+        canva_id = canva_id.lower()
+            
+        canvas = await self.config.guild(ctx.guild).canvas()
+        if canva_id not in canvas:
+            return await ctx.send(f"Aucun canva du nom de `{canva_id}` n'existe sur ce serveur.")
+        
+        new_canva = {'url': canvas[canva_id]['url'], 'rscale': relative_scale, 'relative_margin_x': margin_x, 'relative_margin_y': margin_y, 'transparency': transparency}
+        await self.config.guild(ctx.guild).canvas.set_raw(canva_id, value=new_canva)
+        await ctx.send(f"**Canva édité** • Utilisez-le avec `;canva {canva_id}`.")
 
     @manage_canva.command(name='del', aliases=['delete'])
     @commands.bot_has_guild_permissions(manage_messages=True)
