@@ -124,9 +124,6 @@ class Canva(commands.Cog):
         x = relative_margin_x if relative_margin_x else canvas[canva_id]['relative_margin_x']
         y = relative_margin_y if relative_margin_y else canvas[canva_id]['relative_margin_y']
         
-        if urls.lower() in ('grid', 'calib', 'calibration'):
-            urls = [CALIBRATION_GRID]
-        
         if urls is None:
             urls = await ImageFinder().search_for_images(ctx)
         url = urls[0]
@@ -252,6 +249,14 @@ class Canva(commands.Cog):
             return await ctx.reply("L'image a mis trop de temps à être traitée.", mention_author=False)
         await self.safe_send(ctx, None, file, file_size)
         
+    @manage_canva.command(name='grid')
+    @commands.cooldown(2, 5, commands.BucketType.user)
+    @commands.bot_has_permissions(attach_files=True)
+    async def calibration_canva(self, ctx, canva_id: str, 
+                                relative_scale: int = 50, relative_margin_x: int = 0, relative_margin_y: int = 0, transparency: Union[int, float] = 0):
+        """Applique le canva sur une grille de calibration pour aider au parametrage"""
+        return await ctx.invoke(self.use_canva, canva_id=canva_id, urls=[CALIBRATION_GRID],
+                                relative_scale=relative_scale, relative_margin_x=relative_margin_x, relative_margin_y=relative_margin_y, transparency=transparency)
         
     @manage_canva.command(name='add')
     @commands.bot_has_guild_permissions(manage_messages=True)
