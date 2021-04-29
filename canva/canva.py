@@ -116,10 +116,8 @@ class Canva(commands.Cog):
             return await ctx.reply("**Canva inconnu** • Vérifiez le nom du canva et réessayez.")
         
         mark = canvas[canva_id]['url']
-        x = canvas[canva_id]['margin_x'] + margin_x
-        y = canvas[canva_id]['margin_y'] + margin_y
         transparency = canvas[canva_id]['transparency'] if transparency == 0 else transparency
-        rsize = canvas[canva_id]['rsize'] if relative_size  == 2 else relative_size
+        rsize = canvas[canva_id]['rsize'] if relative_size == 2 else relative_size
         
         if urls is None:
             urls = await ImageFinder().search_for_images(ctx)
@@ -153,7 +151,10 @@ class Canva(commands.Cog):
             wmm.name = "watermark.png"
             if wm_gif:
                 wmm.name = "watermark.gif"
-            
+                
+            with wand.image.Image(file=b) as img:
+                with wand.image.Image(file=wmm) as wm:
+                    wm.transform(resize=f'x{img.height}')
             
         def apply_canva(b, wmm, x, y, transparency, wm_gif=False):
             final = BytesIO()
@@ -166,7 +167,6 @@ class Canva(commands.Cog):
                         final_x = int(new_img.height * (x * 0.01))
                         final_y = int(new_img.width * (y * 0.01))
                         with wand.image.Image(file=wmm) as wm:
-                            wm.resize(int(img.width / rsize), int(img.height / rsize))
                             new_img.watermark(
                                 image=wm, left=final_x, top=final_y, transparency=transparency
                             )
@@ -174,10 +174,6 @@ class Canva(commands.Cog):
 
                 elif is_gif and not wm_gif:
                     logger.debug("L'image de base est un gif")
-                    with wand.image.Image(file=wmm) as wm_mod:
-                        wm_mod.resize(int(img.width / rsize),
-                                      int(img.height / rsize))
-                        
                     wm = wand.image.Image(file=wmm)
                     with wand.image.Image() as new_image:
                         with img.clone() as new_img:
@@ -196,10 +192,6 @@ class Canva(commands.Cog):
 
                 else:
                     logger.debug("Le canva est un gif")
-                    with wand.image.Image(file=wmm) as wm_mod:
-                        wm_mod.resize(int(img.width / rsize),
-                                      int(img.height / rsize))
-                        
                     with wand.image.Image() as new_image:
                         with wand.image.Image(file=wmm) as new_img:
                             for frame in new_img.sequence:
