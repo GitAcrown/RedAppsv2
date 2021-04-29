@@ -97,17 +97,17 @@ class Canva(commands.Cog):
     @commands.group(name='canva', aliases=['canvas'], invoke_without_command=True)
     @commands.guild_only()
     async def manage_canva(self, ctx, canva_id: str, urls: Optional[ImageFinder] = None, 
-                           relative_size: float = 2, margin_x: int = 0, margin_y: int = 0, transparency: Union[int, float] = 0):
+                           relative_scale: int = 50, margin_x: int = 0, margin_y: int = 0, transparency: Union[int, float] = 0):
         """Utilisation et gestion des canvas d'images"""
         if ctx.invoked_subcommand is None:
             return await ctx.invoke(self.use_canva, canva_id=canva_id, urls=urls, 
-                                    relative_size=relative_size, margin_x=margin_x, margin_y=margin_y, transparency=transparency)
+                                    relative_scale=relative_scale, margin_x=margin_x, margin_y=margin_y, transparency=transparency)
 
     @manage_canva.command(name='use')
     @commands.cooldown(2, 10, commands.BucketType.user)
     @commands.bot_has_permissions(attach_files=True)
     async def use_canva(self, ctx, canva_id: str, urls: Optional[ImageFinder] = None,
-                        relative_size: float = 2, margin_x: int = 0, margin_y: int = 0, transparency: Union[int, float] = 0):
+                        relative_scale: int = 50, margin_x: int = 0, margin_y: int = 0, transparency: Union[int, float] = 0):
         """Appliquer un canva pré-enregistré sur l'image
         
         Par défaut utilise la dernière image de l'historique du salon et les paramètres du canva demandé"""
@@ -117,7 +117,7 @@ class Canva(commands.Cog):
         
         mark = canvas[canva_id]['url']
         transparency = canvas[canva_id]['transparency'] if transparency == 0 else transparency
-        rsize = canvas[canva_id]['rsize'] if relative_size == 2 else relative_size
+        rscale = canvas[canva_id]['rscale'] if relative_scale == 50 else relative_scale
         x, y = margin_x, margin_y
         
         if urls is None:
@@ -138,6 +138,10 @@ class Canva(commands.Cog):
                 transparency = 0
             if transparency > 100:
                 transparency = 1
+            if rscale > 100:
+                rscale = 100
+            if rscale < 1:
+                rscale = 1
             b, mime = await self.bytes_download(url)
             if mime not in self.image_mimes + self.gif_mimes and not isinstance(
                 url, discord.Asset
@@ -153,6 +157,8 @@ class Canva(commands.Cog):
             if wm_gif:
                 wmm.name = "watermark.gif"
                 
+            rscale = 1 + (rscale / 100)
+                
             
         def apply_canva(b, wmm, x, y, transparency, wm_gif=False):
             final = BytesIO()
@@ -165,7 +171,7 @@ class Canva(commands.Cog):
                         final_x = int(new_img.height * (x * 0.01))
                         final_y = int(new_img.width * (y * 0.01))
                         with wand.image.Image(file=wmm) as wm:
-                            wm.transform(resize=f"{round(img.height / rsize)}x{round(img.width / rsize)}>")
+                            wm.transform(resize=f"{round(img.height / rscale)}x{round(img.width / rscale)}")
                             new_img.watermark(
                                 image=wm, left=final_x, top=final_y, transparency=transparency
                             )
@@ -174,7 +180,7 @@ class Canva(commands.Cog):
                 elif is_gif and not wm_gif:
                     logger.debug("L'image de base est un gif")
                     with wand.image.Image(file=wmm) as wm_mod:
-                         wm_mod.transform(resize=f"{round(img.height / rsize)}x{round(img.width / rsize)}>")
+                         wm_mod.transform(resize=f"{round(img.height / rscale)}x{round(img.width / rscale)}")
                          
                     wm = wand.image.Image(file=wmm)
                     with wand.image.Image() as new_image:
@@ -194,7 +200,7 @@ class Canva(commands.Cog):
                 else:
                     logger.debug("Le canva est un gif")
                     with wand.image.Image(file=wmm) as wm_mod:
-                         wm_mod.transform(resize=f"{round(img.height / rsize)}x{round(img.width / rsize)}>")
+                         wm_mod.transform(resize=f"{round(img.height / rscale)}x{round(img.width / rscale)}")
                          
                     with wand.image.Image() as new_image:
                         with wand.image.Image(file=wmm) as new_img:
@@ -243,13 +249,13 @@ class Canva(commands.Cog):
     @manage_canva.command(name='add')
     @commands.bot_has_guild_permissions(manage_messages=True)
     async def add_canva(self, ctx, canva_id: str, url: Optional[ImageFinder] = None,
-                        relative_size: float = 2, transparency: Union[int, float] = 0):
+                        relative_scale: int = 50, transparency: Union[int, float] = 0):
         """Ajouter un canva pour l'appliquer sur des images
         
         `url` = Eventuelle URL de l'image (si elle n'a pas été uploadée)
         
         __Paramètres initiaux__
-        `relative_size` = Taille relative (division de la taille de l'image support) du canva
+        `relative_scale` = Echelle relative du canva par rapport à la taille de l'image support
         `margin_x` / `margin_y` = Marges à ajouter par défaut au canva par rapport aux coins de l'image support
         `transparency` = Pourcentage de transparence du canva (0-100%)"""
         if url is None:
@@ -270,7 +276,7 @@ class Canva(commands.Cog):
             # except:
             #     return await ctx.send("**Téléchargement échoué** • Donnez une URL valide ou uploadez-là directement dans Discord.")
             # else:
-            new_canva = {'url': url, 'rsize': relative_size, 'transparency': transparency}
+            new_canva = {'url': url, 'rscale': relative_scale, 'transparency': transparency}
             await self.config.guild(ctx.guild).canvas.set_raw(canva_id, value=new_canva)
         await ctx.send(f"**Canva ajouté** • Vous pouvez désormais l'utiliser avec `;canva {canva_id}`.")
 
