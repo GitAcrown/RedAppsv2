@@ -157,14 +157,14 @@ class Canva(commands.Cog):
         def apply_canva(b, wmm, x, y, transparency, wm_gif=False):
             final = BytesIO()
             
-            # with wand.image.Image(file=b) as imgmod:
-            #     with wand.image.Image(file=wmm) as wmmod:
-            #         wmmod.transform(resize=f'x{imgmod.height / rsize}')
+            with wand.image.Image(file=b) as imgmod:
+                with wand.image.Image(file=wmm) as wmmod:
+                    wmmod.transform(resize=f"x{imgmod.height / rsize}")
             
             with wand.image.Image(file=b) as img:
                 is_gif = len(getattr(img, "sequence")) > 1
                 if not is_gif and not wm_gif:
-                    log.debug("Aucun gif")
+                    logger.debug("Aucun gif")
                     with img.clone() as new_img:
                         new_img.transform(resize="65536@")
                         final_x = int(new_img.height * (x * 0.01))
