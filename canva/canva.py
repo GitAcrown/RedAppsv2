@@ -182,9 +182,10 @@ class Canva(commands.Cog):
                     logger.debug("L'image de base est un gif")
                        
                     with wand.image.Image(file=wmm) as wm:
-                        wm.transform(resize=f"{round(new_img.height * rscale)}x{round(new_img.width * rscale)}")
                         with wand.image.Image() as new_image:
                             with img.clone() as new_img:
+                                wm.transform(
+                                    resize=f"{round(new_img.height * rscale)}x{round(new_img.width * rscale)}")
                                 for frame in new_img.sequence:
                                     frame.transform(resize="65536@")
                                     final_x = int(frame.height * (x * 0.01))
