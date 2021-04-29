@@ -190,7 +190,7 @@ class Canva(commands.Cog):
                                 wm.transform(
                                     resize=f"{round(new_img.height * rscale)}x{round(new_img.width * rscale)}")
                                 for frame in new_img.sequence:
-                                    frame.transform(resize="250000@")
+                                    frame.transform(resize="90000@")
                                     final_x = int(frame.height * (x * 0.01))
                                     final_y = int(frame.width * (y * 0.01))
                                     frame.watermark(
@@ -215,7 +215,7 @@ class Canva(commands.Cog):
                                     else:
                                         clone = clone.convert("gif")
 
-                                    clone.transform(resize="250000@")
+                                    clone.transform(resize="90000@")
                                     final_x = int(
                                         clone.height * (x * 0.01))
                                     final_y = int(clone.width * (y * 0.01))
