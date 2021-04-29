@@ -96,11 +96,11 @@ class Canva(commands.Cog):
     
     @commands.group(name='canva', aliases=['canvas'], invoke_without_command=True)
     @commands.guild_only()
-    async def manage_canva(self, ctx, canva_id: str, url: Optional[ImageFinder] = None, 
+    async def manage_canva(self, ctx, canva_id: str, urls: Optional[ImageFinder] = None, 
                            relative_size: float = 2, margin_x: int = 0, margin_y: int = 0, transparency: Union[int, float] = 0):
         """Utilisation et gestion des canvas d'images"""
         if ctx.invoked_subcommand is None:
-            return await ctx.invoke(self.use_canva, canva_id=canva_id, url=url, 
+            return await ctx.invoke(self.use_canva, canva_id=canva_id, urls=urls, 
                                     relative_size=relative_size, margin_x=margin_x, margin_y=margin_y, transparency=transparency)
 
     @manage_canva.command(name='use')
