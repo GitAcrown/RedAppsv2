@@ -184,8 +184,7 @@ class Canva(commands.Cog):
                         final_y = int(new_img.width * (y * 0.01))
                         with wand.image.Image(file=wmm) as wm:
                             wm.transform(resize=f"{round(new_img.height * rscale)}x{round(new_img.width * rscale)}")
-                            pos = align_wm(
-                                align, new_img.width, new_img.height, wm.width, wm.height)
+                            pos = align_wm(align, final_x, final_y, wm.width, wm.height)
                             new_img.watermark(
                                 image=wm, left=pos[0], top=pos[1], transparency=transparency
                             )
