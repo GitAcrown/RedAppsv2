@@ -118,7 +118,7 @@ class Canva(commands.Cog):
         if canva_id.lower() not in canvas or canva_id.lower():
             return await ctx.reply("**Canva inconnu** • Vérifiez le nom du canva et réessayez.")
         
-        mark = canvas[canva_id]['url'] if canva_id.lower()
+        mark = canvas[canva_id]['url']
         transparency = canvas[canva_id]['transparency'] if transparency == 0 else transparency
         rscale = canvas[canva_id]['rscale'] if relative_scale == 50 else relative_scale
         x = relative_margin_x if relative_margin_x else canvas[canva_id]['relative_margin_x']
