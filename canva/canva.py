@@ -97,17 +97,17 @@ class Canva(commands.Cog):
     @commands.group(name='canva', aliases=['canvas'], invoke_without_command=True)
     @commands.guild_only()
     async def manage_canva(self, ctx, canva_id: str, urls: Optional[ImageFinder] = None, 
-                           relative_scale: Optional[int] = 50, align: Optional[str] = None, margin_x: int = 0, margin_y: int = 0, transparency: Union[int, float] = 0):
+                           relative_scale: int = 50, relative_margin_x: int = 0, relative_margin_y: int = 0, transparency: Union[int, float] = 0):
         """Utilisation et gestion des canvas d'images"""
         if ctx.invoked_subcommand is None:
             return await ctx.invoke(self.use_canva, canva_id=canva_id, urls=urls, 
-                                    relative_scale=relative_scale, margin_x=margin_x, margin_y=margin_y, transparency=transparency)
+                                    relative_scale=relative_scale, relative_margin_x=relative_margin_x, relative_margin_y=relative_margin_y, transparency=transparency)
 
     @manage_canva.command(name='use')
     @commands.cooldown(2, 10, commands.BucketType.user)
     @commands.bot_has_permissions(attach_files=True)
     async def use_canva(self, ctx, canva_id: str, urls: Optional[ImageFinder] = None,
-                        relative_scale: Optional[int] = 50, align: Optional[str] = None, margin_x: int = 0, margin_y: int = 0, transparency: Union[int, float] = 0):
+                        relative_scale: int = 50, relative_margin_x: int = 0, relative_margin_y: int = 0, transparency: Union[int, float] = 0):
         """Appliquer un canva pré-enregistré sur l'image
         
         Par défaut utilise la dernière image de l'historique du salon et les paramètres du canva demandé"""
@@ -118,8 +118,8 @@ class Canva(commands.Cog):
         mark = canvas[canva_id]['url']
         transparency = canvas[canva_id]['transparency'] if transparency == 0 else transparency
         rscale = canvas[canva_id]['rscale'] if relative_scale == 50 else relative_scale
-        align = align if align else canvas[canva_id].get('align', 'top_left')
-        x, y = margin_x, margin_y
+        x = relative_margin_x if relative_margin_x else canvas[canva_id]['relative_margin_x']
+        y = relative_margin_y if relative_margin_y else canvas[canva_id]['relative_margin_y']
         
         if urls is None:
             urls = await ImageFinder().search_for_images(ctx)
@@ -161,17 +161,6 @@ class Canva(commands.Cog):
                 
             rscale = rscale / 100
             
-        def align_wm(align: str, image_x, image_y, wm_x, wm_y):
-            if align.lower() == 'bottom_left':
-                pos = (0, image_y - wm_y)
-            elif align.lower() == 'bottom_right':
-                pos = (image_x - wm_x, image_y - wm_y)
-            elif align.lower() == 'top_right':
-                pos = (image_x - wm_x, 0)
-            else:
-                pos = (0, 0)
-            return pos
-            
         def apply_canva(b, wmm, x, y, transparency, wm_gif=False):
             final = BytesIO()
             with wand.image.Image(file=b) as img:
@@ -184,9 +173,8 @@ class Canva(commands.Cog):
                         final_y = int(new_img.width * (y * 0.01))
                         with wand.image.Image(file=wmm) as wm:
                             wm.transform(resize=f"{round(new_img.width * rscale)}x{round(new_img.height * rscale)}")
-                            pos = align_wm(align, final_y, final_x, wm.width, wm.height)
                             new_img.watermark(
-                                image=wm, left=pos[0], top=pos[1], transparency=transparency
+                                image=wm, left=final_x, top=final_y, transparency=transparency
                             )
                         new_img.save(file=final)
 
@@ -198,7 +186,7 @@ class Canva(commands.Cog):
                         with img.clone() as new_img:
                             
                             with wand.image.Image(file=wmm) as wm_mod:
-                                wm_mod.transform(resize=f"{round(new_img.height / rscale)}x{round(new_img.width / rscale)}")
+                                wm_mod.transform(resize=f"{round(new_img.height * rscale)}x{round(new_img.width * rscale)}")
                                 
                             for frame in new_img.sequence:
                                 frame.transform(resize="65536@")
@@ -219,7 +207,7 @@ class Canva(commands.Cog):
                         with wand.image.Image(file=wmm) as new_img:
                             
                             with wand.image.Image(file=wmm) as wm_mod:
-                                wm_mod.transform(resize=f"{round(new_img.height / rscale)}x{round(new_img.width / rscale)}")
+                                wm_mod.transform(resize=f"{round(new_img.height * rscale)}x{round(new_img.width * rscale)}")
                             
                             for frame in new_img.sequence:
                                 with img.clone() as clone:
@@ -266,14 +254,14 @@ class Canva(commands.Cog):
     @manage_canva.command(name='add')
     @commands.bot_has_guild_permissions(manage_messages=True)
     async def add_canva(self, ctx, canva_id: str, url: Optional[ImageFinder] = None,
-                        relative_scale: Optional[int] = 50, align: str = 'top_left', transparency: Union[int, float] = 0):
+                        relative_scale: int = 50, margin_x: int = 0, margin_y: int = 0, transparency: Union[int, float] = 0):
         """Ajouter un canva pour l'appliquer sur des images
         
         `url` = Eventuelle URL de l'image (si elle n'a pas été uploadée)
         
         __Paramètres initiaux__
         `relative_scale` = Echelle relative du canva par rapport à la taille de l'image support
-        `align` = Alignement du canva par rapport à l'image support (top_left, top_right, bottom_left, bottom_right)
+        `margin_x` / `margin_y` = Marges relatives (en %) du canva par rapport à l'image support
         `transparency` = Pourcentage de transparence du canva (0-100%)"""
         if url is None:
             url = await ImageFinder().search_for_images(ctx)
@@ -293,7 +281,7 @@ class Canva(commands.Cog):
             # except:
             #     return await ctx.send("**Téléchargement échoué** • Donnez une URL valide ou uploadez-là directement dans Discord.")
             # else:
-            new_canva = {'url': url, 'rscale': relative_scale, 'align': 'top_left', 'transparency': transparency}
+            new_canva = {'url': url, 'rscale': relative_scale, 'relative_margin_x': margin_x, 'relative_margin_y': margin_y, 'transparency': transparency}
             await self.config.guild(ctx.guild).canvas.set_raw(canva_id, value=new_canva)
         await ctx.send(f"**Canva ajouté** • Vous pouvez désormais l'utiliser avec `;canva {canva_id}`.")
 
