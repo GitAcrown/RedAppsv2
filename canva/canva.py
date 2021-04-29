@@ -115,7 +115,7 @@ class Canva(commands.Cog):
         
         Par défaut utilise la dernière image de l'historique du salon et les paramètres du canva demandé"""
         canvas = await self.config.guild(ctx.guild).canvas()
-        if canva_id.lower() not in canvas:
+        if canva_id.lower() not in canvas or canva_id.lower() not in ('grid', 'calib', 'calibration'):
             return await ctx.reply("**Canva inconnu** • Vérifiez le nom du canva et réessayez.")
         
         mark = canvas[canva_id]['url'] if canva_id.lower() not in ('grid', 'calib', 'calibration') else CALIBRATION_GRID
