@@ -118,6 +118,7 @@ class Canva(commands.Cog):
         mark = canvas[canva_id]['url']
         transparency = canvas[canva_id]['transparency'] if transparency == 0 else transparency
         rsize = canvas[canva_id]['rsize'] if relative_size == 2 else relative_size
+        x, y = margin_x, margin_y
         
         if urls is None:
             urls = await ImageFinder().search_for_images(ctx)
@@ -239,7 +240,7 @@ class Canva(commands.Cog):
     @manage_canva.command(name='add')
     @commands.bot_has_guild_permissions(manage_messages=True)
     async def add_canva(self, ctx, canva_id: str, url: Optional[ImageFinder] = None,
-                        relative_size: float = 2, margin_x: int = 0, margin_y: int = 0, transparency: Union[int, float] = 0):
+                        relative_size: float = 2, transparency: Union[int, float] = 0):
         """Ajouter un canva pour l'appliquer sur des images
         
         `url` = Eventuelle URL de l'image (si elle n'a pas été uploadée)
@@ -266,7 +267,7 @@ class Canva(commands.Cog):
             # except:
             #     return await ctx.send("**Téléchargement échoué** • Donnez une URL valide ou uploadez-là directement dans Discord.")
             # else:
-            new_canva = {'url': url, 'rsize': relative_size, 'margin_x': margin_x, 'margin_y': margin_y, 'transparency': transparency}
+            new_canva = {'url': url, 'rsize': relative_size, 'transparency': transparency}
             await self.config.guild(ctx.guild).canvas.set_raw(canva_id, value=new_canva)
         await ctx.send(f"**Canva ajouté** • Vous pouvez désormais l'utiliser avec `;canva {canva_id}`.")
 
