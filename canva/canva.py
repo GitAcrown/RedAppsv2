@@ -159,7 +159,7 @@ class Canva(commands.Cog):
             
             with wand.image.Image(file=b) as imgmod:
                 with wand.image.Image(file=wmm) as wmmod:
-                    wmmod.transform(resize=f"x{imgmod.height / rsize}")
+                    wmmod.transform(resize=f"x{round(imgmod.height / rsize)}")
             
             with wand.image.Image(file=b) as img:
                 is_gif = len(getattr(img, "sequence")) > 1
