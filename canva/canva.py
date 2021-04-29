@@ -159,7 +159,7 @@ class Canva(commands.Cog):
             if wm_gif:
                 wmm.name = "watermark.gif"
                 
-            rscale = 1 + (rscale / 100)
+            rscale = rscale / 100
             
         def align_wm(align: str, image_x, image_y, wm_x, wm_y):
             if align.lower() == 'bottom_left':
@@ -183,8 +183,9 @@ class Canva(commands.Cog):
                         final_x = int(new_img.height * (x * 0.01))
                         final_y = int(new_img.width * (y * 0.01))
                         with wand.image.Image(file=wmm) as wm:
-                            wm.transform(resize=f"{round(new_img.height / rscale)}x{round(new_img.width / rscale)}")
-                            pos = align_wm(align, new_img.height, new_img.width, wm.height, wm.width)
+                            wm.transform(resize=f"{round(new_img.height * rscale)}x{round(new_img.width * rscale)}")
+                            pos = align_wm(
+                                align, new_img.width, new_img.height, wm.width, wm.height)
                             new_img.watermark(
                                 image=wm, left=pos[0], top=pos[1], transparency=transparency
                             )
