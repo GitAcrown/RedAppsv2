@@ -201,35 +201,34 @@ class Canva(commands.Cog):
                             new_image.save(file=final)
                 else:
                     logger.debug("Le canva est un gif")
-                    with wand.image.Image(file=wmm) as wm: 
-                        with wand.image.Image() as new_image:
-                            with wand.image.Image(file=wmm) as new_img:
-                                wm.transform(
-                                    resize=f"{round(new_img.height * rscale)}x{round(new_img.width * rscale)}")
-                                
-                                for frame in new_img.sequence:
-                                    with img.clone() as clone:
-                                        if is_gif:
-                                            clone = clone.sequence[0]
-                                        else:
-                                            clone = clone.convert("gif")
+                    with wand.image.Image() as new_image:
+                        with wand.image.Image(file=wmm) as new_img:
+                            new_img.transform(
+                                resize=f"{round(new_img.height * rscale)}x{round(new_img.width * rscale)}")
+                            
+                            for frame in new_img.sequence:
+                                with img.clone() as clone:
+                                    if is_gif:
+                                        clone = clone.sequence[0]
+                                    else:
+                                        clone = clone.convert("gif")
 
-                                        clone.transform(resize="65536@")
-                                        final_x = int(
-                                            clone.height * (x * 0.01))
-                                        final_y = int(clone.width * (y * 0.01))
-                                        clone.watermark(
-                                            image=frame,
-                                            left=final_x,
-                                            top=final_y,
-                                            transparency=transparency,
-                                        )
-                                        new_image.sequence.append(clone)
-                                        new_image.dispose = "background"
-                                        with new_image.sequence[-1] as new_frame:
-                                            new_frame.delay = frame.delay
+                                    clone.transform(resize="65536@")
+                                    final_x = int(
+                                        clone.height * (x * 0.01))
+                                    final_y = int(clone.width * (y * 0.01))
+                                    clone.watermark(
+                                        image=frame,
+                                        left=final_x,
+                                        top=final_y,
+                                        transparency=transparency,
+                                    )
+                                    new_image.sequence.append(clone)
+                                    new_image.dispose = "background"
+                                    with new_image.sequence[-1] as new_frame:
+                                        new_frame.delay = frame.delay
 
-                            new_image.save(file=final)
+                        new_image.save(file=final)
 
             size = final.tell()
             final.seek(0)
