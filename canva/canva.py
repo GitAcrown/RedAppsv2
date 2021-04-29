@@ -171,7 +171,7 @@ class Canva(commands.Cog):
                         final_x = int(new_img.height * (x * 0.01))
                         final_y = int(new_img.width * (y * 0.01))
                         with wand.image.Image(file=wmm) as wm:
-                            wm.transform(resize=f"{round(img.height / rscale)}x{round(img.width / rscale)}")
+                            wm.transform(resize=f"{round(new_img.height / rscale)}x{round(new_img.width / rscale)}")
                             new_img.watermark(
                                 image=wm, left=final_x, top=final_y, transparency=transparency
                             )
@@ -179,12 +179,14 @@ class Canva(commands.Cog):
 
                 elif is_gif and not wm_gif:
                     logger.debug("L'image de base est un gif")
-                    with wand.image.Image(file=wmm) as wm_mod:
-                         wm_mod.transform(resize=f"{round(img.height / rscale)}x{round(img.width / rscale)}")
                          
                     wm = wand.image.Image(file=wmm)
                     with wand.image.Image() as new_image:
                         with img.clone() as new_img:
+                            
+                            with wand.image.Image(file=wmm) as wm_mod:
+                                wm_mod.transform(resize=f"{round(new_img.height / rscale)}x{round(new_img.width / rscale)}")
+                                
                             for frame in new_img.sequence:
                                 frame.transform(resize="65536@")
                                 final_x = int(frame.height * (x * 0.01))
@@ -199,11 +201,13 @@ class Canva(commands.Cog):
                         new_image.save(file=final)
                 else:
                     logger.debug("Le canva est un gif")
-                    with wand.image.Image(file=wmm) as wm_mod:
-                         wm_mod.transform(resize=f"{round(img.height / rscale)}x{round(img.width / rscale)}")
                          
                     with wand.image.Image() as new_image:
                         with wand.image.Image(file=wmm) as new_img:
+                            
+                            with wand.image.Image(file=wmm) as wm_mod:
+                                wm_mod.transform(resize=f"{round(new_img.height / rscale)}x{round(new_img.width / rscale)}")
+                            
                             for frame in new_img.sequence:
                                 with img.clone() as clone:
                                     if is_gif:
