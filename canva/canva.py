@@ -153,7 +153,7 @@ class Canva(commands.Cog):
             wmm, mime = await self.bytes_download(mark)
             wm_gif = mime in self.gif_mimes
             if wmm is False or b is False:
-                await ctx.send(":warning: **Téléchargement du canva échoué...**")
+                await ctx.send(":warning: **Le téléchargement du canva échoué...**")
                 return
             wmm.name = "watermark.png"
             if wm_gif:
@@ -180,26 +180,23 @@ class Canva(commands.Cog):
 
                 elif is_gif and not wm_gif:
                     logger.debug("L'image de base est un gif")
-                         
-                    wm = wand.image.Image(file=wmm)
-                    with wand.image.Image() as new_image:
-                        with img.clone() as new_img:
-                            
-                            with wand.image.Image(file=wmm) as wm_mod:
-                                wm_mod.transform(resize=f"{round(new_img.height * rscale)}x{round(new_img.width * rscale)}")
-                                
-                            for frame in new_img.sequence:
-                                frame.transform(resize="65536@")
-                                final_x = int(frame.height * (x * 0.01))
-                                final_y = int(frame.width * (y * 0.01))
-                                frame.watermark(
-                                    image=wm,
-                                    left=final_x,
-                                    top=final_y,
-                                    transparency=transparency,
-                                )
-                                new_image.sequence.append(frame)
-                        new_image.save(file=final)
+                       
+                    with wand.image.Image(file=wmm) as wm:
+                        wm.transform(resize=f"{round(new_img.height * rscale)}x{round(new_img.width * rscale)}")
+                        with wand.image.Image() as new_image:
+                            with img.clone() as new_img:
+                                for frame in new_img.sequence:
+                                    frame.transform(resize="65536@")
+                                    final_x = int(frame.height * (x * 0.01))
+                                    final_y = int(frame.width * (y * 0.01))
+                                    frame.watermark(
+                                        image=wm,
+                                        left=final_x,
+                                        top=final_y,
+                                        transparency=transparency,
+                                    )
+                                    new_image.sequence.append(frame)
+                            new_image.save(file=final)
                 else:
                     logger.debug("Le canva est un gif")
                          
