@@ -107,7 +107,7 @@ class Canva(commands.Cog):
     @commands.cooldown(2, 10, commands.BucketType.user)
     @commands.bot_has_permissions(attach_files=True)
     async def use_canva(self, ctx, canva_id: str, urls: Optional[ImageFinder] = None,
-                        relative_scale: int = 50, margin_x: int = 0, margin_y: int = 0, transparency: Union[int, float] = 0):
+                        relative_scale: Optional[int] = 50, align: Optional[str] = None, margin_x: int = 0, margin_y: int = 0, transparency: Union[int, float] = 0):
         """Appliquer un canva pré-enregistré sur l'image
         
         Par défaut utilise la dernière image de l'historique du salon et les paramètres du canva demandé"""
@@ -118,6 +118,7 @@ class Canva(commands.Cog):
         mark = canvas[canva_id]['url']
         transparency = canvas[canva_id]['transparency'] if transparency == 0 else transparency
         rscale = canvas[canva_id]['rscale'] if relative_scale == 50 else relative_scale
+        align = align if align else canvas[canva_id].get('align', 'top_left')
         x, y = margin_x, margin_y
         
         if urls is None:
@@ -142,6 +143,7 @@ class Canva(commands.Cog):
                 rscale = 100
             if rscale < 1:
                 rscale = 1
+                
             b, mime = await self.bytes_download(url)
             if mime not in self.image_mimes + self.gif_mimes and not isinstance(
                 url, discord.Asset
@@ -158,7 +160,17 @@ class Canva(commands.Cog):
                 wmm.name = "watermark.gif"
                 
             rscale = 1 + (rscale / 100)
-                
+            
+        def align_wm(align: str, image_x, image_y, wm_x, wm_y):
+            if align.lower() == 'bottom_left':
+                pos = (0, image_y - wm_y)
+            elif align.lower() == 'top_left':
+                pos = (0, 0)
+            elif align.lower() == 'top_right':
+                pos = (image_x - wm_x, 0)
+            else:
+                pos = (image_x - wm_x, image_y - wm_y)
+            return pos   
             
         def apply_canva(b, wmm, x, y, transparency, wm_gif=False):
             final = BytesIO()
@@ -172,8 +184,9 @@ class Canva(commands.Cog):
                         final_y = int(new_img.width * (y * 0.01))
                         with wand.image.Image(file=wmm) as wm:
                             wm.transform(resize=f"{round(new_img.height / rscale)}x{round(new_img.width / rscale)}")
+                            pos = align_wm(align, final_x, final_y, wm.height, wm.width)
                             new_img.watermark(
-                                image=wm, left=final_x, top=final_y, transparency=transparency
+                                image=wm, left=pos[0], top=pos[1], transparency=transparency
                             )
                         new_img.save(file=final)
 
@@ -260,7 +273,7 @@ class Canva(commands.Cog):
         
         __Paramètres initiaux__
         `relative_scale` = Echelle relative du canva par rapport à la taille de l'image support
-        `margin_x` / `margin_y` = Marges à ajouter par défaut au canva par rapport aux coins de l'image support
+        `align` = Alignement du canva par rapport à l'image support (top_left, top_right, bottom_left, bottom_right)
         `transparency` = Pourcentage de transparence du canva (0-100%)"""
         if url is None:
             url = await ImageFinder().search_for_images(ctx)
@@ -280,7 +293,7 @@ class Canva(commands.Cog):
             # except:
             #     return await ctx.send("**Téléchargement échoué** • Donnez une URL valide ou uploadez-là directement dans Discord.")
             # else:
-            new_canva = {'url': url, 'rscale': relative_scale, 'transparency': transparency}
+            new_canva = {'url': url, 'rscale': relative_scale, 'align': 'top_left', 'transparency': transparency}
             await self.config.guild(ctx.guild).canvas.set_raw(canva_id, value=new_canva)
         await ctx.send(f"**Canva ajouté** • Vous pouvez désormais l'utiliser avec `;canva {canva_id}`.")
 
