@@ -157,9 +157,9 @@ class Canva(commands.Cog):
         def apply_canva(b, wmm, x, y, transparency, wm_gif=False):
             final = BytesIO()
             
-            with wand.image.Image(file=b) as imgmod:
-                with wand.image.Image(file=wmm) as wmmod:
-                    wmmod.transform(resize=f'x{imgmod.height / rsize}')
+            # with wand.image.Image(file=b) as imgmod:
+            #     with wand.image.Image(file=wmm) as wmmod:
+            #         wmmod.transform(resize=f'x{imgmod.height / rsize}')
             
             with wand.image.Image(file=b) as img:
                 is_gif = len(getattr(img, "sequence")) > 1
