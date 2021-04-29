@@ -28,6 +28,8 @@ FILES_LINKS = re.compile(
     r"(https?:\/\/[^\"\'\s]*\.(?:png|jpg|jpeg|gif|svg|mp4)(\?size=[0-9]*)?)", flags=re.I
 )
 
+CALIBRATION_GRID = "https://i.imgur.com/ncQpfYp.png"
+
 
 class Canva(commands.Cog):
     """Fusion d'images"""
@@ -116,7 +118,7 @@ class Canva(commands.Cog):
         if canva_id.lower() not in canvas:
             return await ctx.reply("**Canva inconnu** • Vérifiez le nom du canva et réessayez.")
         
-        mark = canvas[canva_id]['url']
+        mark = canvas[canva_id]['url'] if canva_id.lower() not in ('grid', 'calib', 'calibration') else CALIBRATION_GRID
         transparency = canvas[canva_id]['transparency'] if transparency == 0 else transparency
         rscale = canvas[canva_id]['rscale'] if relative_scale == 50 else relative_scale
         x = relative_margin_x if relative_margin_x else canvas[canva_id]['relative_margin_x']
@@ -264,6 +266,9 @@ class Canva(commands.Cog):
             url = await ImageFinder().search_for_images(ctx)
             
         canva_id = canva_id.lower()
+        
+        if canva_id in ("grid", "calibration", "calib"):
+            return await ctx.send(f"Ce nom est réservé pour l'aide à la calibration des images, utilisez-en un autre.")
             
         canvas = await self.config.guild(ctx.guild).canvas()
         if canva_id in canvas:
