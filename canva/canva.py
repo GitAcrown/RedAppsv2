@@ -106,7 +106,7 @@ class Canva(commands.Cog):
     @manage_canva.command(name='use')
     @commands.cooldown(2, 10, commands.BucketType.user)
     @commands.bot_has_permissions(attach_files=True)
-    async def use_canva(self, ctx, canva_id: str, url: Optional[ImageFinder] = None,
+    async def use_canva(self, ctx, canva_id: str, urls: Optional[ImageFinder] = None,
                         relative_size: float = 2, margin_x: int = 0, margin_y: int = 0, transparency: Union[int, float] = 0):
         """Appliquer un canva pré-enregistré sur l'image
         
