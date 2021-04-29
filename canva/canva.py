@@ -17,6 +17,7 @@ import wand
 import wand.color
 import wand.drawing
 from redbot.core import Config, commands, checks
+from redbot.core.utils.chat_formatting import box
 from redbot.core.data_manager import cog_data_path, bundled_data_path
 
 from .converters import ImageFinder
@@ -295,4 +296,30 @@ class Canva(commands.Cog):
         await self.config.guild(ctx.guild).canvas.clear_raw(canva_id)
         await ctx.send(f"**Canva supprimé** • Le canva `{canva_id}` a été supprimé avec succès.")
     
+    @manage_canva.command(name='list', aliases=['show'])
+    async def list_canva(self, ctx, canva_id: str = None):
+        """Liste les canvas disponibles
     
+        Si un identifiant est précisé, renvoie l'image vierge du canva"""
+        canvas = await self.config.guild(ctx.guild).canvas()
+        if canva_id:
+            canva_id = canva_id.lower()
+                
+            if canva_id not in canvas:
+                return await ctx.send(f"Aucun canva du nom de `{canva_id}` n'existe sur ce serveur.")
+            
+            opts = ""
+            for k in canvas[canva_id]:
+                if k == 'url':
+                    continue
+                opts += f"{k}: {canvas[canva_id][k]}\n"
+            em = discord.Embed(title=f"Canva *{canva_id}*")
+            em.add_field(name="Paramètres initiaux (par défaut)", value=box(opts))
+            em.set_image(url=canvas[canva_id]['url'])
+            await ctx.reply(embed=em, mention_author=False)
+        else:
+            txt = ""
+            for canva in canvas:
+                txt += f"- {canva}\n"
+            em = discord.Embed(title=f"Canva disponibles sur *{ctx.guild.name}*", description=box(txt))
+            await ctx.reply(embed=em, mention_author=False)
