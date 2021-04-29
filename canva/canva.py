@@ -153,9 +153,9 @@ class Canva(commands.Cog):
             if wm_gif:
                 wmm.name = "watermark.gif"
                 
-            with wand.image.Image(file=b) as img:
-                with wand.image.Image(file=wmm) as wm:
-                    wm.transform(resize=f'x{img.height}')
+            with wand.image.Image(file=b) as imgmod:
+                with wand.image.Image(file=wmm) as wmmod:
+                    wmmod.transform(resize=f'x{imgmod.height / rsize}')
             
         def apply_canva(b, wmm, x, y, transparency, wm_gif=False):
             final = BytesIO()
@@ -190,7 +190,6 @@ class Canva(commands.Cog):
                                 )
                                 new_image.sequence.append(frame)
                         new_image.save(file=final)
-
                 else:
                     logger.debug("Le canva est un gif")
                     with wand.image.Image() as new_image:
