@@ -166,7 +166,7 @@ class Canva(commands.Cog):
                         final_x = int(new_img.height * (x * 0.01))
                         final_y = int(new_img.width * (y * 0.01))
                         with wand.image.Image(file=wmm) as wm:
-                            wm.resize(img.width / rsize, img.height / rsize)
+                            wm.resize(int(img.width / rsize), int(img.height / rsize))
                             new_img.watermark(
                                 image=wm, left=final_x, top=final_y, transparency=transparency
                             )
@@ -175,7 +175,8 @@ class Canva(commands.Cog):
                 elif is_gif and not wm_gif:
                     logger.debug("L'image de base est un gif")
                     with wand.image.Image(file=wmm) as wm_mod:
-                        wm_mod.resize(img.width / rsize, img.height / rsize)
+                        wm_mod.resize(int(img.width / rsize),
+                                      int(img.height / rsize))
                         
                     wm = wand.image.Image(file=wmm)
                     with wand.image.Image() as new_image:
@@ -196,7 +197,8 @@ class Canva(commands.Cog):
                 else:
                     logger.debug("Le canva est un gif")
                     with wand.image.Image(file=wmm) as wm_mod:
-                        wm_mod.resize(img.width / rsize, img.height / rsize)
+                        wm_mod.resize(int(img.width / rsize),
+                                      int(img.height / rsize))
                         
                     with wand.image.Image() as new_image:
                         with wand.image.Image(file=wmm) as new_img:
