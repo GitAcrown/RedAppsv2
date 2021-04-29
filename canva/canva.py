@@ -184,7 +184,7 @@ class Canva(commands.Cog):
                         final_y = int(new_img.width * (y * 0.01))
                         with wand.image.Image(file=wmm) as wm:
                             wm.transform(resize=f"{round(new_img.height / rscale)}x{round(new_img.width / rscale)}")
-                            pos = align_wm(align, final_x, final_y, wm.height, wm.width)
+                            pos = align_wm(align, new_img.height, new_img.width, wm.height, wm.width)
                             new_img.watermark(
                                 image=wm, left=pos[0], top=pos[1], transparency=transparency
                             )
@@ -266,7 +266,7 @@ class Canva(commands.Cog):
     @manage_canva.command(name='add')
     @commands.bot_has_guild_permissions(manage_messages=True)
     async def add_canva(self, ctx, canva_id: str, url: Optional[ImageFinder] = None,
-                        relative_scale: int = 50, align: str = 'top_left', transparency: Union[int, float] = 0):
+                        relative_scale: Optional[int] = 50, align: str = 'top_left', transparency: Union[int, float] = 0):
         """Ajouter un canva pour l'appliquer sur des images
         
         `url` = Eventuelle URL de l'image (si elle n'a pas été uploadée)
