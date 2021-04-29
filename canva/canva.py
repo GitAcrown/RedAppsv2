@@ -164,13 +164,13 @@ class Canva(commands.Cog):
         def align_wm(align: str, image_x, image_y, wm_x, wm_y):
             if align.lower() == 'bottom_left':
                 pos = (0, image_y - wm_y)
-            elif align.lower() == 'top_left':
-                pos = (0, 0)
+            elif align.lower() == 'bottom_right':
+                pos = (image_x - wm_x, image_y - wm_y)
             elif align.lower() == 'top_right':
                 pos = (image_x - wm_x, 0)
             else:
-                pos = (image_x - wm_x, image_y - wm_y)
-            return pos   
+                pos = (0, 0)
+            return pos
             
         def apply_canva(b, wmm, x, y, transparency, wm_gif=False):
             final = BytesIO()
@@ -266,7 +266,7 @@ class Canva(commands.Cog):
     @manage_canva.command(name='add')
     @commands.bot_has_guild_permissions(manage_messages=True)
     async def add_canva(self, ctx, canva_id: str, url: Optional[ImageFinder] = None,
-                        relative_scale: int = 50, transparency: Union[int, float] = 0):
+                        relative_scale: int = 50, align: str = 'top_left', transparency: Union[int, float] = 0):
         """Ajouter un canva pour l'appliquer sur des images
         
         `url` = Eventuelle URL de l'image (si elle n'a pas été uploadée)
