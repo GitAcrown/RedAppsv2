@@ -156,11 +156,6 @@ class Canva(commands.Cog):
             
         def apply_canva(b, wmm, x, y, transparency, wm_gif=False):
             final = BytesIO()
-            
-            with wand.image.Image(file=b) as imgmod:
-                with wand.image.Image(file=wmm) as wmmod:
-                    wmmod.transform(resize=f"x{round(imgmod.height / rsize)}")
-            
             with wand.image.Image(file=b) as img:
                 is_gif = len(getattr(img, "sequence")) > 1
                 if not is_gif and not wm_gif:
@@ -170,6 +165,7 @@ class Canva(commands.Cog):
                         final_x = int(new_img.height * (x * 0.01))
                         final_y = int(new_img.width * (y * 0.01))
                         with wand.image.Image(file=wmm) as wm:
+                            wm.transform(resize=f"{round(img.height / rsize)}x{round(img.width / rsize)}>")
                             new_img.watermark(
                                 image=wm, left=final_x, top=final_y, transparency=transparency
                             )
@@ -177,6 +173,9 @@ class Canva(commands.Cog):
 
                 elif is_gif and not wm_gif:
                     logger.debug("L'image de base est un gif")
+                    with wand.image.Image(file=wmm) as wm_mod:
+                         wm_mod.transform(resize=f"{round(img.height / rsize)}x{round(img.width / rsize)}>")
+                         
                     wm = wand.image.Image(file=wmm)
                     with wand.image.Image() as new_image:
                         with img.clone() as new_img:
@@ -194,6 +193,9 @@ class Canva(commands.Cog):
                         new_image.save(file=final)
                 else:
                     logger.debug("Le canva est un gif")
+                    with wand.image.Image(file=wmm) as wm_mod:
+                         wm_mod.transform(resize=f"{round(img.height / rsize)}x{round(img.width / rsize)}>")
+                         
                     with wand.image.Image() as new_image:
                         with wand.image.Image(file=wmm) as new_img:
                             for frame in new_img.sequence:
