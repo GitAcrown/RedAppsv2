@@ -1,0 +1,11 @@
+{
+    "author": ["Acrone"],
+	"description": "Simulateur de fortune cookies",
+	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help Cookies` pour voir les commandes disponibles",
+	"short": "Simulateur de fortune cookies",
+	"tags": ["community", "fun", "economy", "games"],
+    "requirements" : [],
+    "required_cogs": {},
+	"type": "COG",
+	"end_user_data_statement": "This cog does not store personal data."
+}
