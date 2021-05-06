@@ -141,26 +141,34 @@ class Cookies(commands.Cog):
             await self.config.member(author).last_cookie.set({'author': cookie_author.id if cookie_author else None, 'text': em.description, 
                                                               'tipped': False, 'timestamp': time.time(), 'cookie_id': cookie_id})
         
-        start_adding_reactions(msg, [like, dislike])
-        try:
-            react, _ = await self.bot.wait_for("reaction_add",
-                                                    check=lambda m,
-                                                                u: u == ctx.author and m.message.id == msg.id,
-                                                    timeout=60)
-        except asyncio.TimeoutError:
-            await msg.clear_reactions()
-        
         rfooter = ""
         if cookie_author:
             rfooter += f"{cookie_author.name}"
-            if react.emoji == like:
-                cookie['score'] *= 2
-                rfooter += f" {config['reward']:+}{currency}"
-                await finance.deposit_credits(cookie_author, config['reward'], reason="Like d'un de vos fortune cookie")
+        else:
+            rfooter += f'Auteur inconnu'
                 
-            elif react.emoji == dislike:
-                cookie['score'] /= 2
-        
+        start_adding_reactions(msg, [like, dislike])
+        try:
+            react, _ = await self.bot.wait_for("reaction_add", check=lambda m, u: u == ctx.author and m.message.id == msg.id,
+                                               timeout=60)
+        except asyncio.TimeoutError:
+            await msg.clear_reactions()
+            await self.config.guild(guild).Cookies.clear_raw(cookie_id)
+            em.set_footer(text=rfooter)
+        else:
+            if cookie_author:
+                if react.emoji == like:
+                    cookie['score'] *= 2
+                    rfooter += f" {config['reward']:+}{currency}"
+                    await finance.deposit_credits(cookie_author, config['reward'], reason="Like d'un de vos fortune cookie")
+                    
+                elif react.emoji == dislike:
+                    cookie['score'] /= 2
+                    
+                em.set_footer(text=rfooter, icon_url=cookie_author.avatar_url)
+            else:
+                em.set_footer(text=rfooter)
+            
             if cookie['posts']:
                 rfooter += ' ♻️'
             cookie['posts'].append(time.time())
@@ -175,14 +183,7 @@ class Cookies(commands.Cog):
                 rfooter += ' ⌛'
                 await self.config.guild(guild).Cookies.clear_raw(cookie_id)
             
-            em.set_footer(text=rfooter, icon_url=cookie_author.avatar_url)
-        else:
-            rfooter += f'Auteur inconnu'
-            await self.config.guild(guild).Cookies.clear_raw(cookie_id)
-            
-            em.set_footer(text=rfooter)
-        
-        await msg.edit(embed=em, mention_author=False)
+        return await msg.edit(embed=em, mention_author=False)
         
     @commands.command(name='cookieadd', aliases=['addf', 'fadd'])
     @commands.guild_only()
