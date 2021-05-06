@@ -225,7 +225,7 @@ class Cookies(commands.Cog):
         except Exception:
             pass
         
-    @commands.command(name='tip')
+    @commands.command(name='tip', aliases=['tips'])
     @commands.guild_only()
     async def tip_cookie_author(self, ctx, somme: int = None):
         """Permet de donner un tip à l'auteur du dernier cookie acheté
@@ -251,7 +251,7 @@ class Cookies(commands.Cog):
         if not await finance.enough_credits(author, somme):
             return await ctx.send("**Solde insuffisant** › Vous n'avez pas les moyens de tipper cette somme.")
         
-        if not last_cookie['tipped']:
+        if last_cookie['tipped']:
             return await ctx.send("**Déjà tippé** › Vous ne pouvez pas donner plus d'un seul tip par cookie.")
         
         if last_cookie['author']:
@@ -363,7 +363,7 @@ class Cookies(commands.Cog):
         await self.config.guild(guild).Cookies.set(new_cookies)
         
         if tabl:
-            rem = discord.Embed(title="Cookies signalés", description=box(tabulate(tabl, headers=('ID', 'Texte'))), color=discord.Color.red())
+            rem = discord.Embed(title="Cookies signalés", description="```py\n" + tabulate(tabl, headers=('ID', 'Texte')) + "```"), color=discord.Color.red())
             rem.set_footer(text="Supprimez-en avec ';cookieset delete <ID>'")
             await ctx.send(embed=rem)
         else:
