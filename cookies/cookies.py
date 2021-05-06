@@ -104,12 +104,13 @@ class Cookies(commands.Cog):
         currency = await finance.get_currency(guild)
         
         lc = await self.config.member(author).last_cookie()
-        cooldown = lc['timestamp']
-        if cooldown + config['cooldown'] > time.time():
-            td = humanize_timedelta(seconds=int(
-                (cooldown + config['cooldown']) - time.time()))
-            return await ctx.reply(f"**Cooldown** › Vous devez attendre encore "
-                                   f"*{td}* avant de pouvoir acheter un autre cookie.", mention_author=False)
+        if lc:
+            cooldown = lc['timestamp']
+            if cooldown + config['cooldown'] > time.time():
+                td = humanize_timedelta(seconds=int(
+                    (cooldown + config['cooldown']) - time.time()))
+                return await ctx.reply(f"**Cooldown** › Vous devez attendre encore "
+                                    f"*{td}* avant de pouvoir acheter un autre cookie.", mention_author=False)
         
         if not await finance.enough_credits(author, config['price']):
             return await ctx.reply(f"**Solde insuffisant** › Il vous faut {config['price']}{currency} pour acheter un cookie.", mention_author=False)
@@ -192,7 +193,8 @@ class Cookies(commands.Cog):
         - Vous êtes récompensé lorsqu'un membre like votre cookie
         - Les URL sont formattés automatiquement et les images peuvent s'afficher directement dans l'embed
         - Les cookies expirent automatiquement au bout d'un certain nombre d'apparitions
-        - Un cookie peut être supprimé si son score est trop bas (<= 0.25)"""
+        - Un cookie peut être supprimé si son score est trop bas (<= 0.25)
+        - Vous ne pouvez pas tomber sur vos propres cookies"""
         guild, author = ctx.guild, ctx.author
         config = await self.config.guild(guild).all()
         finance = self.bot.get_cog('Finance')
