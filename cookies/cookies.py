@@ -158,6 +158,7 @@ class Cookies(commands.Cog):
             if cookie_author:
                 em.set_footer(text=rfooter, icon_url=cookie_author.avatar_url)
         else:
+            await msg.clear_reactions()
             if cookie_author:
                 if react.emoji == like:
                     cookie['score'] *= 2
