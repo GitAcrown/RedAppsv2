@@ -166,10 +166,6 @@ class Cookies(commands.Cog):
                     
                 elif react.emoji == dislike:
                     cookie['score'] /= 2
-                    
-                em.set_footer(text=rfooter, icon_url=cookie_author.avatar_url)
-            else:
-                em.set_footer(text=rfooter)
             
             if cookie['posts']:
                 rfooter += ' ♻️'
@@ -184,6 +180,8 @@ class Cookies(commands.Cog):
             if len(cookie['posts']) >= config['cookie_life']:
                 rfooter += ' ⌛'
                 await self.config.guild(guild).Cookies.clear_raw(cookie_id)
+            
+            em.set_footer(text=rfooter, icon_url=cookie_author.avatar_url if cookie_author else None)
             
         return await msg.edit(embed=em, mention_author=False)
         
