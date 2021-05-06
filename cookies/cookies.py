@@ -211,9 +211,9 @@ class Cookies(commands.Cog):
             return await ctx.reply("**Flood** › Votre message comporte trop de répétitions et s'apparente à du flood.", mention_author=False)
         
         all_cookies = [config['Cookies'][c]['text'].lower() for c in config['Cookies']]
-        dist = process.extractOne(texte.lower(), all_cookies, score_cutoff=85)
+        dist = process.extractOne(texte.lower(), all_cookies, score_cutoff=91)
         if dist:
-            return await ctx.reply("**Doublon** › Votre message est trop proche (> 85% de similiarité) avec un cookie déjà présent.", mention_author=False)
+            return await ctx.reply("**Doublon** › Votre message est trop proche (> 90% de similiarité) avec un cookie déjà présent.", mention_author=False)
         
         cookie = {'text': texte, 'author': author.id, 'posts': [], 'score': 1}
         cookie_id = f"{int(time.time())}-{author.id}"
