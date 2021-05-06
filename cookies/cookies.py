@@ -155,6 +155,8 @@ class Cookies(commands.Cog):
             await msg.clear_reactions()
             await self.config.guild(guild).Cookies.clear_raw(cookie_id)
             em.set_footer(text=rfooter)
+            if cookie_author:
+                em.set_footer(text=rfooter, icon_url=cookie_author.avatar_url)
         else:
             if cookie_author:
                 if react.emoji == like:
