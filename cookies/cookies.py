@@ -363,7 +363,7 @@ class Cookies(commands.Cog):
         await self.config.guild(guild).Cookies.set(new_cookies)
         
         if tabl:
-            rem = discord.Embed(title="Cookies signalés", description="```py\n" + tabulate(tabl, headers=('ID', 'Texte')) + "```"), color=discord.Color.red())
+            rem = discord.Embed(title="Cookies signalés", description="```py\n" + tabulate(tabl, headers=('ID', 'Texte')) + "```", color=discord.Color.red())
             rem.set_footer(text="Supprimez-en avec ';cookieset delete <ID>'")
             await ctx.send(embed=rem)
         else:
