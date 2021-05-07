@@ -359,10 +359,10 @@ class Cookies(commands.Cog):
             except:
                 to_del.append(r)
                 
-        new_cookies = cookies
+        new_reports = copy(reports)
         for d in to_del:
-            del new_cookies[d]
-        await self.config.guild(guild).Cookies.set(new_cookies)
+            new_reports.remove(d)
+        await self.config.guild(guild).reports.set(new_reports)
         
         if tabl:
             rem = discord.Embed(title="Cookies signalés", description="```py\n" + tabulate(tabl, headers=('ID', 'Texte')) + "```", color=discord.Color.red())
