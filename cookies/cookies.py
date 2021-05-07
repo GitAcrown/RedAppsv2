@@ -361,7 +361,7 @@ class Cookies(commands.Cog):
                 
         new_cookies = cookies
         for d in to_del:
-            new_cookies.remove(d)
+            del new_cookies[d]
         await self.config.guild(guild).Cookies.set(new_cookies)
         
         if tabl:
