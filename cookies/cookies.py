@@ -359,7 +359,7 @@ class Cookies(commands.Cog):
             except:
                 to_del.append(r)
                 
-        new_reports = copy(reports)
+        new_reports = reports[::]
         for d in to_del:
             new_reports.remove(d)
         await self.config.guild(guild).reports.set(new_reports)
