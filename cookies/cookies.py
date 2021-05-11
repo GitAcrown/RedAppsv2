@@ -121,6 +121,9 @@ class Cookies(commands.Cog):
             cookie_author = guild.get_member(cookie['author'])
             random_member = random.choice(guild.members)
             date, hour = datetime.now().strftime('%d/%m/%Y'), datetime.now().strftime('%H:%M')
+            rdm_ten = random.randint(0, 10)
+            rdm_hundred = random.randint(0, 100)
+            rdm_bool = random.choice(("Vrai", "Faux"))
             
             em = discord.Embed(description=cookie['text'].format(buyer=author, 
                                                                  guild=guild, 
@@ -128,7 +131,10 @@ class Cookies(commands.Cog):
                                                                  cookie_author=cookie_author, 
                                                                  random_member=random_member,
                                                                  date=date,
-                                                                 hour=hour), 
+                                                                 hour=hour,
+                                                                 random_ten=rdm_ten,
+                                                                 random_hundred=rdm_hundred,
+                                                                 random_bool=rdm_bool), 
                                color=author.color)
             em.set_footer(
                 text=f"Vous avez payé {config['price']}{currency}", icon_url='https://i.imgur.com/Lv9E1uL.png')
@@ -217,7 +223,9 @@ class Cookies(commands.Cog):
         *{cookie_author}* = Ref. au créateur du cookie, vous-même donc. ex. {cookie_author.mention} affiche une mention de vous-même
         *{random_member}* = Ref. à un membre aléatoire du serveur
         *{date}* = Date au moment de l'ouverture du cookie au format dd/mm/aaaa
-        *{hour}* = Heure au moment de l'ouverture du cookie au format hh:mm"""
+        *{hour}* = Heure au moment de l'ouverture du cookie au format hh:mm
+        *{random_ten}* / *{random_hundred}* = Affiche un nombre aléatoire entre 0 et 10 / entre 0 et 100
+        *{random_bool}* = Affiche un booléen au hasard (Vrai ou Faux)"""
         guild, author = ctx.guild, ctx.author
         config = await self.config.guild(guild).all()
         finance = self.bot.get_cog('Finance')
