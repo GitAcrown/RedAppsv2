@@ -219,8 +219,8 @@ class Cookies(commands.Cog):
         __Balises__
         Vous pouvez mettre les balises suivantes dans vos cookies pour exploiter les objets renvoyés directement dans le texte
         *{buyer}* = Ref. à l'acheteur du cookie, ex. {buyer.name} remplace la balise par le pseudo de l'acheteur
-        *{guild}* / *{server}* = Ref. au serveur où vous vous trouvez, ex. {guild.name} affiche le nom du serveur
-        *{cookie_author}* = Ref. au créateur du cookie, vous-même donc. ex. {cookie_author.mention} affiche une mention de vous-même
+        *{guild}* / *{server}* = Ref. au serveur où vous vous trouvez
+        *{cookie_author}* = Ref. au créateur du cookie (vous-même)
         *{random_member}* = Ref. à un membre aléatoire du serveur
         *{date}* = Date au moment de l'ouverture du cookie au format dd/mm/aaaa
         *{hour}* = Heure au moment de l'ouverture du cookie au format hh:mm
