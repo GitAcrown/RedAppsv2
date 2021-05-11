@@ -118,8 +118,18 @@ class Cookies(commands.Cog):
         cookie = config['Cookies'][cookie_id]
         async with ctx.typing():
             await finance.remove_credits(author, config['price'], reason="Achat d'un fortune cookie")
+            cookie_author = guild.get_member(cookie['author'])
+            random_member = random.choice(guild.members)
+            date, hour = datetime.strftime('%d/%m/%Y'), datetime.strftime('%H:%M')
             
-            em = discord.Embed(description=cookie['text'], color=author.color)
+            em = discord.Embed(description=cookie['text'].format(buyer=author, 
+                                                                 guild=guild, 
+                                                                 server=guild, 
+                                                                 cookie_author=cookie_author, 
+                                                                 random_member=random_member,
+                                                                 date=date,
+                                                                 hour=hour), 
+                               color=author.color)
             em.set_footer(
                 text=f"Vous avez payé {config['price']}{currency}", icon_url='https://i.imgur.com/Lv9E1uL.png')
             
@@ -135,7 +145,6 @@ class Cookies(commands.Cog):
                     txt = cookie['text'].replace(scan[0], f"[[{name}]]({scan[0]})")
                     em.description = txt
 
-            cookie_author = guild.get_member(cookie['author'])
             msg = await ctx.reply(embed=em, mention_author=False)
             
             await self.config.member(author).last_cookie.set({'author': cookie_author.id if cookie_author else None, 'text': em.description, 
@@ -193,10 +202,19 @@ class Cookies(commands.Cog):
         """Ajouter un nouveau fortune cookie sur ce serveur
         
         - Vous êtes récompensé lorsqu'un membre like votre cookie
-        - Les URL sont formattés automatiquement et les images peuvent s'afficher directement dans l'embed
         - Les cookies expirent automatiquement au bout d'un certain nombre d'apparitions
         - Un cookie peut être supprimé si son score est trop bas (<= 0.25)
-        - Vous ne pouvez pas tomber sur vos propres cookies"""
+        - Vous ne pouvez pas tomber sur vos propres cookies
+        - Les URL sont automatiquement réduites et les images peuvent s'afficher directement dans le cookie
+        
+        __Balises__
+        Vous pouvez mettre les balises suivantes dans vos cookies pour exploiter les objets renvoyés directement dans le texte
+        *{buyer}* = Ref. à l'acheteur du cookie, ex. {buyer.name} remplace la balise par le pseudo de l'acheteur
+        *{guild}* / *{server}* = Ref. au serveur où vous vous trouvez, ex. {guild.name} affiche le nom du serveur
+        *{cookie_author}* = Ref. au créateur du cookie, vous-même donc. ex. {cookie_author.mention} affiche une mention de vous-même
+        *{random_member}* = Ref. à un membre aléatoire du serveur
+        *{date}* = Date au moment de l'ouverture du cookie au format dd/mm/aaaa
+        *{hour}* = Heure au moment de l'ouverture du cookie au format hh:mm"""
         guild, author = ctx.guild, ctx.author
         config = await self.config.guild(guild).all()
         finance = self.bot.get_cog('Finance')
