@@ -89,7 +89,7 @@ class Cookies(commands.Cog):
     
     @commands.command(name='cookie', aliases=['f'])
     @commands.guild_only()
-    @commands.cooldown(1, 30, commands.BucketType.guild)
+    @commands.cooldown(1, 30, commands.BucketType.user)
     async def get_fortune_cookie(self, ctx):
         """Obtenir un fortune cookie aléatoire"""
         guild, author = ctx.guild, ctx.author
@@ -197,7 +197,7 @@ class Cookies(commands.Cog):
         
     @commands.command(name='cookieadd', aliases=['addf', 'fadd'])
     @commands.guild_only()
-    @commands.cooldown(1, 10, commands.BucketType.guild)
+    @commands.cooldown(1, 10, commands.BucketType.user)
     async def add_new_cookie(self, ctx, *, texte: str):
         """Ajouter un nouveau fortune cookie sur ce serveur
         
