@@ -218,14 +218,14 @@ class Cookies(commands.Cog):
         
         __Balises__
         Vous pouvez mettre les balises suivantes dans vos cookies pour exploiter les objets renvoyés directement dans le texte
-        *{buyer}* = Ref. à l'acheteur du cookie, ex. {buyer.name} remplace la balise par le pseudo de l'acheteur
-        *{guild}* / *{server}* = Ref. au serveur où vous vous trouvez
-        *{cookie_author}* = Ref. au créateur du cookie (vous-même)
-        *{random_member}* = Ref. à un membre aléatoire du serveur
+        *{buyer}* = Acheteur du cookie
+        *{guild}* / *{server}* = Serveur où vous êtes
+        *{cookie_author}* = Créateur du cookie (vous-même)
+        *{random_member}* = Membre aléatoire du serveur
         *{date}* = Date au moment de l'ouverture du cookie au format dd/mm/aaaa
         *{hour}* = Heure au moment de l'ouverture du cookie au format hh:mm
-        *{random_ten}* / *{random_hundred}* = Affiche un nombre aléatoire entre 0 et 10 / entre 0 et 100
-        *{random_bool}* = Affiche un booléen au hasard (Vrai ou Faux)"""
+        *{random_ten}* / *{random_hundred}* = Nombre aléatoire entre 0 et 10 / entre 0 et 100
+        *{random_bool}* = Booléen au hasard (Vrai ou Faux)"""
         guild, author = ctx.guild, ctx.author
         config = await self.config.guild(guild).all()
         finance = self.bot.get_cog('Finance')
