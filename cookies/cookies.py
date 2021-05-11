@@ -120,7 +120,7 @@ class Cookies(commands.Cog):
             await finance.remove_credits(author, config['price'], reason="Achat d'un fortune cookie")
             cookie_author = guild.get_member(cookie['author'])
             random_member = random.choice(guild.members)
-            date, hour = datetime.strftime('%d/%m/%Y'), datetime.strftime('%H:%M')
+            date, hour = datetime.now().strftime('%d/%m/%Y'), datetime.now().strftime('%H:%M')
             
             em = discord.Embed(description=cookie['text'].format(buyer=author, 
                                                                  guild=guild, 
