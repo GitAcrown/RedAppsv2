@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import random
 import re
 from copy import copy
 from datetime import datetime, timedelta
@@ -156,3 +157,58 @@ class DevSupport(commands.Cog):
         else:
             await self.config.TicketsChannel.set(channel.id)
             await ctx.send(f"**Fonctionnalité activée** • Les tickets arriveront sur {channel.mention}.")
+
+
+    @commands.group(name="publictest", aliases=['pt'])
+    async def _public_testing(self, ctx):
+        """Ensemble de commandes à tester (Public)"""
+        
+    @commands.command(name='radargame')
+    async def test_radar_minigame(self, ctx):
+        user, guild = ctx.author, ctx.guild
+        arrows = ['➡️', '⬅️', '⬆️', '⬇️', '↗️', '↘️', '↙️', '↖️']
+        goods = random.sample(arrows, k=3)
+        affs = [f"🛰️ {goods[0]} · {goods[1]} · {goods[2]} ☑️",
+                f"· {goods[0]} 🛰️ {goods[1]} · {goods[2]} ☑️",
+                f"· {goods[0]} · {goods[1]} 🛰️ {goods[2]} ☑️",
+                f"· {goods[0]} · {goods[1]} · {goods[2]} ✅"]
+
+        affnb = 0
+        msg = None
+        while affnb < 3:
+            random.shuffle(arrows)
+            em = discord.Embed(description=box(
+                affs[affnb]), color=user.color)
+            em.set_footer(
+                text="› Cliquez sur les bonnes réactions dans l'ordre (5s)")
+            if msg:
+                msg = await ctx.send(embed=em)
+                start_adding_reactions(msg, arrows)
+            else:
+                msg = await msg.edit(embed=em)
+
+            try:
+                react, _ = await self.bot.wait_for("reaction_add", check=lambda m, u: u == ctx.author and m.message.id == msg.id,
+                                                   timeout=5)
+            except asyncio.TimeoutError:
+                em.description = affs[affnb].replace('🛰️', '💥')
+                txt = ["Loupé", "Manqué", "Echec"]
+                nrg = random.randint(4, 8)
+                em.set_footer(
+                    text=f"{random.choice(txt)} › Vous perdez {nrg}x ⚡")
+                return await msg.edit(embed=em)
+
+            if react.emoji == goods[affnb]:
+                affnb += 1
+                continue
+            else:
+                em.description = affs[affnb].replace('🛰️', '💥')
+                txt = ["Loupé", "Manqué", "Echec"]
+                nrg = random.randint(2, 5)
+                em.set_footer(
+                    text=f"{random.choice(txt)} › Vous perdez {nrg}x ⚡")
+                return await msg.edit(embed=em)
+            
+        em = discord.Embed(description=box(affs[affnb]), color=user.color)
+        em.set_footer(text="Vous avez réussi !")
+        await msg.edit(embed=em)
