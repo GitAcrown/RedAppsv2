@@ -180,10 +180,11 @@ class DevSupport(commands.Cog):
         random.shuffle(arrows)
         msg = None
         while affnb < 3:
+            timeout = 5 if affnb > 0 else 7
             em = discord.Embed(description=box(
                 affs[affnb]), color=user.color)
             em.set_footer(
-                text="› Cliquez sur les bonnes réactions dans l'ordre (5s)")
+                text=f"› Cliquez sur les bonnes réactions dans l'ordre ({timeout}s)")
             if not msg:
                 msg = await ctx.send(embed=em)
                 start_adding_reactions(msg, arrows)
@@ -194,7 +195,7 @@ class DevSupport(commands.Cog):
                 react, _ = await self.bot.wait_for("reaction_add", check=lambda m, u: u == ctx.author and m.message.id == msg.id,
                                                    timeout=5)
             except asyncio.TimeoutError:
-                em.description = affs[affnb].replace('🛰️', '💥')
+                em.description = box(affs[affnb].replace('🛰️', '💥'))
                 txt = ["Loupé", "Manqué", "Echec"]
                 nrg = random.randint(4, 8)
                 em.set_footer(
@@ -205,7 +206,7 @@ class DevSupport(commands.Cog):
                 affnb += 1
                 continue
             else:
-                em.description = affs[affnb].replace('🛰️', '💥')
+                em.description = box(affs[affnb].replace('🛰️', '💥'))
                 txt = ["Loupé", "Manqué", "Echec"]
                 nrg = random.randint(2, 5)
                 em.set_footer(
