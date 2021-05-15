@@ -171,10 +171,10 @@ class DevSupport(commands.Cog):
         user, guild = ctx.author, ctx.guild
         arrows = ['➡️', '⬅️', '⬆️', '⬇️', '↗️', '↘️', '↙️', '↖️']
         goods = random.sample(arrows, k=3)
-        affs = [f"🛰️ {goods[0]} · {goods[1]} · {goods[2]} ☑️",
-                f"· {goods[0]} 🛰️ {goods[1]} · {goods[2]} ☑️",
-                f"· {goods[0]} · {goods[1]} 🛰️ {goods[2]} ☑️",
-                f"· {goods[0]} · {goods[1]} · {goods[2]} ✅"]
+        affs = [f"🛰️ {goods[0]} · {goods[1]} · {goods[2]} ✅",
+                f"· {goods[0]} 🛰️ {goods[1]} · {goods[2]} ✅",
+                f"· {goods[0]} · {goods[1]} 🛰️ {goods[2]} ✅",
+                f"· {goods[0]} · {goods[1]} · {goods[2]} 🛰️"]
 
         affnb = 0
         random.shuffle(arrows)
@@ -188,7 +188,7 @@ class DevSupport(commands.Cog):
                 msg = await ctx.send(embed=em)
                 start_adding_reactions(msg, arrows)
             else:
-                msg = await msg.edit(embed=em)
+                await msg.edit(embed=em)
 
             try:
                 react, _ = await self.bot.wait_for("reaction_add", check=lambda m, u: u == ctx.author and m.message.id == msg.id,
