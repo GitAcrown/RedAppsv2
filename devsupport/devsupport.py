@@ -200,6 +200,10 @@ class DevSupport(commands.Cog):
                 nrg = random.randint(4, 8)
                 em.set_footer(
                     text=f"{random.choice(txt)} › Vous perdez {nrg}x ⚡")
+                try:
+                    await msg.clear_reactions()
+                except:
+                    pass
                 return await msg.edit(embed=em)
 
             if react.emoji == goods[affnb]:
@@ -211,8 +215,16 @@ class DevSupport(commands.Cog):
                 nrg = random.randint(2, 5)
                 em.set_footer(
                     text=f"{random.choice(txt)} › Vous perdez {nrg}x ⚡")
+                try:
+                    await msg.clear_reactions()
+                except:
+                    pass
                 return await msg.edit(embed=em)
             
         em = discord.Embed(description=box(affs[affnb]), color=user.color)
         em.set_footer(text="Vous avez réussi !")
+        try:
+            await msg.clear_reactions()
+        except:
+            pass
         await msg.edit(embed=em)
