@@ -163,7 +163,7 @@ class DevSupport(commands.Cog):
     async def _public_testing(self, ctx):
         """Ensemble de commandes à tester (Public)"""
         
-    @commands.command(name='radargame')
+    @_public_testing.command(name='radargame')
     async def test_radar_minigame(self, ctx):
         user, guild = ctx.author, ctx.guild
         arrows = ['➡️', '⬅️', '⬆️', '⬇️', '↗️', '↘️', '↙️', '↖️']
