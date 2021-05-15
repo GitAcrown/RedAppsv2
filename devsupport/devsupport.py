@@ -165,6 +165,9 @@ class DevSupport(commands.Cog):
         
     @_public_testing.command(name='radargame')
     async def test_radar_minigame(self, ctx):
+        """Mini-jeu où on doit faire passer un satellite d'un côté à l'autre
+        
+        Intégration prévue dans le prochain jeu 'Astral'"""
         user, guild = ctx.author, ctx.guild
         arrows = ['➡️', '⬅️', '⬆️', '⬇️', '↗️', '↘️', '↙️', '↖️']
         goods = random.sample(arrows, k=3)
@@ -174,14 +177,14 @@ class DevSupport(commands.Cog):
                 f"· {goods[0]} · {goods[1]} · {goods[2]} ✅"]
 
         affnb = 0
+        random.shuffle(arrows)
         msg = None
         while affnb < 3:
-            random.shuffle(arrows)
             em = discord.Embed(description=box(
                 affs[affnb]), color=user.color)
             em.set_footer(
                 text="› Cliquez sur les bonnes réactions dans l'ordre (5s)")
-            if msg:
+            if not msg:
                 msg = await ctx.send(embed=em)
                 start_adding_reactions(msg, arrows)
             else:
