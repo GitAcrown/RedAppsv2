@@ -38,12 +38,14 @@ class Cookies(commands.Cog):
                          'reward': 10,
                          'cookie_life': 3,
                          'cooldown': 3600,
+                         'free_cooldown': 1800,
                          'cookie_delay': 86400,
                          
                          'report_channel': None,
                          'reports': []}
 
-        default_member = {'last_cookie': {}}
+        default_member = {'last_cookie': {},
+                          'last_free_cookie': 0}
         
         self.config.register_guild(**default_guild)
         self.config.register_member(**default_member)
@@ -111,14 +113,23 @@ class Cookies(commands.Cog):
         like, dislike = '👍', '👎'
         if not cookie_id:
             quote = await self.fetch_inspirobot_quote()
+            fcd = await self.config.member(author).last_free_cookie()
             if not quote:
                 return await ctx.reply("**Réserve vide** › Il n'y a actuellement aucun cookie disponible.\nVous pouvez contribuer à en ajouter avec `;addf` !",
                                     mention_author=False)
-            else:
+                
+            elif fcd + config['free_cooldown'] <= time.time():
                 em = discord.Embed(color=author.color)
                 em.set_image(url=quote)
                 em.set_footer(text="Gratuit · Cookie offert en raison du manque de stock", icon_url=self.bot.user.avatar_url)
+                await self.config.member(author).last_free_cookie.set(time.time())
                 return await ctx.reply(embed=em, mention_author=False)
+            
+            else:
+                td = humanize_timedelta(seconds=int(
+                    (fcd + config['free_cooldown']) - time.time()))
+                return await ctx.reply(f"**Cooldown** › Vous devez attendre encore "
+                                       f"*{td}* avant de pouvoir obtenir un autre cookie (même gratuit).", mention_author=False)
         
         finance = self.bot.get_cog('Finance')
         currency = await finance.get_currency(guild)
@@ -460,6 +471,18 @@ class Cookies(commands.Cog):
         if val >= 0:
             await self.config.guild(guild).cooldown.set(val)
             await ctx.send(f"**Valeur modifiée** • Les fortunes cookies pourront désormais être achetés toutes les {val}s.")
+        else:
+            await ctx.send(f"**Valeur invalide** • La valeur doit être supérieure ou égale à 0s.")
+            
+    @_cookie_settings.command()
+    async def freecooldown(self, ctx, val: int = 1800):
+        """Modifie le temps en secondes entre l'obtention de deux cookies gratuit (manque de stock)
+        
+        Par défaut 30m (1800s)"""
+        guild=ctx.guild
+        if val >= 0:
+            await self.config.guild(guild).free_cooldown.set(val)
+            await ctx.send(f"**Valeur modifiée** • Les cookies gratuits (fillers) pourront désormais être obtenus toutes les {val}s.")
         else:
             await ctx.send(f"**Valeur invalide** • La valeur doit être supérieure ou égale à 0s.")
         
