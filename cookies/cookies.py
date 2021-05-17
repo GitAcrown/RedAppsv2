@@ -116,6 +116,7 @@ class Cookies(commands.Cog):
                                     mention_author=False)
             else:
                 em = discord.Embed(color=author.color)
+                em.set_image(url=quote)
                 em.set_footer(text="Gratuit · Cookie offert en raison du manque de stock", icon_url=self.bot.user.avatar_url)
                 return await ctx.reply(embed=em, mention_author=False)
         
