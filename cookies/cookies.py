@@ -5,6 +5,7 @@ import operator
 import re
 
 import random
+import aiohttp
 import os
 import string
 import time
@@ -46,6 +47,9 @@ class Cookies(commands.Cog):
         
         self.config.register_guild(**default_guild)
         self.config.register_member(**default_member)
+        
+        self.session = aiohttp.ClientSession()
+
 
     async def import_old_data(self):
         """Attention : écrase les données présentes sur le serveur"""
@@ -85,6 +89,15 @@ class Cookies(commands.Cog):
         if weighted:
             return random.choices(list(weighted.keys()), weights=list(weighted.values()), k=1)[0]
         return None
+    
+    async def fetch_inspirobot_quote(self):
+        """Récupère une image quote d'Inspirobot.me"""
+        try:
+            async with self.session.request("GET", "http://inspirobot.me/api?generate=true") as page:
+                pic = await page.text(encoding="utf-8")
+                return pic
+        except Exception as e:
+            return None
                     
     
     @commands.command(name='cookie', aliases=['f'])
@@ -97,8 +110,14 @@ class Cookies(commands.Cog):
         cookie_id = await self.get_random_cookie(guild, [author])
         like, dislike = '👍', '👎'
         if not cookie_id:
-            return await ctx.reply("**Réserve vide** › Il n'y a actuellement aucun cookie disponible.\nVous pouvez contribuer à en ajouter avec `;addf` !",
-                                   mention_author=False)
+            quote = await self.fetch_inspirobot_quote()
+            if not quote:
+                return await ctx.reply("**Réserve vide** › Il n'y a actuellement aucun cookie disponible.\nVous pouvez contribuer à en ajouter avec `;addf` !",
+                                    mention_author=False)
+            else:
+                em = discord.Embed(color=author.color)
+                em.set_footer(text="Gratuit · Cookie offert en raison du manque de stock", icon_url=self.bot.user.avatar_url)
+                return await ctx.reply(embed=em, mention_author=False)
         
         finance = self.bot.get_cog('Finance')
         currency = await finance.get_currency(guild)
@@ -589,3 +608,5 @@ class Cookies(commands.Cog):
         await ctx.send(
             f"**Fortune cookies supprimés** • La liste est désormais vide pour ce serveur.")
     
+    def cog_unload(self):
+        self.bot.loop.create_task(self.session.close())
