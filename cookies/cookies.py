@@ -252,6 +252,65 @@ class Cookies(commands.Cog):
                 em.set_footer(text=rfooter)
             
         return await msg.edit(embed=em, mention_author=False)
+    
+    @commands.command(name="testcookie")
+    async def test_cookie_formating(self, ctx, *, text: str):
+        """Permet de tester le formattage d'un cookie (balises et fonctions)"""
+        guild, author = ctx.guild, ctx.author
+        
+        def special_formatter(string: str):
+            scan = re.compile(r'<([\w:\-|]*)>', re.DOTALL | re.IGNORECASE).findall(string)
+            for b in scan:
+                chunk = f'<{b}>'
+                b, *p = re.split(':|\|', b)
+                
+                if b == 'number':
+                    seuils = [int(i) for i in p[0].split('_')] if p else (0, 10)
+                    string = string.replace(chunk, str(random.randint(*seuils)))
+                    
+                if b == 'member':
+                    mem = random.choice(guild.members)
+                    string = string.replace(chunk, mem.mention)
+                    
+                if b == 'bool':
+                    string = string.replace(chunk, random.choice(('✅', '❎')))
+                    
+            return string
+        
+        cookie_author = '`Auteur du cookie`'
+        random_member = random.choice(guild.members)
+        date, hour = datetime.now().strftime('%d/%m/%Y'), datetime.now().strftime('%H:%M')
+        rdm_ten = random.randint(0, 10)
+        rdm_hundred = random.randint(0, 100)
+        rdm_bool = random.choice(("Vrai", "Faux"))
+        
+        text = special_formatter(text).format(buyer=author,
+                                                        guild=guild,
+                                                        server=guild,
+                                                        cookie_author=cookie_author,
+                                                        random_member=random_member,
+                                                        date=date,
+                                                        hour=hour,
+                                                        random_ten=rdm_ten,
+                                                        random_hundred=rdm_hundred,
+                                                        random_bool=rdm_bool)
+        
+        em = discord.Embed(description=text, color=author.color)
+        
+        if 'http' in text:
+            scan = re.compile(r'(https?://\S*\.\S*)', re.DOTALL | re.IGNORECASE).findall(text)
+            if scan:
+                em.set_image(url=scan[0])
+                name = scan[0].split('/')[-1]
+                if "?" in name:
+                    name = name.split('?')[0]
+                if not name:
+                    name = "URL"
+                txt = text.replace(scan[0], f"[[{name}]]({scan[0]})")
+                em.description = txt
+        
+        em.set_footer(text="Ceci est une démonstration de ce que donnerait votre texte s'il était obtenu par quelqu'un")
+        await ctx.reply(embed=em, mention_author=False)
         
     @commands.command(name='cookieadd', aliases=['addf', 'fadd'])
     @commands.guild_only()
