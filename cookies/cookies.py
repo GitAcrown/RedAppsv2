@@ -135,9 +135,11 @@ class Cookies(commands.Cog):
         currency = await finance.get_currency(guild)
                     
         def special_formatter(string: str):
-            scan = re.compile(r"<([\w:'\-|]*)>", re.DOTALL | re.IGNORECASE).findall(string)
+            scan = re.compile(r"<([\w\s:'\-|]*)>", re.DOTALL | re.IGNORECASE).findall(string)
             for b in scan:
                 chunk = f'<{b}>'
+                if len(chunk) > 200:
+                    continue
                 b, *p = re.split(':|\|', b)
                 b = b.lower()
                 
@@ -291,9 +293,11 @@ class Cookies(commands.Cog):
         original = copy(text)
         
         def special_formatter(string: str):
-            scan = re.compile(r"<([\w:'\-|]*)>", re.DOTALL | re.IGNORECASE).findall(string)
+            scan = re.compile(r"<([\w\s:'\-|]*)>", re.DOTALL | re.IGNORECASE).findall(string)
             for b in scan:
                 chunk = f'<{b}>'
+                if len(chunk) > 200:
+                    continue
                 b, *p = re.split(':|\|', b)
                 b = b.lower()
                 
