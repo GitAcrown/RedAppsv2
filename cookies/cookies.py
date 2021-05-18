@@ -280,6 +280,7 @@ class Cookies(commands.Cog):
         <number|X_Y|n> = Génère un nombre aléatoire entre X et Y
         <member|n> = Génère une mention de membre aléatoire
         <bool|n> = Génère un emoji booléen au hasard
+        <random|A_B_C...> = Choisir une réponse aléatoire parmi les options (délim. par _)
         
         Il est possible d'utiliser `:` à la place de `|`"""
         guild, author = ctx.guild, ctx.author
@@ -290,6 +291,7 @@ class Cookies(commands.Cog):
             for b in scan:
                 chunk = f'<{b}>'
                 b, *p = re.split(':|\|', b)
+                b = b.lower()
                 
                 if b == 'number':
                     seuils = [int(i) for i in p[0].split('_')] if p else (0, 10)
@@ -304,6 +306,10 @@ class Cookies(commands.Cog):
                     
                 if b == 'bool':
                     string = string.replace(chunk, random.choice(('✅', '❎')))
+                    
+                if b == 'random' and p:
+                    c = random.choice(p[0].split('_'))
+                    string = string.replace(chunk, c)
                     
             return string
         
