@@ -278,6 +278,7 @@ class Cookies(commands.Cog):
         
         Il est possible d'utiliser `:` à la place de `|`"""
         guild, author = ctx.guild, ctx.author
+        original = copy(text)
         
         def special_formatter(string: str):
             scan = re.compile(r'<([\w:\-|]*)>', re.DOTALL | re.IGNORECASE).findall(string)
@@ -329,6 +330,8 @@ class Cookies(commands.Cog):
                     name = "URL"
                 txt = text.replace(scan[0], f"[[{name}]]({scan[0]})")
                 em.description = txt
+                
+        em.add_field(name="Texte brut", value=box(original), inline=False)
         
         em.set_footer(text="Ceci est une démonstration de ce que donnerait votre texte s'il était obtenu par quelqu'un")
         await ctx.reply(embed=em, mention_author=False)
