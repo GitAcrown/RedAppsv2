@@ -255,7 +255,26 @@ class Cookies(commands.Cog):
     
     @commands.command(name="testcookie")
     async def test_cookie_formating(self, ctx, *, text: str):
-        """Permet de tester le formattage d'un cookie (balises et fonctions)"""
+        """Permet de tester le formattage d'un cookie (balises et fonctions)
+        
+        __Balises__
+        Vous pouvez mettre les balises suivantes dans vos cookies pour exploiter les objets renvoyés directement dans le texte
+        /!\\ Mettre plusieurs fois la même balise renvoie le même objet !
+        
+        *{buyer}* = Acheteur du cookie
+        *{guild}* / *{server}* = Serveur où vous êtes
+        *{cookie_author}* = Créateur du cookie (vous-même)
+        *{random_member}* = Membre aléatoire du serveur
+        *{date}* = Date au moment de l'ouverture du cookie au format dd/mm/aaaa
+        *{hour}* = Heure au moment de l'ouverture du cookie au format hh:mm
+        *{random_ten}* / *{random_hundred}* = Nombre aléatoire entre 0 et 10 / entre 0 et 100
+        *{random_bool}* = Booléen au hasard (Vrai ou Faux)
+        
+        __Fonctions__
+        n = ID de la fonction si vous comptez en mettre plusieures identiques
+        <number|X_Y|n> = Génère un nombre aléatoire entre X et Y
+        <member|n> = Génère une mention de membre aléatoire
+        <bool|n> = Génère un emoji booléen au hasard"""
         guild, author = ctx.guild, ctx.author
         
         def special_formatter(string: str):
@@ -324,16 +343,7 @@ class Cookies(commands.Cog):
         - Vous ne pouvez pas tomber sur vos propres cookies
         - Les URL sont automatiquement réduites et les images peuvent s'afficher directement dans le cookie
         
-        __Balises__
-        Vous pouvez mettre les balises suivantes dans vos cookies pour exploiter les objets renvoyés directement dans le texte
-        *{buyer}* = Acheteur du cookie
-        *{guild}* / *{server}* = Serveur où vous êtes
-        *{cookie_author}* = Créateur du cookie (vous-même)
-        *{random_member}* = Membre aléatoire du serveur
-        *{date}* = Date au moment de l'ouverture du cookie au format dd/mm/aaaa
-        *{hour}* = Heure au moment de l'ouverture du cookie au format hh:mm
-        *{random_ten}* / *{random_hundred}* = Nombre aléatoire entre 0 et 10 / entre 0 et 100
-        *{random_bool}* = Booléen au hasard (Vrai ou Faux)"""
+        Voir `;help testcookie` pour voir comment utiliser les balises et les fonctions"""
         guild, author = ctx.guild, ctx.author
         config = await self.config.guild(guild).all()
         finance = self.bot.get_cog('Finance')
