@@ -274,7 +274,9 @@ class Cookies(commands.Cog):
         n = ID de la fonction si vous comptez en mettre plusieures identiques
         <number|X_Y|n> = Génère un nombre aléatoire entre X et Y
         <member|n> = Génère une mention de membre aléatoire
-        <bool|n> = Génère un emoji booléen au hasard"""
+        <bool|n> = Génère un emoji booléen au hasard
+        
+        Il est possible d'utiliser `:` à la place de `|`"""
         guild, author = ctx.guild, ctx.author
         
         def special_formatter(string: str):
