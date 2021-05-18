@@ -318,7 +318,7 @@ class Cookies(commands.Cog):
                                                         random_hundred=rdm_hundred,
                                                         random_bool=rdm_bool)
         
-        em = discord.Embed(description=text, color=author.color)
+        em = discord.Embed(description=box(original), color=author.color)
         
         if 'http' in text:
             scan = re.compile(r'(https?://\S*\.\S*)', re.DOTALL | re.IGNORECASE).findall(text)
@@ -332,7 +332,7 @@ class Cookies(commands.Cog):
                 txt = text.replace(scan[0], f"[[{name}]]({scan[0]})")
                 em.description = txt
                 
-        em.add_field(name="Texte brut", value=box(original), inline=False)
+        em.add_field(name="Résultat", value=text, inline=False)
         
         em.set_footer(text="Ceci est une démonstration de ce que donnerait votre texte s'il était obtenu par quelqu'un")
         await ctx.reply(embed=em, mention_author=False)
