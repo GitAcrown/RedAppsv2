@@ -142,7 +142,11 @@ class Cookies(commands.Cog):
                 
                 if b == 'number':
                     seuils = [int(i) for i in p[0].split('_')] if p else (0, 10)
-                    string = string.replace(chunk, str(random.randint(*seuils)))
+                    try:
+                        string = string.replace(
+                            chunk, str(random.randint(*seuils)))
+                    except:
+                        pass
                     
                 if b == 'member':
                     mem = random.choice(guild.members)
@@ -289,7 +293,10 @@ class Cookies(commands.Cog):
                 
                 if b == 'number':
                     seuils = [int(i) for i in p[0].split('_')] if p else (0, 10)
-                    string = string.replace(chunk, str(random.randint(*seuils)))
+                    try:
+                        string = string.replace(chunk, str(random.randint(*seuils)))
+                    except:
+                        pass
                     
                 if b == 'member':
                     mem = random.choice(guild.members)
