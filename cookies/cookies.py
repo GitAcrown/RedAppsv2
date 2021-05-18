@@ -100,7 +100,6 @@ class Cookies(commands.Cog):
                 return pic
         except Exception as e:
             return None
-                    
     
     @commands.command(name='cookie', aliases=['f'])
     @commands.guild_only()
@@ -133,6 +132,25 @@ class Cookies(commands.Cog):
         
         finance = self.bot.get_cog('Finance')
         currency = await finance.get_currency(guild)
+                    
+        def special_formatter(string: str):
+            scan = re.compile(r'<([\w:\-|]*)>', re.DOTALL | re.IGNORECASE).findall(string)
+            for b in scan:
+                chunk = f'<{b}>'
+                b, *p = re.split(':|\|', b)
+                
+                if b == 'number':
+                    seuils = [int(i) for i in p[0].split('_')] if p else (0, 10)
+                    string = string.replace(chunk, str(random.randint(*seuils)))
+                    
+                if b == 'member':
+                    mem = random.choice(guild.members)
+                    string = string.replace(chunk, mem.mention)
+                    
+                if b == 'bool':
+                    string = string.replace(chunk, random.choice(('✅', '❎')))
+                    
+            return string
         
         lc = await self.config.member(author).last_cookie()
         if lc:
@@ -156,17 +174,17 @@ class Cookies(commands.Cog):
             rdm_hundred = random.randint(0, 100)
             rdm_bool = random.choice(("Vrai", "Faux"))
             
-            em = discord.Embed(description=cookie['text'].format(buyer=author, 
-                                                                 guild=guild, 
-                                                                 server=guild, 
-                                                                 cookie_author=cookie_author, 
-                                                                 random_member=random_member,
-                                                                 date=date,
-                                                                 hour=hour,
-                                                                 random_ten=rdm_ten,
-                                                                 random_hundred=rdm_hundred,
-                                                                 random_bool=rdm_bool), 
-                               color=author.color)
+            text = special_formatter(cookie['text']).format(buyer=author,
+                                                            guild=guild,
+                                                            server=guild,
+                                                            cookie_author=cookie_author,
+                                                            random_member=random_member,
+                                                            date=date,
+                                                            hour=hour,
+                                                            random_ten=rdm_ten,
+                                                            random_hundred=rdm_hundred,
+                                                            random_bool=rdm_bool)
+            em = discord.Embed(description=text, color=author.color)
             em.set_footer(
                 text=f"Vous avez payé {config['price']}{currency}", icon_url='https://i.imgur.com/Lv9E1uL.png')
             
@@ -179,7 +197,7 @@ class Cookies(commands.Cog):
                         name = name.split('?')[0]
                     if not name:
                         name = "URL"
-                    txt = cookie['text'].replace(scan[0], f"[[{name}]]({scan[0]})")
+                    txt = text.replace(scan[0], f"[[{name}]]({scan[0]})")
                     em.description = txt
 
             msg = await ctx.reply(embed=em, mention_author=False)
