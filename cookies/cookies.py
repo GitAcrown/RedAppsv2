@@ -139,12 +139,12 @@ class Cookies(commands.Cog):
             for b in scan:
                 chunk = f'<{b}>'
                 b, *p = re.split(':|\|', b)
+                b = b.lower()
                 
                 if b == 'number':
                     seuils = [int(i) for i in p[0].split('_')] if p else (0, 10)
                     try:
-                        string = string.replace(
-                            chunk, str(random.randint(*seuils)))
+                        string = string.replace(chunk, str(random.randint(*seuils)))
                     except:
                         pass
                     
@@ -154,6 +154,10 @@ class Cookies(commands.Cog):
                     
                 if b == 'bool':
                     string = string.replace(chunk, random.choice(('✅', '❎')))
+                    
+                if b == 'random' and p:
+                    c = random.choice(list(p[0].split('_')))
+                    string = string.replace(chunk, c)
                     
             return string
         
