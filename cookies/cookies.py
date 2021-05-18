@@ -308,7 +308,7 @@ class Cookies(commands.Cog):
                     string = string.replace(chunk, random.choice(('✅', '❎')))
                     
                 if b == 'random' and p:
-                    c = random.choice(p[0].split('_'))
+                    c = random.choice(list(p[0].split('_')))
                     string = string.replace(chunk, c)
                     
             return string
