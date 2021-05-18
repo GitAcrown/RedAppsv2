@@ -17,6 +17,7 @@ from redbot.core.data_manager import cog_data_path, bundled_data_path
 from redbot.core.utils.menus import start_adding_reactions, menu, DEFAULT_CONTROLS
 
 from typing import Union, Tuple, List
+from copy import copy
 from redbot.core import Config, commands, checks, errors
 from redbot.core.utils.chat_formatting import box, humanize_number, humanize_timedelta
 from tabulate import tabulate
