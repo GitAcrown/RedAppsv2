@@ -192,8 +192,8 @@ class Community(commands.Cog):
                 reps, stats = polls[p]['reps'], polls[p]['stats']
                 total = sum([len(stats[r]) for r in stats])
                 dispstats = polls[p]['disp_stats']
-                em.description = box("\n".join([f'{reps[p]} › **{p}** ({round(100 * (len(stats[p]) / max(total, 1)), 2)}%)' for p in reps])) if dispstats \
-                    else box("\n".join([f'{reps[p]} › **{p}**' for p in reps]))
+                em.description = "\n".join([f'{reps[p]} › **{p}** ({round(100 * (len(stats[p]) / max(total, 1)), 2)}%)' for p in reps]) if dispstats \
+                    else "\n".join([f'{reps[p]} › **{p}**' for p in reps])
 
                 message = await channel.fetch_message(p)
                 if message:
@@ -254,8 +254,8 @@ class Community(commands.Cog):
                     total = sum([len(stats[r]) for r in stats])
                     dispstats = poll['disp_stats']
                     
-                    em.description = box("\n".join([f'{reps[p]} › **{p}** ({round(100 * (len(stats[p]) / max(total, 1)), 2) or 0}%)' for p in reps])) if dispstats \
-                        else box("\n".join([f'{reps[p]} › **{p}**' for p in reps]))
+                    em.description = "\n".join([f'{reps[p]} › **{p}** ({round(100 * (len(stats[p]) / max(total, 1)), 2) or 0}%)' for p in reps]) if dispstats \
+                        else "\n".join([f'{reps[p]} › **{p}**' for p in reps])
                     
                     await message.edit(embed=em)
                     
