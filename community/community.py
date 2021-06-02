@@ -46,7 +46,7 @@ class Community(commands.Cog):
                     
                     reps, stats = polls[p]['reps'], polls[p]['stats']
                     total = sum([len(stats[r]) for r in stats])
-                    dispstats = polls[p]['dispstats']
+                    dispstats = polls[p]['disp_stats']
                     em.description = box("\n".join([f'{reps[p]} › **{p}** ({round(100 * (stats[p] / total), 2)}%)' for p in reps])) if dispstats \
                         else box("\n".join([f'{reps[p]} › **{p}**' for p in reps]))
                     
@@ -143,7 +143,7 @@ class Community(commands.Cog):
         stats = {i: [] for i in r}
         em.timestamp = datetime.utcnow() + timedelta(minutes=exp)
         em.title = f'`#{poll_id}` · ***{q}***'
-        em.description = box("\n".join([f'{reps[p]} › **{p}** (0%)' for p in reps])) if dispstats else box("\n".join([f'{reps[p]} › **{p}**' for p in reps]))
+        em.description = "\n".join([f'{reps[p]} › **{p}** (0%)' for p in reps]) if dispstats else "\n".join([f'{reps[p]} › **{p}**' for p in reps])
         
         if not anonyme:
             em.set_footer(text=author.name, icon_url=author.avatar_url)
@@ -191,7 +191,7 @@ class Community(commands.Cog):
 
                 reps, stats = polls[p]['reps'], polls[p]['stats']
                 total = sum([len(stats[r]) for r in stats])
-                dispstats = polls[p]['dispstats']
+                dispstats = polls[p]['disp_stats']
                 em.description = box("\n".join([f'{reps[p]} › **{p}** ({round(100 * (stats[p] / total), 2)}%)' for p in reps])) if dispstats \
                     else box("\n".join([f'{reps[p]} › **{p}**' for p in reps]))
 
