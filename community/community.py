@@ -134,7 +134,10 @@ class Community(commands.Cog):
             return await ctx.reply("**Trop de réponses possibles** › Vous ne pouvez mettre que 9 réponses possibles au maximum.", mention_author=False)
         
         polls = await self.config.channel(channel).Polls()
-        poll_id = max([polls[n]['id'] for n in polls]) + 1
+        if polls:
+            poll_id = max([polls[n]['id'] for n in polls]) + 1
+        else:
+            poll_id = 1
         
         reps = {i: emojis[r.index(i)] for i in r}
         stats = {i: [] for i in r}
