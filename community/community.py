@@ -42,7 +42,7 @@ class Community(commands.Cog):
                     channel = self.bot.get_channel(chan)
                     em = discord.Embed().from_dict(polls[p]['embed'])
                     em.timestamp = discord.Embed.Empty
-                    em.set_footer(text=em.footer.text + ' [Terminé]')
+                    em.set_footer(text='Sondage terminé')
                     
                     reps, stats = polls[p]['reps'], polls[p]['stats']
                     total = sum([len(stats[r]) for r in stats])
@@ -187,7 +187,7 @@ class Community(commands.Cog):
                 
                 em = discord.Embed().from_dict(polls[p]['embed'])
                 em.timestamp = discord.Embed.Empty
-                em.set_footer(text=em.footer.text + ' [Terminé]')
+                em.set_footer(text='Sondage terminé')
 
                 reps, stats = polls[p]['reps'], polls[p]['stats']
                 total = sum([len(stats[r]) for r in stats])
@@ -248,7 +248,7 @@ class Community(commands.Cog):
                     
                     em = discord.Embed().from_dict(poll['embed'])
                     em.timestamp = discord.Embed.Empty
-                    em.set_footer(text=em.footer.text + ' [Terminé]')
+                    em.set_footer(text='Sondage terminé')
                     
                     reps, stats = poll['reps'], poll['stats']
                     total = sum([len(stats[r]) for r in stats])
