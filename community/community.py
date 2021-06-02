@@ -233,7 +233,10 @@ class Community(commands.Cog):
                 poll = polls[message.id]
                 
                 if user.id in [i for s in poll['stats'] for i in poll['stats'][s]]:
-                    return
+                    try:
+                        await message.remove_reaction(reaction.emoji, user)
+                    except:
+                        pass
                 
                 is_rep = [e for e in poll['reps'] if poll['reps'][e] == reaction.emoji]
                 if is_rep:
