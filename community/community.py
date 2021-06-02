@@ -202,7 +202,7 @@ class Community(commands.Cog):
                     except Exception:
                         pass
                     else:
-                        await channel.reply(embed=em)
+                        await message.reply(embed=em)
 
                     if polls[p]['pin']:
                         try:
