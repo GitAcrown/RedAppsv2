@@ -232,8 +232,10 @@ class Community(commands.Cog):
         channel = message.channel
         if not user.bot:
             polls = await self.config.channel(channel).Polls()
+            logger.info("Détection reaction Community")
             if polls.get(message.id, False):
                 poll = polls[message.id]
+                logger.info("- Message du poll retrouvé")
                 
                 if user.id in [i for s in poll['stats'] for i in poll['stats'][s]]:
                     try:
@@ -242,7 +244,7 @@ class Community(commands.Cog):
                         pass
                 
                 is_rep = [e for e in poll['reps'] if poll['reps'][e] == reaction.emoji]
-                logger.info(f'{str(is_rep)}')
+                logger.info(f'-- Données : {str(is_rep)}')
                 if is_rep:
                     rep = is_rep[0]
                     poll['stats'][rep].append(user.id)
