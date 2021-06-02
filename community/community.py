@@ -98,7 +98,7 @@ class Community(commands.Cog):
         emcolor = discord.Color.random()
         em = discord.Embed(color=emcolor)
         
-        opts = re.compile(r'-(\w*)(?:\s?([\w:\/\.?=&]*))?', re.DOTALL | re.IGNORECASE).findall(args)
+        opts = re.compile(r'-(\w*)(?:\s?([\w:\/\.?=&\-]*))?', re.DOTALL | re.IGNORECASE).findall(args)
         if opts:
             args = args.split('-')[0]
             for opt, val in opts:
@@ -242,14 +242,12 @@ class Community(commands.Cog):
                         pass
                 
                 is_rep = [e for e in poll['reps'] if poll['reps'][e] == reaction.emoji]
+                logger.info(f'{str(is_rep)}')
                 if is_rep:
                     rep = is_rep[0]
                     poll['stats'][rep].append(user.id)
                     
                     em = discord.Embed().from_dict(poll['embed'])
-                    em.timestamp = discord.Embed.Empty
-                    em.set_footer(text='Sondage terminé')
-                    
                     reps, stats = poll['reps'], poll['stats']
                     total = sum([len(stats[r]) for r in stats])
                     dispstats = poll['disp_stats']
