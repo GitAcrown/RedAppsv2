@@ -46,9 +46,7 @@ class Community(commands.Cog):
                     
                     reps, stats = polls[p]['reps'], polls[p]['stats']
                     total = sum([len(stats[r]) for r in stats])
-                    dispstats = polls[p]['disp_stats']
-                    em.description = box("\n".join([f'{reps[p]} › **{p}** ({round(100 * (len(stats[p]) / max(total, 1)), 2)}%)' for p in reps])) if dispstats \
-                        else box("\n".join([f'{reps[p]} › **{p}**' for p in reps]))
+                    em.description = "\n".join([f'{reps[p]} › **{p}** ({round(100 * (len(stats[p]) / max(total, 1)), 2)}%)' for p in reps])
                     
                     message = await channel.fetch_message(p)
                     if message:
@@ -84,7 +82,7 @@ class Community(commands.Cog):
         `-exp X` = Modifier la durée (en minutes) après lequel le sondage expire (par def. 10m)
         `-image URL` = Ajouter une image au sondage
         `-pin` = Epingler/désépingler auto. le sondage
-        `-nostats` = Désactiver les statistiques en direct
+        `-nostats` = Désactiver les statistiques en direct (elles s'afficheront quand même à la fin)
         `-anonymous` = Ne pas afficher le créateur du sondage"""
         author, channel = ctx.author, ctx.channel
         letters = [u for u in '🇦🇧🇨🇩🇪🇫🇬🇭🇮']
