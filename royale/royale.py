@@ -18,15 +18,14 @@ from redbot.core.data_manager import cog_data_path, bundled_data_path
 from redbot.core.utils.menus import menu, DEFAULT_CONTROLS
 from redbot.core.utils.chat_formatting import box
 from redbot.core.utils.menus import start_adding_reactions
-from tabulate import tabulat
+from tabulate import tabulate
 
 logger = logging.getLogger("red.RedAppsv2.Royale")
 
 ROYALE_FOOTER, ROYALE_ICON, ROYALE_COLOR = 'Royale BETA (`;royale`)', 'https://i.imgur.com/GVHrOHh.png', 0xFFC107
 
 default_cache = {'game_status': 0,
-                 'players': {}
-                 }
+                 'players': {}}
 
 
 class RoyaleError(Exception):
