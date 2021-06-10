@@ -1,0 +1,11 @@
+{
+    "author": ["Acrone"],
+	"description": "Rejoignez l'aventure !",
+	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help Astra` pour voir les commandes disponibles",
+	"short": "Aventure coopérative",
+	"tags": ["community", "fun", "economy", "games"],
+    "requirements" : [],
+    "required_cogs": {},
+	"type": "COG",
+	"end_user_data_statement": "This cog does not store personal data."
+}
