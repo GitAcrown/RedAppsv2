@@ -1,10 +1,12 @@
 {
     "author": ["Acrone"],
-	"description": "Rejoignez l'aventure !",
-	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help Astra` pour voir les commandes disponibles",
-	"short": "Aventure coopérative",
+	"description": "Simulateur avancé de battle royale sur Discord",
+	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help Royale` pour voir les commandes disponibles",
+	"short": "Battle royale sur Discord",
 	"tags": ["community", "fun", "economy", "games"],
-    "requirements" : [],
+    "requirements" : [
+		"tabulate"
+	],
     "required_cogs": {},
 	"type": "COG",
 	"end_user_data_statement": "This cog does not store personal data."

@@ -22,7 +22,7 @@ from tabulate import tabulate
 
 logger = logging.getLogger("red.RedAppsv2.Royale")
 
-ROYALE_FOOTER, ROYALE_ICON, ROYALE_COLOR = 'Royale BETA (`;royale`)', 'https://i.imgur.com/GVHrOHh.png', 0xFFC107
+ROYALE_FOOTER, ROYALE_ICON, ROYALE_COLOR = 'Royale BETA', 'https://i.imgur.com/GVHrOHh.png', 0xFFC107
 
 default_cache = {'game_status': 0,
                  'players': {}}
@@ -115,15 +115,15 @@ class Royale(commands.Cog):
             if not finance.enough_credits(author, sys['joining_fee']):
                 await ctx.reply(f"**Fonds insuffisants** • Vous n'avez pas assez de crédits ({sys['joining_fee']}{creds}) pour jouer.")
             
-            em = discord.Embed(description=f"Pour s'inscrire à cette partie, cliquez sur la réaction ci-dessous.\nL'inscription coûte {sys['joining_fee']}{creds}.",
+            em = discord.Embed(description=f"{author.mention} **a lancé une partie de Royale sur ce salon.**\nPour s'inscrire à cette partie, cliquez sur la réaction ci-dessous.\nL'inscription coûte {sys['joining_fee']}{creds}.",
                                color=ROYALE_COLOR)
-            em.set_footer(text=ROYALE_FOOTER, icon_url=ROYALE_ICON)
+            em.set_footer(text=ROYALE_FOOTER + ' (60s)', icon_url=ROYALE_ICON)
             
             cache['players'] = {}
             plist = await self.wait_for_players(ctx, em, sys['joining_fee'])
             
-            if len(plist) < 6:
-                return await ctx.send("**Nombre de joueurs insuffisants** • Pour lancer une partie il faut minimum 6 joueurs. La partie est donc annulée.")
+            if len(plist) < 2:
+                return await ctx.send("**Nombre de joueurs insuffisants** • Pour lancer une partie il faut minimum 2 joueurs. La partie est donc annulée.")
             
             for m in plist:
                 await finance.remove_credits(m, sys['joining_fee'], reason="Frais d'inscription Royale")
