@@ -47,9 +47,8 @@ class EmojiVote(commands.Cog):
                     await self.config.guild(guild).props_expiration.set(time.time())
                     duration = await self.config.guild(guild).props_duration()
                     
-                    ow = channel.overwrites
-                    for target in [t for t in ow if type(t) in (discord.Member, discord.User)]:
-                        await channel.set_permissions(ow[target], overwrite=None)
+                    for target in [t for t in channel.overwrites if type(t) == discord.Member]:
+                        await channel.set_permissions(target, overwrite=None)
                     
                     em = discord.Embed(title="Nouvelle période de propositions d'emojis", description="Les limites de propositions ont été réinitialisées.\n" \
                                     "N'oubliez pas que vous n'avez le droit qu'à un nombre limité de propositions et qu'elles doivent être réalisées dans des messages distincts.")
@@ -121,10 +120,9 @@ class EmojiVote(commands.Cog):
                                "N'oubliez pas que vous n'avez le droit qu'à un nombre limité de propositions et qu'elles doivent être réalisées dans des messages distincts.")
             em.add_field(name="Fin de la période*", value=box((datetime.now() + timedelta(seconds=duration)).strftime("%d/%m/%Y %H:%M")))
             em.set_footer(text="*Estimation, la période peut terminer avant ou après si un modérateur le décide")
-            
-            ow = channel.overwrites
-            for target in [t for t in ow if type(t) in (discord.Member, discord.User)]:
-                await channel.set_permissions(ow[target], overwrite=None)
+        
+            for target in [t for t in channel.overwrites if type(t) == discord.Member]:
+                await channel.set_permissions(target, overwrite=None)
             
             await channel.send(embed=em)
         else:
