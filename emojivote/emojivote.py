@@ -173,7 +173,7 @@ class EmojiVote(commands.Cog):
                     pass
                 return message.delete()
             
-            await self.config.guild(guild).props_users(author.id, value=prop_nb + props)
+            await self.config.guild(guild).props_users.set_raw(author.id, value=prop_nb + props)
             if prop_nb + props >= prop_limit and not all([author.permissions_in(channel).manage_messages and setts['mods_immune']]):
                 await channel.set_permissions(author, send_messages=False, reason="Proposition(s) d'emoji réalisée(s)")
             
