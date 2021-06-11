@@ -1,0 +1,11 @@
+{
+    "author": ["Acrone"],
+	"description": "Faire d'un salon un endroit pour voter les futurs émojis du serveur",
+	"install_msg": "Merci d'avoir installé ce module. Consultez `[p]help EmojiVote` pour voir les commandes disponibles",
+	"short": "Salon de vote d'emojis",
+	"tags": ["community", "fun"],
+    "requirements" : [],
+    "required_cogs": {},
+	"type": "COG",
+	"end_user_data_statement": "This cog does not store personal data."
+}
