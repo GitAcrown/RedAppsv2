@@ -61,7 +61,7 @@ class Royale(commands.Cog):
         
     def get_cache(self, channel: discord.TextChannel) -> dict:
         if channel.id not in self.cache:
-            self.cache[channel.id] = default_cache
+            self.cache[channel.id] = copy(default_cache)
         return self.cache[channel.id]
     
     async def wait_for_players(self, ctx, embed: discord.Embed, price: int = 0):
@@ -130,11 +130,11 @@ class Royale(commands.Cog):
                 cache['players'][m.id] = {}
             
             cache['game_status'] = 1
-            debem = discord.Embed(description="La partie va débuter dans peu de temps.\nVoici ci-dessous les participants, que le meilleur gagne !",
+            debem = discord.Embed(description="**La partie va débuter dans quelques instants.**\nVoici ci-dessous les participants, que le meilleur gagne !",
                                   color=ROYALE_COLOR)
             txt = " | ".join([m.mention for m in plist])
             debem.add_field(name="Participants", value=txt)
-            em.set_footer(text=ROYALE_FOOTER, icon_url=ROYALE_ICON)
+            debem.set_footer(text=ROYALE_FOOTER, icon_url=ROYALE_ICON)
             await ctx.send(embed=debem)
         else:
             await ctx.send("**Une partie est déjà en cours** • Veuillez attendre la fin avant d'en lancer un sur ce salon, ou lancez-en une en parallèle sur un autre salon écrit autorisé.")
@@ -160,7 +160,7 @@ class Royale(commands.Cog):
         """Reset le cache de la partie sur un channel défini"""
         channel = channel if channel else ctx.channel
         if channel.id in self.cache:
-            self.cache[channel.id] = default_cache
+            self.cache[channel.id] = copy(default_cache)
         await ctx.send(f"**Reset effectué** • Le reset du cache de Royale sur {channel.mention} a été effectué")
     
     # TRIGGERS ==========================================
