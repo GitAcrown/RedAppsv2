@@ -25,6 +25,7 @@ class EmojiVote(commands.Cog):
 
         default_guild = {'channel': None,
                          'booster_bonus': True,
+                         'mods_immune': True,
                          
                          'props_users': {},
                          'props_expiration': None,
@@ -79,6 +80,16 @@ class EmojiVote(commands.Cog):
         else:
             await self.config.guild(ctx.guild).channel.clear()
             await ctx.send("**Proposition d'emojis désactivé** • Aucun channel n'est désormais dédié à cette fonctionnalité")
+            
+    @emojivote_settings.command(name="immunemods")
+    async def mods_immune(self, ctx):
+        """Activer/désactiver l'immunité des modérateurs à la suppression/mute (permissions `manage_messages` nécessaire)"""
+        current = await self.config.guild(ctx.guild).mods_immune()
+        if current is True:
+            await ctx.send("**Désactivé** • Les modérateurs ne sont plus immunisés dans le salon de propositions/vote")
+        else:
+            await ctx.send("**Activé** • Les modérateurs sont immunisés à la suppression de propositions supperflues et au mute de salon")
+        await self.config.guild(ctx.guild).mods_immune.set(not current)
             
     @emojivote_settings.command(name="periode")
     async def props_duration(self, ctx, value: int = 10080):
@@ -140,7 +151,7 @@ class EmojiVote(commands.Cog):
             prop_limit = 1 if not author.premium_since else 2
             props = 0
             
-            if prop_nb >= prop_limit and author.permissions_in(channel).manage_messages is False:
+            if prop_nb >= prop_limit and not all([author.permissions_in(channel).manage_messages and setts['mods_immune']]):
                 errortxt = "‼️ **Limite de propositions atteinte** • Vous ne pouvez pas faire plus de propositions pour la période donnée."
                 if setts['booster_bonus'] and prop_limit > 1:
                     errortxt += "\n💎 Boostez le serveur pour obtenir la possibilité de faire une seconde proposition."
@@ -165,7 +176,7 @@ class EmojiVote(commands.Cog):
                 return message.delete()
             
             await self.config.guild(guild).props_users(author.id, value=prop_nb + props)
-            if prop_nb + props >= prop_limit and author.permissions_in(channel).manage_messages is False:
+            if prop_nb + props >= prop_limit and not all([author.permissions_in(channel).manage_messages and setts['mods_immune']]):
                 await channel.set_permissions(author, send_messages=False, reason="Proposition(s) d'emoji réalisée(s)")
             
             start_adding_reactions(message, ['⬆️','⬇️'])
