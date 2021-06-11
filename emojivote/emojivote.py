@@ -177,5 +177,6 @@ class EmojiVote(commands.Cog):
             if prop_nb + props >= prop_limit and not all([author.permissions_in(channel).manage_messages and setts['mods_immune']]):
                 await channel.set_permissions(author, send_messages=False, reason="Proposition(s) d'emoji réalisée(s)")
             
-            start_adding_reactions(message, ['⬆️','⬇️'])
+            if props:
+                start_adding_reactions(message, ['⬆️','⬇️'])
         
