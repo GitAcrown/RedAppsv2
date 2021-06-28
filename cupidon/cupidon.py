@@ -5,6 +5,7 @@ import discord
 from bs4 import BeautifulSoup
 from redbot.core import commands
 from redbot.core.commands import Cog
+from redbot.core.utils.chat_formatting import box
 
 log = logging.getLogger("red.RedAppsv2.Cupidon")
 
@@ -43,7 +44,7 @@ class Cupidon(Cog):
         description = soup_object.find("div", class_="result__score").get_text()
 
         if description is None:
-            description = f"Dr. {self.bot.user.mention} est occupé..."
+            description = f"Dr. {self.bot.user.name} est occupé..."
         else:
             description = description.strip()
 
@@ -63,12 +64,13 @@ class Cupidon(Cog):
                 emoji = "❤"
             else:
                 emoji = "💔"
-            title = f"Dr. {self.bot.user.mention} dit que la compatibilité entre **{x}** et **{y}** est de : {emoji} {description} {emoji}"
+            title = f"Dr. {self.bot.user.name} dit que la compatibilité entre **{x}** et **{y}** est de : {emoji} {description} {emoji}"
         except (TypeError, ValueError):
-            title = f"Dr. {self.bot.user.mention} a rencontré des problèmes en réalisant son calcul."
+            title = f"Dr. {self.bot.user.name} a rencontré des problèmes en réalisant son calcul."
 
+        text = result_text.replace('Dr. Love', f'Dr. {self.bot.user.name}')
         em = discord.Embed(
-            title=title, description=result_text, color=discord.Color.red(), url=url
+            title=title, description=box(text), color=discord.Color.red(), url=url
         )
         em.set_image(url=f"https://www.lovecalculator.com/{result_image}")
         await ctx.send(embed=em)
