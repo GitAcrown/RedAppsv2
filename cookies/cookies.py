@@ -131,8 +131,8 @@ class Cookies(commands.Cog):
                 return await ctx.reply(f"**Cooldown** › Vous devez attendre encore "
                                        f"*{td}* avant de pouvoir obtenir un autre cookie (même gratuit).", mention_author=False)
         
-        finance = self.bot.get_cog('Finance')
-        currency = await finance.get_currency(guild)
+        eco = self.bot.get_cog('AltEco')
+        currency = await eco.get_currency(guild)
                     
         def special_formatter(string: str):
             scan = re.compile(r"<([\w\s:'\-|]*)>", re.DOTALL | re.IGNORECASE).findall(string)
@@ -172,12 +172,12 @@ class Cookies(commands.Cog):
                 return await ctx.reply(f"**Cooldown** › Vous devez attendre encore "
                                     f"*{td}* avant de pouvoir acheter un autre cookie.", mention_author=False)
         
-        if not await finance.enough_credits(author, config['price']):
+        if not await eco.check_balance(author, config['price']):
             return await ctx.reply(f"**Solde insuffisant** › Il vous faut {config['price']}{currency} pour acheter un cookie.", mention_author=False)
     
         cookie = config['Cookies'][cookie_id]
         async with ctx.typing():
-            await finance.remove_credits(author, config['price'], reason="Achat d'un fortune cookie")
+            await eco.withdraw_credits(author, config['price'], reason="Achat d'un fortune cookie")
             cookie_author = guild.get_member(cookie['author'])
             random_member = random.choice(guild.members)
             date, hour = datetime.now().strftime('%d/%m/%Y'), datetime.now().strftime('%H:%M')
@@ -238,7 +238,7 @@ class Cookies(commands.Cog):
                 if react.emoji == like:
                     cookie['score'] *= 2
                     rfooter += f" {config['reward']:+}{currency}"
-                    await finance.deposit_credits(cookie_author, config['reward'], reason="Like d'un de vos fortune cookie")
+                    await eco.deposit_credits(cookie_author, config['reward'], reason="Like d'un de vos fortune cookie")
                     
                 elif react.emoji == dislike:
                     cookie['score'] /= 2
@@ -373,8 +373,8 @@ class Cookies(commands.Cog):
         Voir `;help testcookie` pour voir comment utiliser les balises et les fonctions"""
         guild, author = ctx.guild, ctx.author
         config = await self.config.guild(guild).all()
-        finance = self.bot.get_cog('Finance')
-        curr = await finance.get_currency(guild)
+        eco = self.bot.get_cog('AltEco')
+        curr = await eco.get_currency(guild)
         
         if len(texte) < 10 or len(texte) > 1000:
             return await ctx.reply("**Longueur invalide** › Le message du cookie doit faire entre 10 et 1000 caractères, liens compris.", mention_author=False)
@@ -412,8 +412,8 @@ class Cookies(commands.Cog):
             somme = await self.config.guild(guild).reward() if await self.config.guild(guild).reward() > 0 else 1
             
         last_cookie = await self.config.member(author).last_cookie()
-        finance = self.bot.get_cog('Finance')
-        currency = await finance.get_currency(guild)
+        eco = self.bot.get_cog('AltEco')
+        currency = await eco.get_currency(guild)
         confirm, cancel = self.bot.get_emoji(
             812451214037221439), self.bot.get_emoji(812451214179434551)
         
@@ -424,7 +424,7 @@ class Cookies(commands.Cog):
         if somme <= 0 or somme > cookie_price:
             return await ctx.send(f"**Valeur invalide** › Le tip doit être compris entre 1 et la valeur d'achat ({cookie_price}{currency}).")
         
-        if not await finance.enough_credits(author, somme):
+        if not await eco.check_balance(author, somme):
             return await ctx.send("**Solde insuffisant** › Vous n'avez pas les moyens de tipper cette somme.")
         
         if last_cookie['tipped']:
@@ -449,7 +449,13 @@ class Cookies(commands.Cog):
             if react.emoji == confirm:
                 await msg.clear_reactions()
                 await self.config.member(author).last_cookie.set_raw('tipped', value=True)
-                await finance.transfert_credits(author, lc_author, somme, reason="Tip d'un fortune cookie")
+                try:
+                    await eco.withdraw_credits(author, somme, reason="Tip de fortune cookie")
+                except:
+                    em.set_footer(text=f"Erreur dans l'envoi du tips")
+                    return await msg.edit(embed=em)
+                else:
+                    await eco.deposit_credits(lc_author, somme, reason="Tip reçu pour un fortune cookie")
                 em.set_footer(text=f"Vous avez envoyé {somme}{currency} à {lc_author.name}")
                 return await msg.edit(embed=em, mention_author=False)
             else:
