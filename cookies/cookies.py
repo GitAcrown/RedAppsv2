@@ -131,7 +131,7 @@ class Cookies(commands.Cog):
                 return await ctx.reply(f"**Cooldown** › Vous devez attendre encore "
                                        f"*{td}* avant de pouvoir obtenir un autre cookie (même gratuit).", mention_author=False)
         
-        eco = self.bot.get_cog('AltEco')
+        eco = self.bot.get_cog('XPay')
         currency = await eco.get_currency(guild)
                     
         def special_formatter(string: str):
@@ -373,7 +373,7 @@ class Cookies(commands.Cog):
         Voir `;help testcookie` pour voir comment utiliser les balises et les fonctions"""
         guild, author = ctx.guild, ctx.author
         config = await self.config.guild(guild).all()
-        eco = self.bot.get_cog('AltEco')
+        eco = self.bot.get_cog('XPay')
         curr = await eco.get_currency(guild)
         
         if len(texte) < 10 or len(texte) > 1000:
@@ -412,7 +412,7 @@ class Cookies(commands.Cog):
             somme = await self.config.guild(guild).reward() if await self.config.guild(guild).reward() > 0 else 1
             
         last_cookie = await self.config.member(author).last_cookie()
-        eco = self.bot.get_cog('AltEco')
+        eco = self.bot.get_cog('XPay')
         currency = await eco.get_currency(guild)
         confirm, cancel = self.bot.get_emoji(
             812451214037221439), self.bot.get_emoji(812451214179434551)
